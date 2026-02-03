@@ -16,6 +16,26 @@ class AuthProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
+  // --- [FIX] Thêm hàm kiểm tra đăng nhập tự động ---
+  Future<bool> tryAutoLogin() async {
+    final token = await _authService.getToken();
+    if (token == null) {
+      return false; 
+    }
+    
+    // Ở đây bạn có thể gọi API getUserProfile để lấy thông tin user mới nhất
+    // Tạm thời mình sẽ giả lập user đã login thành công để vào app
+    // Trong thực tế nên gọi: _user = await _authService.getUserProfile(token);
+    
+    // Tạo user giả tạm thời để app hiểu là đã login (vì mình chỉ mới save token)
+    // Cải thiện sau: Lưu toàn bộ info user xuống local storage
+    _user = User(fullName: "User", email: "", role: "Student", token: token); 
+    
+    notifyListeners();
+    return true;
+  }
+  // ------------------------------------------------
+
   // Hàm xử lý đăng nhập (Được gọi từ UI)
   Future<bool> login(String email, String password) async {
     // 1. Bắt đầu loading, reset lỗi

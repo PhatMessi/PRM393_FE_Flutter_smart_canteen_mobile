@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/menu_item.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
-import 'cart_screen.dart';
+import 'cart_screen.dart'; 
+import '../utils/image_helper.dart'; // [FIX] Import image helper
 
 // Định nghĩa màu xanh giống trong hình thiết kế
 const Color kPrimaryColor = Color(0xFF2ED162); // Màu xanh lá sáng
@@ -96,20 +97,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   // Widget hiển thị ảnh Header
   Widget _buildHeaderImage(BuildContext context) {
-    return Container(
+    return SizedBox( // Dùng SizedBox thay Container
       height: 300,
       width: double.infinity,
-      color: Colors.grey[300], // Màu nền tạm khi chưa load ảnh
-      child: widget.menuItem.imageUrl != null && widget.menuItem.imageUrl!.isNotEmpty
-          ? Image.network(
-              widget.menuItem.imageUrl!.startsWith("http") 
-                  ? widget.menuItem.imageUrl! 
-                  // Xử lý nếu ảnh local host (cần đổi localhost thành IP máy nếu chạy máy thật)
-                  : "http://10.0.2.2:5000${widget.menuItem.imageUrl}", 
-              fit: BoxFit.cover,
-              errorBuilder: (ctx, _, __) => const Center(child: Icon(Icons.fastfood, size: 50, color: Colors.grey)),
-            )
-          : const Center(child: Icon(Icons.image, size: 80, color: Colors.grey)),
+      child: buildProductImage(
+        widget.menuItem.imageUrl,
+        width: double.infinity,
+        height: 300,
+        fit: BoxFit.cover,
+      ),
     );
   }
 

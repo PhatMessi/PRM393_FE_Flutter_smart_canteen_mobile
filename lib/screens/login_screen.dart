@@ -53,8 +53,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Màu xanh lá chủ đạo lấy từ hình mẫu
-    const Color brandGreen = Color(0xFF00E676);
+    // [FIX] Lấy màu từ Theme chung, không khai báo cứng nữa
+    final primaryColor = Theme.of(context).primaryColor;
     const Color textDark = Color(0xFF1A1A1A);
     const Color textGray = Color(0xFF757575);
 
@@ -96,11 +96,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 5),
                     
-                    const Text(
+                    Text(
                       "Smart Canteen Login",
                       style: TextStyle(
                         fontSize: 16,
-                        color: Color(0xFF588157), // Màu xanh rêu nhạt
+                        color: primaryColor.withOpacity(0.8), // Màu xanh rêu nhạt
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -168,10 +168,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             ? null
                             : () => _handleLogin(context),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: brandGreen,
+                          backgroundColor: primaryColor,
                           foregroundColor: Colors.white,
                           elevation: 5,
-                          shadowColor: brandGreen.withOpacity(0.4),
+                          shadowColor: primaryColor.withOpacity(0.4),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
                           ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart'; // Import Google Fonts
 import 'providers/auth_provider.dart';
-import 'screens/login_screen.dart';
+import 'screens/splash_screen.dart';
 import 'providers/cart_provider.dart';
 import 'providers/order_provider.dart';
 
@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
           ),
           scaffoldBackgroundColor: const Color(0xFFF8F9FA), // Màu nền trắng xám nhẹ
         ),
-        home: const LoginScreen(),
+        home: const SplashScreen(),
       ),
     );
   }

@@ -38,9 +38,11 @@ class Category {
   Category({required this.categoryId, required this.name});
 
   factory Category.fromJson(Map<String, dynamic> json) {
+    // [FIX] Ưu tiên đọc 'CategoryName' vì đó là tên trường trong DB/API
+    // Nếu không có mới thử đọc 'name' hoặc 'Name'
     return Category(
       categoryId: json['categoryId'] ?? json['CategoryId'] ?? 0,
-      name: json['name'] ?? json['Name'] ?? 'All',
+      name: json['CategoryName'] ?? json['categoryName'] ?? json['name'] ?? json['Name'] ?? 'Unknown',
     );
   }
 }

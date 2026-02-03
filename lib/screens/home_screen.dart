@@ -3,9 +3,9 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../services/menu_service.dart';
 import '../models/menu_item.dart';
-import 'login_screen.dart'; 
 import 'product_detail_screen.dart'; // <--- 1. BỔ SUNG IMPORT NÀY
 import '../widgets/custom_bottom_nav_bar.dart';
+import '../utils/image_helper.dart'; // [FIX] Import Helper
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -142,12 +142,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           Positioned.fill(
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(20),
-                              child: Image.network(
-                                "https://img.freepik.com/free-photo/delicious-burger-with-fresh-ingredients_23-2150857908.jpg",
+                              child: Image.asset(
+                                'assets/images/banner.png',
                                 fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return const Center(child: Icon(Icons.broken_image, color: Colors.white, size: 50));
-                                },
+                                errorBuilder: (context, error, stackTrace) =>
+                                    const Center(
+                                        child: Icon(Icons.image_not_supported,
+                                            color: Colors.white, size: 50)),
                               ),
                             ),
                           ),
@@ -255,14 +256,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                         tag: 'product_img_${item.itemId}',
                                         child: ClipRRect(
                                           borderRadius: BorderRadius.circular(15),
-                                          child: Image.network(
-                                            item.imageUrl ?? "", 
-                                            width: 80, height: 80, fit: BoxFit.cover,
-                                            errorBuilder: (ctx, err, stack) => Container(
-                                              width: 80, height: 80, 
-                                              color: Colors.grey[200], 
-                                              child: const Icon(Icons.fastfood, color: Colors.grey)
-                                            ),
+                                          // [FIX] Sử dụng helper để load ảnh local hoặc online
+                                          child: buildProductImage(
+                                            item.imageUrl,
+                                            width: 80, 
+                                            height: 80, 
+                                            fit: BoxFit.cover
                                           ),
                                         ),
                                       ),
