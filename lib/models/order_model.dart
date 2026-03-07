@@ -18,15 +18,23 @@ class OrderModel {
   });
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
+    final orderIdRaw = json['orderId'] ?? json['OrderId'] ?? 0;
+    final orderDateRaw = json['orderDate'] ?? json['OrderDate'];
+    final pickupTimeRaw = json['pickupTime'] ?? json['PickupTime'];
+    final totalPriceRaw = json['totalPrice'] ?? json['TotalPrice'] ?? 0;
+    final statusRaw = json['status'] ?? json['Status'] ?? '';
+    final rejectionReasonRaw = json['rejectionReason'] ?? json['RejectionReason'];
+    final orderItemsRaw = json['orderItems'] ?? json['OrderItems'] ?? const [];
+
     return OrderModel(
-      orderId: json['orderId'],
-      orderDate: DateTime.parse(json['orderDate']),
-      pickupTime: json['pickupTime'] != null ? DateTime.parse(json['pickupTime']) : null,
-      totalPrice: (json['totalPrice'] as num).toDouble(),
-      status: json['status'],
-      rejectionReason: json['rejectionReason'],
-      orderItems: (json['orderItems'] as List)
-          .map((item) => OrderItemModel.fromJson(item))
+      orderId: orderIdRaw is int ? orderIdRaw : int.tryParse(orderIdRaw.toString()) ?? 0,
+      orderDate: DateTime.parse(orderDateRaw?.toString() ?? DateTime.now().toIso8601String()),
+      pickupTime: pickupTimeRaw != null ? DateTime.tryParse(pickupTimeRaw.toString()) : null,
+      totalPrice: (totalPriceRaw as num).toDouble(),
+      status: statusRaw.toString(),
+      rejectionReason: rejectionReasonRaw?.toString(),
+      orderItems: (orderItemsRaw is List ? orderItemsRaw : const [])
+          .map((item) => OrderItemModel.fromJson(item as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -50,16 +58,20 @@ class OrderItemModel {
   });
 
   factory OrderItemModel.fromJson(Map<String, dynamic> json) {
-    // Lưu ý: Key ở đây phải khớp với JSON trả về từ Backend của bạn
-    // Nếu OrderItem backend trả về object MenuItem lồng bên trong thì phải sửa đoạn này.
-    // Code dưới đây giả định OrderItem DTO đã phẳng hóa thông tin món ăn.
+    final idRaw = json['id'] ?? json['orderItemId'] ?? json['OrderItemId'] ?? 0;
+    final quantityRaw = json['quantity'] ?? json['Quantity'] ?? 1;
+    final priceRaw =
+        json['price'] ?? json['Price'] ?? json['priceAtTimeOfOrder'] ?? json['PriceAtTimeOfOrder'] ?? 0;
+    final menuItem = (json['menuItem'] ?? json['MenuItem']) as Map<String, dynamic>?;
+
     return OrderItemModel(
-      id: json['id'] ?? 0, // Fallback nếu null
-      menuItemName: json['menuItemName'] ?? json['menuItem']?['name'] ?? "Unknown Item",
-      imageUrl: json['imageUrl'] ?? json['menuItem']?['imageUrl'],
-      quantity: json['quantity'] ?? 1,
-      price: (json['price'] as num).toDouble(),
-      note: json['note'],
+      id: idRaw is int ? idRaw : int.tryParse(idRaw.toString()) ?? 0,
+      menuItemName: (json['menuItemName'] ?? json['MenuItemName'] ?? menuItem?['name'] ?? menuItem?['Name'] ?? 'Unknown Item')
+          .toString(),
+      imageUrl: (json['imageUrl'] ?? json['ImageUrl'] ?? menuItem?['imageUrl'] ?? menuItem?['ImageUrl'])?.toString(),
+      quantity: quantityRaw is int ? quantityRaw : int.tryParse(quantityRaw.toString()) ?? 1,
+      price: (priceRaw as num).toDouble(),
+      note: (json['note'] ?? json['Note'])?.toString(),
     );
   }
 }

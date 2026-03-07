@@ -4,6 +4,9 @@ import 'package:intl/intl.dart'; // Cần thêm package intl
 import '../providers/order_provider.dart';
 import '../models/order_model.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
+import 'map_screen.dart';
+import '../utils/image_helper.dart';
+import '../utils/money.dart';
 
 class OrderHistoryScreen extends StatefulWidget {
   const OrderHistoryScreen({super.key});
@@ -88,6 +91,17 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           Expanded(
             child: orderProvider.isLoading
                 ? const Center(child: CircularProgressIndicator(color: Color(0xFF2ED162)))
+                : (orderProvider.error != null)
+                    ? Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Text(
+                            orderProvider.error!,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: Colors.grey),
+                          ),
+                        ),
+                      )
                 : displayedOrders.isEmpty
                     ? const Center(child: Text("No orders found"))
                     : ListView.builder(
@@ -119,21 +133,31 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 
     // Logic màu sắc trạng thái giống hình
     switch (order.status) {
-      case "Ready":
+      case "Ready for Pickup":
         statusColor = const Color(0xFF2ED162); // Xanh lá
         statusText = "READY FOR PICKUP";
         break;
-      case "Pending":
       case "Preparing":
         statusColor = Colors.orange; // Vàng
+        statusText = "PREPARING";
         break;
-      case "Rejected":
+      case "Paid":
+        statusColor = Colors.orange;
+        statusText = "PAID";
+        break;
+      case "Pending Payment":
+        statusColor = Colors.orange;
+        statusText = "PENDING PAYMENT";
+        break;
+      case "Cancelled":
         statusColor = Colors.red;
         statusIcon = Icons.error;
+        statusText = "CANCELLED";
         break;
       case "Completed":
         statusColor = Colors.grey;
         statusIcon = Icons.check_circle;
+        statusText = "COMPLETED";
         break;
       default:
         statusColor = Colors.blue;
@@ -166,7 +190,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 ],
               ),
               Text(
-                "#${order.orderId} • ${DateFormat('HH:mm').format(order.orderDate)}",
+                "#${order.orderId} • ${DateFormat('HH:mm').format(order.orderDate.toLocal())}",
                 style: const TextStyle(color: Colors.grey, fontSize: 12),
               ),
             ],
@@ -174,7 +198,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           const SizedBox(height: 12),
 
           // Rejected Reason Box (Chỉ hiện nếu Rejected)
-          if (order.status == "Rejected" && order.rejectionReason != null)
+          if (order.status == "Cancelled" && order.rejectionReason != null)
             Container(
               width: double.infinity,
               margin: const EdgeInsets.only(bottom: 12),
@@ -196,8 +220,18 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: firstItem?.imageUrl != null
-                    ? Image.network(firstItem!.imageUrl!, width: 70, height: 70, fit: BoxFit.cover)
-                    : Container(width: 70, height: 70, color: Colors.grey.shade200, child: const Icon(Icons.fastfood, color: Colors.grey)),
+                    ? buildProductImage(
+                        firstItem!.imageUrl!,
+                        width: 70,
+                        height: 70,
+                        fit: BoxFit.cover,
+                      )
+                    : Container(
+                        width: 70,
+                        height: 70,
+                        color: Colors.grey.shade200,
+                        child: const Icon(Icons.fastfood, color: Colors.grey),
+                      ),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -216,7 +250,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                       style: const TextStyle(color: Colors.grey, fontSize: 13)
                     ),
                     const SizedBox(height: 8),
-                    Text("\$${order.totalPrice.toStringAsFixed(2)}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text(Money.vnd(order.totalPrice), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                   ],
                 ),
               )
@@ -225,11 +259,16 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           const SizedBox(height: 16),
 
           // Action Buttons
-          if (order.status == "Ready")
+          if (order.status == "Ready for Pickup")
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const MapScreen()),
+                  );
+                },
                 icon: const Icon(Icons.location_on, size: 18),
                 label: const Text("Track Order"),
                 style: ElevatedButton.styleFrom(
@@ -240,7 +279,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 ),
               ),
             )
-          else if (order.status == "Pending")
+          else if (order.status == "Pending Payment" || order.status == "Paid")
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(

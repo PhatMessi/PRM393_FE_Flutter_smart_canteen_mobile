@@ -4,8 +4,10 @@ import '../providers/auth_provider.dart';
 import '../services/menu_service.dart';
 import '../models/menu_item.dart';
 import 'product_detail_screen.dart'; // <--- 1. BỔ SUNG IMPORT NÀY
+import 'notifications_screen.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../utils/image_helper.dart'; // [FIX] Import Helper
+import '../utils/money.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -101,10 +103,18 @@ class _HomeScreenState extends State<HomeScreen> {
                             )
                           ],
                         ),
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                          child: const Icon(Icons.notifications_outlined, size: 24),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                            child: const Icon(Icons.notifications_outlined, size: 24),
+                          ),
                         )
                       ],
                     ),
@@ -292,7 +302,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             const SizedBox(height: 5),
                                             const Text("~ 10 mins • 450 kcal", style: TextStyle(color: Colors.grey, fontSize: 12)),
                                             const SizedBox(height: 8),
-                                            Text("\$${item.price.toStringAsFixed(2)}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                                            Text(Money.vnd(item.price), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                                           ],
                                         ),
                                       ),

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 import 'cart_screen.dart'; 
 import '../utils/image_helper.dart'; // [FIX] Import image helper
+import '../utils/money.dart';
 
 // Định nghĩa màu xanh giống trong hình thiết kế
 const Color kPrimaryColor = Color(0xFF2ED162); // Màu xanh lá sáng
@@ -34,8 +35,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   // Quản lý trạng thái chọn Extras (Checkbox)
   // Map lưu tên món thêm và giá tiền
   final Map<String, double> _extrasOptions = {
-    "Extra Cheese": 0.50,
-    "Add Coke Zero": 1.00,
+    "Extra Cheese": 5000,
+    "Add Coke Zero": 10000,
   };
   // List lưu những món đã được check
   final List<String> _selectedExtras = [];
@@ -133,7 +134,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
               ),
               Text(
-                "\$${widget.menuItem.price.toStringAsFixed(2)}",
+                Money.vnd(widget.menuItem.price),
                 style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87),
               ),
             ],
@@ -182,7 +183,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           _buildSectionHeader("Extras", ""),
           ..._extrasOptions.entries.map((entry) => CheckboxListTile(
             title: Text(entry.key),
-            secondary: Text("+\$${entry.value.toStringAsFixed(2)}", 
+            secondary: Text(
+              "+${Money.vnd(entry.value)}",
                 style: const TextStyle(color: kPrimaryColor, fontWeight: FontWeight.bold)),
             value: _selectedExtras.contains(entry.key),
             activeColor: kPrimaryColor,
@@ -280,7 +282,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
-                    child: Text("\$${totalPrice.toStringAsFixed(2)}", style: const TextStyle(color: Colors.white)),
+                    child: Text(Money.vnd(totalPrice), style: const TextStyle(color: Colors.white)),
                   )
                 ],
               ),

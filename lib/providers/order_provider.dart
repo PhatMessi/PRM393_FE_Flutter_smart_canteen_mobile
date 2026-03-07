@@ -36,19 +36,22 @@ class OrderProvider with ChangeNotifier {
     if (tab == "All") return _allOrders;
     
     if (tab == "Pending") {
-      return _allOrders.where((o) => o.status == "Pending" || o.status == "Paying").toList();
+      // Backend statuses: "Pending Payment", "Paid"
+      return _allOrders
+          .where((o) => o.status == "Pending Payment" || o.status == "Paid")
+          .toList();
     }
     
     if (tab == "Ready") {
-      return _allOrders.where((o) => o.status == "Ready" || o.status == "Preparing").toList();
+      // Backend statuses: "Preparing", "Ready for Pickup"
+      return _allOrders
+          .where((o) => o.status == "Preparing" || o.status == "Ready for Pickup")
+          .toList();
     }
     
     if (tab == "History") {
-      return _allOrders.where((o) => 
-        o.status == "Completed" || 
-        o.status == "Rejected" || 
-        o.status == "Cancelled"
-      ).toList();
+      // Requirement: only completed orders appear in History.
+      return _allOrders.where((o) => o.status == "Completed").toList();
     }
     
     return [];

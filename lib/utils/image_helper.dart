@@ -1,6 +1,28 @@
 // Helper widget to handle image loading logic
 import 'package:flutter/material.dart';
 
+import '../config/api_config.dart';
+
+String _getApiRoot() {
+  // ApiConfig.baseUrl usually ends with `/api`
+  final base = ApiConfig.baseUrl;
+  return base.replaceFirst(RegExp(r'/api/?$'), '');
+}
+
+bool _looksLikeBackendPath(String value) {
+  // Backend returns static file paths like `/images/menu/xxx.png`
+  return value.startsWith('/') ||
+      value.startsWith('images/') ||
+      value.startsWith('uploads/') ||
+      value.startsWith('static/');
+}
+
+String _toAbsoluteBackendUrl(String value) {
+  final root = _getApiRoot();
+  if (value.startsWith('/')) return '$root$value';
+  return '$root/$value';
+}
+
 Widget buildProductImage(String? imageUrl,
     {double? width, double? height, BoxFit fit = BoxFit.cover}) {
   if (imageUrl == null || imageUrl.isEmpty) {
@@ -41,6 +63,23 @@ Widget buildProductImage(String? imageUrl,
       ),
     );
   } 
+
+  // Nếu backend trả về path static (ví dụ: /images/menu/abc.png)
+  if (_looksLikeBackendPath(normalized)) {
+    final absoluteUrl = _toAbsoluteBackendUrl(normalized);
+    return Image.network(
+      absoluteUrl,
+      width: width,
+      height: height,
+      fit: fit,
+      errorBuilder: (ctx, err, stack) => Container(
+        width: width,
+        height: height,
+        color: Colors.grey[200],
+        child: const Icon(Icons.broken_image, color: Colors.grey),
+      ),
+    );
+  }
   
   // Nếu là local asset (tên file)
   return Image.asset(

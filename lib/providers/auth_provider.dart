@@ -7,9 +7,9 @@ class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
 
   // Các biến trạng thái (State)
-  User? _user;           // Lưu thông tin user sau khi login
+  User? _user; // Lưu thông tin user sau khi login
   bool _isLoading = false; // Để hiện vòng xoay loading
-  String? _errorMessage;   // Để hiện lỗi nếu có
+  String? _errorMessage; // Để hiện lỗi nếu có
 
   // Getter để UI có thể đọc dữ liệu
   User? get user => _user;
@@ -20,17 +20,14 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> tryAutoLogin() async {
     final token = await _authService.getToken();
     if (token == null) {
-      return false; 
+      return false;
     }
-    
-    // Ở đây bạn có thể gọi API getUserProfile để lấy thông tin user mới nhất
-    // Tạm thời mình sẽ giả lập user đã login thành công để vào app
-    // Trong thực tế nên gọi: _user = await _authService.getUserProfile(token);
-    
-    // Tạo user giả tạm thời để app hiểu là đã login (vì mình chỉ mới save token)
-    // Cải thiện sau: Lưu toàn bộ info user xuống local storage
-    _user = User(fullName: "User", email: "", role: "Student", token: token); 
-    
+
+    final profile = await _authService.getProfile(token);
+    _user =
+        profile ??
+        User(fullName: "User", email: "", role: "Student", token: token);
+
     notifyListeners();
     return true;
   }
@@ -75,11 +72,11 @@ class AuthProvider extends ChangeNotifier {
     try {
       final result = await _authService.forgotPassword(email);
       _isLoading = false;
-      
+
       if (!result['success']) {
         _errorMessage = result['message'];
       }
-      
+
       notifyListeners();
       return result['success'];
     } catch (e) {

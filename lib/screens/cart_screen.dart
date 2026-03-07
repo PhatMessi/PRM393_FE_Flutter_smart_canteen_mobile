@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 import 'checkout_screen.dart';
+import '../utils/image_helper.dart';
+import '../utils/money.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -63,12 +65,11 @@ class CartScreen extends StatelessWidget {
                             // Ảnh
                             ClipRRect(
                               borderRadius: BorderRadius.circular(50), // Ảnh tròn
-                              child: Image.network(
-                                item.menuItem.imageUrl != null && item.menuItem.imageUrl!.startsWith("http")
-                                    ? item.menuItem.imageUrl!
-                                    : "http://10.0.2.2:5000${item.menuItem.imageUrl}",
-                                width: 70, height: 70, fit: BoxFit.cover,
-                                errorBuilder: (c,e,s) => Container(width: 70, height: 70, color: Colors.grey[200]),
+                              child: buildProductImage(
+                                item.menuItem.imageUrl,
+                                width: 70,
+                                height: 70,
+                                fit: BoxFit.cover,
                               ),
                             ),
                             const SizedBox(width: 15),
@@ -106,7 +107,7 @@ class CartScreen extends StatelessWidget {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text("\$${item.totalPrice.toStringAsFixed(2)}", 
+                                      Text(Money.vnd(item.totalPrice), 
                                         style: const TextStyle(color: brandGreen, fontWeight: FontWeight.bold, fontSize: 16)),
                                       // Nút tăng giảm số lượng nhỏ gọn
                                       Container(
@@ -151,15 +152,15 @@ class CartScreen extends StatelessWidget {
             ),
             child: Column(
               children: [
-                _buildSummaryRow("Subtotal", "\$${cart.subtotal.toStringAsFixed(2)}"),
+                _buildSummaryRow("Subtotal", Money.vnd(cart.subtotal)),
                 const SizedBox(height: 10),
-                _buildSummaryRow("Tax (5%)", "\$${cart.tax.toStringAsFixed(2)}"),
+                _buildSummaryRow("Tax (5%)", Money.vnd(cart.tax)),
                 const Padding(padding: EdgeInsets.symmetric(vertical: 15), child: Divider()),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text("Total", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                    Text("\$${cart.totalAmount.toStringAsFixed(2)}", 
+                    Text(Money.vnd(cart.totalAmount), 
                       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: brandGreen)),
                   ],
                 ),
