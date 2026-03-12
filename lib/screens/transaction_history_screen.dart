@@ -4,11 +4,12 @@ import '../models/transaction_model.dart';
 import '../services/wallet_service.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../utils/money.dart';
+import 'home_screen.dart';
 
 class TransactionHistoryScreen extends StatefulWidget {
   final String initialFilter;
 
-  const TransactionHistoryScreen({super.key, this.initialFilter = 'All'});
+  const TransactionHistoryScreen({super.key, this.initialFilter = 'Tat ca'});
 
   @override
   State<TransactionHistoryScreen> createState() =>
@@ -22,7 +23,18 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
   List<TransactionModel> _filteredTransactions = [];
   double _balance = 0.0;
   bool _isLoading = true;
-  String _selectedFilter = "All"; // All, Payment, TopUp
+  String _selectedFilter = "Tat ca"; // Tat ca, Thanh toan, Nap tien
+
+  void _handleBack(BuildContext context) {
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+      return;
+    }
+
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+    );
+  }
 
   @override
   void initState() {
@@ -43,7 +55,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
         _isLoading = false;
       });
 
-      if (_selectedFilter != 'All') {
+      if (_selectedFilter != 'Tat ca') {
         _filterTransactions(_selectedFilter);
       }
     }
@@ -52,11 +64,15 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
   void _filterTransactions(String filterType) {
     setState(() {
       _selectedFilter = filterType;
-      if (filterType == "All") {
+      if (filterType == "Tat ca") {
         _filteredTransactions = _allTransactions;
       } else {
+        String backendType = filterType;
+        if (filterType == 'Thanh toan') backendType = 'Payment';
+        if (filterType == 'Nap tien') backendType = 'TopUp';
+
         _filteredTransactions = _allTransactions
-            .where((t) => t.type == filterType)
+            .where((t) => t.type == backendType || t.type == filterType)
             .toList();
       }
     });
@@ -83,8 +99,8 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
     final yesterday = DateTime(now.year, now.month, now.day - 1);
     final dateToCheck = DateTime(date.year, date.month, date.day);
 
-    if (dateToCheck == today) return "Today";
-    if (dateToCheck == yesterday) return "Yesterday";
+    if (dateToCheck == today) return "Hom nay";
+    if (dateToCheck == yesterday) return "Hom qua";
     return DateFormat('MMM dd').format(date);
   }
 
@@ -105,10 +121,10 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => _handleBack(context),
         ),
         title: const Text(
-          "Transaction History",
+          "Lich su giao dich",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -138,7 +154,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            "Total Spent (All Time)",
+                            "Tong chi tieu",
                             style: TextStyle(color: Colors.grey),
                           ),
                           const SizedBox(height: 5),
@@ -160,7 +176,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                               ),
                               const SizedBox(width: 5),
                               Text(
-                                "Balance: ${Money.vnd(_balance)}",
+                                "So du: ${Money.vnd(_balance)}",
                                 style: const TextStyle(color: Colors.grey),
                               ),
                             ],
@@ -199,7 +215,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                           ),
                           child: const TextField(
                             decoration: InputDecoration(
-                              hintText: "Search item or date",
+                              hintText: "Tim theo mon hoac ngay",
                               border: InputBorder.none,
                               icon: Icon(Icons.search, color: Colors.grey),
                             ),
@@ -215,17 +231,17 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
                     children: [
-                      _buildFilterChip("All", _selectedFilter == "All"),
+                      _buildFilterChip("Tat ca", _selectedFilter == "Tat ca"),
                       const SizedBox(width: 10),
                       _buildFilterChip(
-                        "Payment",
-                        _selectedFilter == "Payment",
+                        "Thanh toan",
+                        _selectedFilter == "Thanh toan",
                         icon: Icons.fastfood,
                       ),
                       const SizedBox(width: 10),
                       _buildFilterChip(
-                        "TopUp",
-                        _selectedFilter == "TopUp",
+                        "Nap tien",
+                        _selectedFilter == "Nap tien",
                         icon: Icons.account_balance_wallet,
                       ),
                     ],
@@ -235,7 +251,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                 // 3. TRANSACTION LIST
                 Expanded(
                   child: _filteredTransactions.isEmpty
-                      ? const Center(child: Text("No transactions found"))
+                      ? const Center(child: Text("Khong tim thay giao dich"))
                       : ListView(
                           padding: const EdgeInsets.all(20),
                           children:
@@ -309,11 +325,11 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
   }
 
   Widget _buildTransactionItem(TransactionModel t) {
-    bool isNegative = t.type == "Payment" || t.type == "Withdrawal";
-    Color iconColor = t.type == "TopUp"
+    bool isNegative = t.type == "Payment" || t.type == "Withdrawal" || t.type == "Thanh toan";
+    Color iconColor = t.type == "TopUp" || t.type == "Nap tien"
         ? const Color(0xFF2ED162)
         : (t.type == "Refund" ? Colors.purple : Colors.orange);
-    IconData icon = t.type == "TopUp"
+    IconData icon = t.type == "TopUp" || t.type == "Nap tien"
         ? Icons.account_balance_wallet
         : (t.type == "Refund" ? Icons.undo : Icons.fastfood);
 

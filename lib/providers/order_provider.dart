@@ -33,23 +33,23 @@ class OrderProvider with ChangeNotifier {
 
   // Hàm lọc danh sách theo Tab
   List<OrderModel> getOrdersByStatus(String tab) {
-    if (tab == "All") return _allOrders;
+    if (tab == "Tat ca") return _allOrders;
     
-    if (tab == "Pending") {
+    if (tab == "Cho xu ly") {
       // Backend statuses: "Pending Payment", "Paid"
       return _allOrders
           .where((o) => o.status == "Pending Payment" || o.status == "Paid")
           .toList();
     }
     
-    if (tab == "Ready") {
+    if (tab == "San sang") {
       // Backend statuses: "Preparing", "Ready for Pickup"
       return _allOrders
           .where((o) => o.status == "Preparing" || o.status == "Ready for Pickup")
           .toList();
     }
     
-    if (tab == "History") {
+    if (tab == "Lich su") {
       // Requirement: only completed orders appear in History.
       return _allOrders.where((o) => o.status == "Completed").toList();
     }

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import '../providers/cart_provider.dart';
 import '../services/menu_service.dart';
 import '../models/menu_item.dart';
 import 'product_detail_screen.dart'; // <--- 1. BỔ SUNG IMPORT NÀY
 import 'notifications_screen.dart';
+import 'cart_screen.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../utils/image_helper.dart'; // [FIX] Import Helper
 import '../utils/money.dart';
@@ -22,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Category> _categories = [];
   List<MenuItem> _menuItems = [];
   bool _isLoading = true;
-  int _selectedCategoryId = -1; // -1 là "All"
+  int _selectedCategoryId = -1; // -1 là "Tat ca"
 
   @override
   void initState() {
@@ -41,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (mounted) {
       setState(() {
-        _categories = [Category(categoryId: -1, name: "All"), ...categories];
+        _categories = [Category(categoryId: -1, name: "Tat ca"), ...categories];
         _menuItems = menu;
         _isLoading = false;
       });
@@ -67,6 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<AuthProvider>(context).user;
+    final cartCount = context.select<CartProvider, int>((cart) => cart.itemCount);
     const Color brandGreen = Color(0xFF2ED162); // Đã chỉnh lại màu cho giống ProductDetailScreen
 
     return Scaffold(
@@ -94,28 +97,73 @@ class _HomeScreenState extends State<HomeScreen> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text("Good Morning,", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                                const Text("Chao buoi sang,", style: TextStyle(color: Colors.grey, fontSize: 12)),
                                 Text(
-                                  "Hi, ${user?.fullName ?? 'Student'} 👋", 
+                                  "Xin chao, ${user?.fullName ?? 'Hoc sinh'} 👋", 
                                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)
                                 ),
                               ],
                             )
                           ],
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const NotificationsScreen()),
-                            );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                            child: const Icon(Icons.notifications_outlined, size: 24),
-                          ),
-                        )
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const CartScreen()),
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                                child: Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    const Icon(Icons.shopping_cart_outlined, size: 24),
+                                    if (cartCount > 0)
+                                      Positioned(
+                                        top: -6,
+                                        right: -8,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                          decoration: const BoxDecoration(
+                                            color: Colors.red,
+                                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                                          ),
+                                          constraints: const BoxConstraints(minWidth: 18, minHeight: 14),
+                                          child: Text(
+                                            cartCount > 99 ? '99+' : '$cartCount',
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                                child: const Icon(Icons.notifications_outlined, size: 24),
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                     const SizedBox(height: 20),
@@ -129,7 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       child: const TextField(
                         decoration: InputDecoration(
-                          hintText: "Search for pizza, drinks...",
+                          hintText: "Tim mon an, do uong...",
                           hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
                           border: InputBorder.none,
                           icon: Icon(Icons.search, color: Colors.grey),
@@ -179,11 +227,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                                   decoration: BoxDecoration(color: brandGreen, borderRadius: BorderRadius.circular(20)),
-                                  child: const Text("50% OFF", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                                  child: const Text("GIAM 50%", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
                                 ),
                                 const SizedBox(height: 5),
-                                const Text("Daily Specials", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-                                const Text("Get half price on combos", style: TextStyle(color: Colors.white70, fontSize: 12)),
+                                const Text("Uu dai hom nay", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+                                const Text("Combo gia tot moi ngay", style: TextStyle(color: Colors.white70, fontSize: 12)),
                               ],
                             ),
                           ),
@@ -228,14 +276,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("Popular Menu", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                        TextButton(onPressed: () {}, child: const Text("See All", style: TextStyle(color: brandGreen)))
+                        const Text("Mon pho bien", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                        TextButton(onPressed: () {}, child: const Text("Xem tat ca", style: TextStyle(color: brandGreen)))
                       ],
                     ),
 
                     // 6. MENU LIST (ĐÃ FIX ĐIỀU HƯỚNG)
                     _menuItems.isEmpty 
-                        ? const Center(child: Padding(padding: EdgeInsets.all(20), child: Text("No items found")))
+                        ? const Center(child: Padding(padding: EdgeInsets.all(20), child: Text("Khong tim thay mon nao")))
                         : ListView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
@@ -286,7 +334,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               Container(
                                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                                 decoration: BoxDecoration(color: Colors.orange[50], borderRadius: BorderRadius.circular(10)),
-                                                child: const Text("\uD83D\uDD25 HOT", style: TextStyle(color: Colors.orange, fontSize: 10, fontWeight: FontWeight.bold)),
+                                                child: const Text("\uD83D\uDD25 BAN CHAY", style: TextStyle(color: Colors.orange, fontSize: 10, fontWeight: FontWeight.bold)),
                                               ),
                                             const SizedBox(height: 5),
                                             
@@ -300,7 +348,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             // ----------------------------
                                             
                                             const SizedBox(height: 5),
-                                            const Text("~ 10 mins • 450 kcal", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                                            const Text("~ 10 phut • 450 kcal", style: TextStyle(color: Colors.grey, fontSize: 12)),
                                             const SizedBox(height: 8),
                                             Text(Money.vnd(item.price), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                                           ],

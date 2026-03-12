@@ -2,13 +2,35 @@ import 'package:flutter/material.dart';
 import '../models/menu_item.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
-import 'cart_screen.dart'; 
+import 'cart_screen.dart';
+import 'home_screen.dart';
 import '../utils/image_helper.dart'; // [FIX] Import image helper
 import '../utils/money.dart';
 
 // Định nghĩa màu xanh giống trong hình thiết kế
 const Color kPrimaryColor = Color(0xFF2ED162); // Màu xanh lá sáng
 const Color kBackgroundColor = Color(0xFFF8F9FA); // Màu nền xám rất nhạt
+
+class _OptionGroup {
+  final String key;
+  final String title;
+  final bool required;
+  final List<String> choices;
+
+  const _OptionGroup({
+    required this.key,
+    required this.title,
+    required this.required,
+    required this.choices,
+  });
+}
+
+class _CustomizationPreset {
+  final List<_OptionGroup> optionGroups;
+  final Map<String, double> extras;
+
+  const _CustomizationPreset({required this.optionGroups, required this.extras});
+}
 
 class ProductDetailScreen extends StatefulWidget {
   final MenuItem menuItem;
@@ -28,26 +50,208 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   final double _rating = 4.8;
   final int _reviews = 120;
   
-  // Quản lý trạng thái chọn Sauce (Radio Button)
-  String _selectedSauce = "Spicy Mayo";
-  final List<String> _sauces = ["Spicy Mayo", "BBQ Sauce", "Honey Mustard"];
+  late final _CustomizationPreset _preset;
+  final Map<String, String> _selectedByGroup = {};
+  final Set<String> _selectedExtras = <String>{};
+  final TextEditingController _otherController = TextEditingController();
 
-  // Quản lý trạng thái chọn Extras (Checkbox)
-  // Map lưu tên món thêm và giá tiền
-  final Map<String, double> _extrasOptions = {
-    "Extra Cheese": 5000,
-    "Add Coke Zero": 10000,
-  };
-  // List lưu những món đã được check
-  final List<String> _selectedExtras = [];
+  void _handleBack() {
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+      return;
+    }
+
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _preset = _buildPreset(widget.menuItem);
+
+    for (final group in _preset.optionGroups) {
+      if (group.required && group.choices.isNotEmpty) {
+        _selectedByGroup[group.key] = group.choices.first;
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _otherController.dispose();
+    super.dispose();
+  }
 
   // Hàm tính tổng tiền: (Giá gốc + Giá Extras) * Số lượng
   double get totalPrice {
     double extrasTotal = 0;
     for (var extra in _selectedExtras) {
-      extrasTotal += _extrasOptions[extra] ?? 0;
+      extrasTotal += _preset.extras[extra] ?? 0;
     }
     return (widget.menuItem.price + extrasTotal) * quantity;
+  }
+
+  _CustomizationPreset _buildPreset(MenuItem item) {
+    final name = (item.categoryName ?? '').toLowerCase();
+    final categoryId = item.categoryId;
+
+    final isMainDish =
+        categoryId == 1 || name.contains('món chính') || name.contains('main');
+    final isDrink =
+        categoryId == 2 || name.contains('đồ uống') || name.contains('drink');
+    final isSnack =
+        categoryId == 3 || name.contains('ăn vặt') || name.contains('snack');
+
+    if (isMainDish) {
+      return const _CustomizationPreset(
+        optionGroups: [
+          _OptionGroup(
+            key: 'sauce',
+            title: 'Lua chon sot',
+            required: false,
+            choices: ['Sot cay mayo', 'Sot BBQ', 'Sot mat ong'],
+          ),
+          _OptionGroup(
+            key: 'spice',
+            title: 'Muc do cay',
+            required: false,
+            choices: ['Khong cay', 'It cay', 'Binh thuong', 'Rat cay'],
+          ),
+        ],
+        extras: {
+          'Them pho mai': 5000,
+          'Them trung': 7000,
+          'Them com': 5000,
+        },
+      );
+    }
+
+    if (isDrink) {
+      return const _CustomizationPreset(
+        optionGroups: [
+          _OptionGroup(
+            key: 'size',
+            title: 'Kich co',
+            required: true,
+            choices: ['M', 'L'],
+          ),
+          _OptionGroup(
+            key: 'sweet',
+            title: 'Do ngot',
+            required: true,
+            choices: ['0%', '30%', '50%', '70%', '100%'],
+          ),
+          _OptionGroup(
+            key: 'ice',
+            title: 'Luong da',
+            required: true,
+            choices: ['Khong da', 'It da', 'Da vua'],
+          ),
+        ],
+        extras: {
+          'Them tran chau': 5000,
+          'Them milk foam': 8000,
+        },
+      );
+    }
+
+    if (isSnack) {
+      return const _CustomizationPreset(
+        optionGroups: [
+          _OptionGroup(
+            key: 'sauce',
+            title: 'Sot cham',
+            required: false,
+            choices: ['Khong', 'Mayonnaise', 'Sot pho mai', 'Sot me'],
+          ),
+          _OptionGroup(
+            key: 'spice',
+            title: 'Muc do cay',
+            required: false,
+            choices: ['Khong cay', 'Cay vua', 'Cay nhieu'],
+          ),
+        ],
+        extras: {
+          'Them rong bien': 4000,
+          'Them sot': 5000,
+        },
+      );
+    }
+
+    return const _CustomizationPreset(optionGroups: [], extras: {});
+  }
+
+  List<String> _buildSelectedOptions() {
+    final options = <String>[];
+    for (final group in _preset.optionGroups) {
+      final selected = _selectedByGroup[group.key];
+      if (selected != null && selected.isNotEmpty) {
+        options.add('${group.title}: $selected');
+      }
+    }
+
+    for (final extra in _selectedExtras) {
+      options.add('Them: $extra');
+    }
+
+    return options;
+  }
+
+  bool _hasMissingRequiredSelection() {
+    for (final group in _preset.optionGroups) {
+      if (!group.required) continue;
+      final selected = _selectedByGroup[group.key];
+      if (selected == null || selected.isEmpty) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Widget _buildOptionGroup(_OptionGroup group) {
+    final selected = _selectedByGroup[group.key];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: _buildSectionHeader(
+            group.title,
+            group.required ? '(Bat buoc)' : '(Tuy chon)',
+          ),
+        ),
+        if (!group.required && selected != null && selected.isNotEmpty)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: () {
+                setState(() {
+                  _selectedByGroup.remove(group.key);
+                });
+              },
+              child: const Text('Bo chon'),
+            ),
+          ),
+        ...group.choices.map(
+          (choice) => RadioListTile<String>(
+            title: Text(choice),
+            value: choice,
+            groupValue: _selectedByGroup[group.key],
+            activeColor: kPrimaryColor,
+            contentPadding: EdgeInsets.zero,
+            onChanged: (value) {
+              setState(() {
+                _selectedByGroup[group.key] = value ?? '';
+              });
+            },
+          ),
+        ),
+        const SizedBox(height: 12),
+      ],
+    );
   }
 
   @override
@@ -76,7 +280,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildCircleIconButton(Icons.arrow_back, () => Navigator.pop(context)),
+                _buildCircleIconButton(Icons.arrow_back, _handleBack),
                 _buildCircleIconButton(Icons.favorite_border, () {
                   // TODO: Xử lý logic yêu thích sau
                 }),
@@ -140,7 +344,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          const Text("Canteen A • Western Station", style: TextStyle(color: Colors.grey)),
+          const Text("Cang tin A • Khu phia Tay", style: TextStyle(color: Colors.grey)),
 
           const SizedBox(height: 20),
           // Hàng thông tin metrics (Rating, Calories, Tag)
@@ -149,57 +353,79 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             children: [
               _buildMetricChip(Icons.star, "$_rating ($_reviews)", Colors.amber),
               _buildMetricChip(Icons.local_fire_department, _calories, Colors.orange),
-              _buildMetricChip(Icons.eco, "Healthy", Colors.green),
+              _buildMetricChip(Icons.eco, "Tot cho suc khoe", Colors.green),
             ],
           ),
 
           const SizedBox(height: 24),
           // Description
-          const Text("Description", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const Text("Mo ta", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Text(
-            widget.menuItem.description ?? "No description available.",
+            widget.menuItem.description ?? "Chua co mo ta.",
             style: const TextStyle(color: Colors.grey, height: 1.5),
           ),
 
-          const SizedBox(height: 24),
-          // Choice of Sauce (Radio)
-          _buildSectionHeader("Choice of Sauce", "(Required)"),
-          ..._sauces.map((sauce) => RadioListTile<String>(
-            title: Text(sauce),
-            value: sauce,
-            groupValue: _selectedSauce,
-            activeColor: kPrimaryColor,
-            contentPadding: EdgeInsets.zero,
-            onChanged: (value) {
-              setState(() {
-                _selectedSauce = value!;
-              });
-            },
-          )),
+          if (_preset.optionGroups.isNotEmpty) ...[
+            const SizedBox(height: 24),
+            ..._preset.optionGroups.map(_buildOptionGroup),
+          ],
+
+          if (_preset.extras.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            _buildSectionHeader('Phan them', '(Tuy chon)'),
+            ..._preset.extras.entries.map(
+              (entry) => CheckboxListTile(
+                title: Text(entry.key),
+                secondary: Text(
+                  '+${Money.vnd(entry.value)}',
+                  style: const TextStyle(
+                    color: kPrimaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                value: _selectedExtras.contains(entry.key),
+                activeColor: kPrimaryColor,
+                contentPadding: EdgeInsets.zero,
+                controlAffinity: ListTileControlAffinity.leading,
+                onChanged: (bool? checked) {
+                  setState(() {
+                    if (checked == true) {
+                      _selectedExtras.add(entry.key);
+                    } else {
+                      _selectedExtras.remove(entry.key);
+                    }
+                  });
+                },
+              ),
+            ),
+          ],
 
           const SizedBox(height: 16),
-          // Extras (Checkbox)
-          _buildSectionHeader("Extras", ""),
-          ..._extrasOptions.entries.map((entry) => CheckboxListTile(
-            title: Text(entry.key),
-            secondary: Text(
-              "+${Money.vnd(entry.value)}",
-                style: const TextStyle(color: kPrimaryColor, fontWeight: FontWeight.bold)),
-            value: _selectedExtras.contains(entry.key),
-            activeColor: kPrimaryColor,
-            contentPadding: EdgeInsets.zero,
-            controlAffinity: ListTileControlAffinity.leading, // Checkbox bên trái
-            onChanged: (bool? checked) {
-              setState(() {
-                if (checked == true) {
-                  _selectedExtras.add(entry.key);
-                } else {
-                  _selectedExtras.remove(entry.key);
-                }
-              });
-            },
-          )),
+          _buildSectionHeader('Khac', '(Ghi chu tuy chon)'),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _otherController,
+            maxLines: 3,
+            maxLength: 200,
+            decoration: InputDecoration(
+              hintText: 'VD: Ít hành, không tiêu, đóng gói riêng...',
+              filled: true,
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey.shade300),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey.shade300),
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+                borderSide: BorderSide(color: kPrimaryColor),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -243,8 +469,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           Expanded(
             child: ElevatedButton(
               onPressed: () {
-                // Lấy danh sách options đã chọn
-                List<String> options = [_selectedSauce, ..._selectedExtras];
+                if (_hasMissingRequiredSelection()) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Vui lòng chọn đủ các mục bắt buộc.'),
+                    ),
+                  );
+                  return;
+                }
+
+                final options = _buildSelectedOptions();
+                final otherNote = _otherController.text.trim();
                 
                 // Gọi Provider để thêm vào giỏ
                 Provider.of<CartProvider>(context, listen: false).addItem(
@@ -252,17 +487,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   quantity,
                   options,
                   totalPrice / quantity, // Giá đơn vị đã cộng toppings
+                  otherNote: otherNote.isEmpty ? null : otherNote,
                 );
 
                 // Hiển thị thông báo hoặc chuyển sang giỏ hàng
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text("Added ${widget.menuItem.name} to tray!"),
+                    content: Text("Da them ${widget.menuItem.name} vao khay!"),
                     backgroundColor: kPrimaryColor,
                     action: SnackBarAction(
-                      label: "VIEW TRAY",
+                      label: "XEM KHAY",
                       textColor: Colors.white,
                       onPressed: () {
+                        if (!mounted) return;
                         Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen()));
                       },
                     ),
@@ -277,7 +514,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Add to Order", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                  const Text("Them vao don", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                   const SizedBox(width: 10),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

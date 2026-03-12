@@ -26,6 +26,110 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   double _weekDelta = 0.0;
   List<TransactionModel> _recent = [];
 
+  Future<void> _openTransferHub() async {
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                const Text(
+                  'Chuyen tien nhanh',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Chon tac vu phu hop de thao tac nhanh hon',
+                  style: TextStyle(color: Colors.grey),
+                ),
+                const SizedBox(height: 12),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const CircleAvatar(
+                    backgroundColor: Color(0xFFE8F9EF),
+                    child: Icon(Icons.account_balance_wallet, color: Color(0xFF2ED162)),
+                  ),
+                  title: const Text('Nap tien vao vi'),
+                  subtitle: const Text('Bo sung so du de thanh toan don hang'),
+                  onTap: () => Navigator.pop(ctx, 'topup'),
+                ),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.blue.shade50,
+                    child: const Icon(Icons.history, color: Colors.blue),
+                  ),
+                  title: const Text('Xem lich su giao dich'),
+                  subtitle: const Text('Theo doi nap tien va thanh toan'),
+                  onTap: () => Navigator.pop(ctx, 'history'),
+                ),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.purple.shade50,
+                    child: const Icon(Icons.chat_bubble_outline, color: Colors.purple),
+                  ),
+                  title: const Text('Nhan tin ho tro'),
+                  subtitle: const Text('Can tro giup khi can giao dich'),
+                  onTap: () => Navigator.pop(ctx, 'chat'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (!mounted || action == null) return;
+
+    if (action == 'topup') {
+      final didTopUp = await Navigator.push<bool>(
+        context,
+        MaterialPageRoute(builder: (_) => const WalletTopUpScreen()),
+      );
+      if (didTopUp == true) {
+        if (!mounted) return;
+        setState(() => _isLoading = true);
+        await _fetchWalletSnapshot();
+      }
+      return;
+    }
+
+    if (action == 'history') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const TransactionHistoryScreen()),
+      );
+      return;
+    }
+
+    if (action == 'chat') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const ChatScreen()),
+      );
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -42,9 +146,9 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
     final weekAgo = DateTime.now().subtract(const Duration(days: 7));
     double delta = 0;
     for (final t in history.where((t) => t.date.isAfter(weekAgo))) {
-      if (t.type == 'TopUp' || t.type == 'Refund') {
+      if (t.type == 'TopUp' || t.type == 'Refund' || t.type == 'Nap tien') {
         delta += t.amount;
-      } else if (t.type == 'Payment') {
+      } else if (t.type == 'Payment' || t.type == 'Thanh toan') {
         delta -= t.amount;
       }
     }
@@ -93,11 +197,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            "Good Morning,",
+                            "Chao buoi sang,",
                             style: TextStyle(color: Colors.grey, fontSize: 13),
                           ),
                           Text(
-                            user?.fullName ?? "Alex!",
+                            user?.fullName ?? "Ban!",
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 20,
@@ -149,7 +253,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                 child: Column(
                   children: [
                     const Text(
-                      "CURRENT BALANCE",
+                      "SO DU HIEN TAI",
                       style: TextStyle(
                         color: Colors.white54,
                         fontSize: 12,
@@ -189,7 +293,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                           ),
                           const SizedBox(width: 5),
                           Text(
-                            "${_weekDelta >= 0 ? '+' : '-'}${Money.vnd(_weekDelta.abs())} this week",
+                            "${_weekDelta >= 0 ? '+' : '-'}${Money.vnd(_weekDelta.abs())} trong tuan nay",
                             style: TextStyle(
                               color: _weekDelta >= 0
                                   ? brandGreen
@@ -230,7 +334,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                         color: Colors.black,
                       ),
                       label: const Text(
-                        "Top Up",
+                        "Nap tien",
                         style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
@@ -251,12 +355,12 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('My QR: coming soon')),
+                          const SnackBar(content: Text('Ma QR cua toi: sap co')),
                         );
                       },
                       icon: const Icon(Icons.qr_code, color: Colors.black),
                       label: const Text(
-                        "My QR",
+                        "Ma QR cua toi",
                         style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
@@ -288,6 +392,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                   border: Border.all(color: Colors.grey.shade100),
                 ),
                 child: ListTile(
+                  onTap: _openTransferHub,
                   leading: Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
@@ -297,13 +402,13 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     child: const Icon(Icons.swap_horiz, color: Colors.blue),
                   ),
                   title: const Text(
-                    "Transfer Funds",
+                    "Chuyen tien",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  subtitle: const Text(
-                    "Send money to friends",
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
+                  // subtitle: const Text(
+                  //   "Gui tien cho ban be",
+                  //   style: TextStyle(fontSize: 12, color: Colors.grey),
+                  // ),
                   trailing: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
@@ -347,11 +452,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     ),
                   ),
                   title: const Text(
-                    "Messaging",
+                    "Nhan tin",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: const Text(
-                    "Chat with support",
+                    "Tro chuyen voi ho tro",
                     style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                   trailing: Container(
@@ -375,7 +480,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    "Recent Transactions",
+                    "Giao dich gan day",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                   ),
                   TextButton(
@@ -388,7 +493,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                       );
                     },
                     child: const Text(
-                      "See All",
+                      "Xem tat ca",
                       style: TextStyle(color: brandGreen),
                     ),
                   ),
@@ -408,7 +513,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                   padding: EdgeInsets.symmetric(vertical: 18),
                   child: Center(
                     child: Text(
-                      'No transactions yet',
+                      'Chua co giao dich nao',
                       style: TextStyle(color: Colors.grey),
                     ),
                   ),
@@ -438,11 +543,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   }
 
   Widget _buildTransactionRow(TransactionModel t, Color brandGreen) {
-    final isNegative = t.type == 'Payment' || t.type == 'Withdrawal';
-    final iconColor = t.type == 'TopUp'
+    final isNegative = t.type == 'Payment' || t.type == 'Withdrawal' || t.type == 'Thanh toan';
+    final iconColor = t.type == 'TopUp' || t.type == 'Nap tien'
         ? brandGreen
         : (t.type == 'Refund' ? Colors.purple : Colors.orange);
-    final icon = t.type == 'TopUp'
+    final icon = t.type == 'TopUp' || t.type == 'Nap tien'
         ? Icons.account_balance_wallet
         : (t.type == 'Refund' ? Icons.undo : Icons.fastfood);
 

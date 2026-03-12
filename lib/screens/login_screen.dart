@@ -23,7 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      _showSnackBar(context, 'Please enter email and password', isError: true);
+      _showSnackBar(context, 'Vui long nhap email va mat khau', isError: true);
       return;
     }
 
@@ -35,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
         MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } else if (context.mounted) {
-      _showSnackBar(context, authProvider.errorMessage ?? 'Login failed',
+        _showSnackBar(context, authProvider.errorMessage ?? 'Dang nhap that bai',
           isError: true);
     }
   }
@@ -86,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 20),
                     const Text(
-                      "Welcome To",
+                      "Chao mung den",
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -97,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 5),
                     
                     Text(
-                      "Smart Canteen Login",
+                      "Dang nhap Cang Tin Thong Minh",
                       style: TextStyle(
                         fontSize: 16,
                         color: primaryColor.withOpacity(0.8), // Màu xanh rêu nhạt
@@ -109,11 +109,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     // --- 2. FORM SECTION ---
                     
                     // Email Field
-                    _buildLabel("Student Email"),
+                    _buildLabel("Email hoc sinh"),
                     const SizedBox(height: 8),
                     _buildInputField(
                       controller: _emailController,
-                      hintText: "student@university.edu",
+                      hintText: "student@school.edu.vn",
                       icon: Icons.email_outlined,
                       inputType: TextInputType.emailAddress,
                     ),
@@ -121,11 +121,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 20),
 
                     // Password Field
-                    _buildLabel("Password"),
+                    _buildLabel("Mat khau"),
                     const SizedBox(height: 8),
                     _buildInputField(
                       controller: _passwordController,
-                      hintText: "Enter your password",
+                      hintText: "Nhap mat khau",
                       icon: Icons.lock_outline_rounded,
                       obscureText: _obscurePassword,
                       isPassword: true,
@@ -148,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           );
                         },
                         child: const Text(
-                          "Forgot Password?",
+                          "Quen mat khau?",
                           style: TextStyle(
                             color: Color(0xFF588157),
                             fontWeight: FontWeight.w600,
@@ -182,7 +182,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    "Login",
+                                    "Dang nhap",
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -203,7 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Expanded(child: Divider(color: Colors.grey[300])),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Text("Or continue with",
+                            child: Text("Hoac tiep tuc voi",
                               style: TextStyle(color: textGray)),
                         ),
                         Expanded(child: Divider(color: Colors.grey[300])),
@@ -235,7 +235,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "Don't have an account? ",
+                          "Chua co tai khoan? ",
                           style: TextStyle(color: textGray, fontSize: 14),
                         ),
                         GestureDetector(
@@ -243,7 +243,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             // TODO: Navigate to Register
                           },
                           child: const Text(
-                            "Register Now",
+                            "Dang ky ngay",
                             style: TextStyle(
                               color: textDark,
                               fontWeight: FontWeight.bold,

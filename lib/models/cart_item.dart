@@ -5,6 +5,7 @@ class CartItem {
   final MenuItem menuItem;
   int quantity;
   final List<String> selectedOptions; // Lưu tên sốt và các món thêm (VD: "Spicy Mayo", "Extra Cheese")
+  final String? otherNote; // Ghi chú tự do người dùng nhập ở phần Other
   final double pricePerItem; // Giá của 1 item bao gồm cả extras
 
   CartItem({
@@ -12,8 +13,24 @@ class CartItem {
     required this.menuItem,
     required this.quantity,
     required this.selectedOptions,
+    this.otherNote,
     required this.pricePerItem,
   });
 
   double get totalPrice => pricePerItem * quantity;
+
+  String? get orderItemNote {
+    final parts = <String>[];
+    if (selectedOptions.isNotEmpty) {
+      parts.add("Options: ${selectedOptions.join(', ')}");
+    }
+
+    final cleanOther = otherNote?.trim();
+    if (cleanOther != null && cleanOther.isNotEmpty) {
+      parts.add("Other: $cleanOther");
+    }
+
+    if (parts.isEmpty) return null;
+    return parts.join(' | ');
+  }
 }

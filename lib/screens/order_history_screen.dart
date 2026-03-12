@@ -5,6 +5,7 @@ import '../providers/order_provider.dart';
 import '../models/order_model.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import 'map_screen.dart';
+import 'order_detail_screen.dart';
 import '../utils/image_helper.dart';
 import '../utils/money.dart';
 
@@ -16,8 +17,8 @@ class OrderHistoryScreen extends StatefulWidget {
 }
 
 class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
-  String _selectedTab = "All"; // Tab mặc định
-  final List<String> _tabs = ["All", "Pending", "Ready", "History"];
+  String _selectedTab = "Tat ca"; // Tab mặc định
+  final List<String> _tabs = ["Tat ca", "Cho xu ly", "San sang", "Lich su"];
 
   @override
   void initState() {
@@ -36,7 +37,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
-        title: const Text("Order History", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+        title: const Text("Lich su don hang", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
         backgroundColor: const Color(0xFFF9FAFB),
         elevation: 0,
         centerTitle: false,
@@ -103,7 +104,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                         ),
                       )
                 : displayedOrders.isEmpty
-                    ? const Center(child: Text("No orders found"))
+                    ? const Center(child: Text("Khong co don hang nao"))
                     : ListView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         itemCount: displayedOrders.length,
@@ -125,6 +126,15 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     );
   }
 
+  void _openOrderDetail(OrderModel order) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => OrderDetailScreen(order: order),
+      ),
+    );
+  }
+
   // WIDGET CON: THẺ ĐƠN HÀNG
   Widget _buildOrderCard(OrderModel order) {
     Color statusColor;
@@ -135,29 +145,29 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     switch (order.status) {
       case "Ready for Pickup":
         statusColor = const Color(0xFF2ED162); // Xanh lá
-        statusText = "READY FOR PICKUP";
+        statusText = "SAN SANG NHAN MON";
         break;
       case "Preparing":
         statusColor = Colors.orange; // Vàng
-        statusText = "PREPARING";
+        statusText = "DANG CHUAN BI";
         break;
       case "Paid":
         statusColor = Colors.orange;
-        statusText = "PAID";
+        statusText = "DA THANH TOAN";
         break;
       case "Pending Payment":
         statusColor = Colors.orange;
-        statusText = "PENDING PAYMENT";
+        statusText = "CHO THANH TOAN";
         break;
       case "Cancelled":
         statusColor = Colors.red;
         statusIcon = Icons.error;
-        statusText = "CANCELLED";
+        statusText = "DA HUY";
         break;
       case "Completed":
         statusColor = Colors.grey;
         statusIcon = Icons.check_circle;
-        statusText = "COMPLETED";
+        statusText = "HOAN TAT";
         break;
       default:
         statusColor = Colors.blue;
@@ -208,7 +218,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                "Reason: ${order.rejectionReason}",
+                "Ly do: ${order.rejectionReason}",
                 style: TextStyle(color: Colors.red.shade700, fontSize: 13),
               ),
             ),
@@ -240,13 +250,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   children: [
                     Text(
                       firstItem != null 
-                        ? (otherItemsCount > 0 ? "${firstItem.menuItemName} + $otherItemsCount others" : firstItem.menuItemName)
-                        : "Unknown Items",
+                        ? (otherItemsCount > 0 ? "${firstItem.menuItemName} + $otherItemsCount mon khac" : firstItem.menuItemName)
+                        : "Khong ro mon",
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      firstItem?.note ?? "Regular", 
+                      firstItem?.note ?? "Mac dinh", 
                       style: const TextStyle(color: Colors.grey, fontSize: 13)
                     ),
                     const SizedBox(height: 8),
@@ -260,32 +270,47 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 
           // Action Buttons
           if (order.status == "Ready for Pickup")
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const MapScreen()),
-                  );
-                },
-                icon: const Icon(Icons.location_on, size: 18),
-                label: const Text("Track Order"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2ED162),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const MapScreen()),
+                      );
+                    },
+                    icon: const Icon(Icons.location_on, size: 18),
+                    label: const Text("Theo doi don"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2ED162),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => _openOrderDetail(order),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey.shade100,
+                      foregroundColor: Colors.black,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: const Text("Xem chi tiet"),
+                  ),
+                ),
+              ],
             )
           else if (order.status == "Pending Payment" || order.status == "Paid")
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  // TODO: Navigate to Order Detail
-                },
+                onPressed: () => _openOrderDetail(order),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey.shade100,
                   foregroundColor: Colors.black,
@@ -293,7 +318,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
-                child: const Text("View Details"),
+                child: const Text("Xem chi tiet"),
               ),
             )
           else if (order.status == "Completed")
@@ -308,7 +333,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                       elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
                     ),
-                    child: const Text("Rate"),
+                    child: const Text("Danh gia"),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -316,7 +341,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   child: ElevatedButton.icon(
                     onPressed: () {},
                     icon: const Icon(Icons.refresh, size: 18),
-                    label: const Text("Reorder"),
+                    label: const Text("Dat lai"),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFD4F8E2), // Màu xanh nhạt
                       foregroundColor: const Color(0xFF2ED162),

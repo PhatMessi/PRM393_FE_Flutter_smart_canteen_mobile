@@ -20,7 +20,7 @@ class MapScreen extends StatelessWidget {
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: const Text(
-          'Store Location',
+          'Vi tri canteen',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
         backgroundColor: const Color(0xFFF9FAFB),
@@ -63,10 +63,10 @@ class MapScreen extends StatelessWidget {
               child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Smart Canteen', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                  Text('Cang Tin Thong Minh', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                   SizedBox(height: 6),
                   Text(
-                    'Canteen A • Campus',
+                    'Cang tin A • Trong truong',
                     style: TextStyle(color: Colors.grey),
                   ),
                   SizedBox(height: 10),
@@ -76,7 +76,7 @@ class MapScreen extends StatelessWidget {
                       SizedBox(width: 6),
                       Expanded(
                         child: Text(
-                          'Tap "Track Order" to view this location',
+                          'Nhan "Theo doi don" de xem vi tri nay',
                           style: TextStyle(color: Colors.grey),
                         ),
                       ),

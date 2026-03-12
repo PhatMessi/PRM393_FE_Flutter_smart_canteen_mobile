@@ -18,7 +18,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
     if (email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter your email address")),
+        const SnackBar(content: Text("Vui long nhap dia chi email")),
       );
       return;
     }
@@ -33,15 +33,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: const Text("Check your email"),
-            content: const Text("We have sent password recovery instructions to your email."),
+            title: const Text("Kiem tra email"),
+            content: const Text("Chung toi da gui huong dan khoi phuc mat khau den email cua ban."),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(ctx).pop(); // Đóng Dialog
                   Navigator.of(context).pop(); // Về màn hình Login
                 },
-                child: const Text("OK", style: TextStyle(color: Color(0xFF00E676))),
+                child: const Text("Dong", style: TextStyle(color: Color(0xFF00E676))),
               )
             ],
           ),
@@ -49,7 +49,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(authProvider.errorMessage ?? "Error occurred"),
+            content: Text(authProvider.errorMessage ?? "Da xay ra loi"),
             backgroundColor: Colors.red,
           ),
         );
@@ -72,7 +72,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         ),
         centerTitle: true,
         title: const Text(
-          "Reset Password",
+          "Dat lai mat khau",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
         ),
       ),
@@ -119,7 +119,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                 // 2. Tiêu đề & Mô tả
                 const Text(
-                  "Forgot Password?",
+                  "Quen mat khau?",
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -130,7 +130,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20),
                   child: Text(
-                    "Don't worry! It happens. Please enter the email address linked to your canteen account.",
+                    "Dung lo! Hay nhap email da lien ket voi tai khoan canteen cua ban.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
@@ -146,7 +146,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: const Text(
-                    "Email Address",
+                    "Dia chi email",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                   ),
                 ),
@@ -160,7 +160,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   child: TextField(
                     controller: _emailController,
                     decoration: InputDecoration(
-                      hintText: "student@university.edu",
+                      hintText: "student@school.edu.vn",
                       hintStyle: TextStyle(color: Colors.grey[400]),
                       prefixIcon: const Icon(Icons.email_outlined, color: Colors.grey),
                       border: OutlineInputBorder(
@@ -196,7 +196,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         child: auth.isLoading
                             ? const CircularProgressIndicator(color: Colors.white)
                             : const Text(
-                                "Send Instructions",
+                                "Gui huong dan",
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -214,7 +214,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      "Having trouble? ",
+                      "Can ho tro? ",
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                     ),
                     Icon(Icons.open_in_new, size: 14, color: Colors.grey[800]),

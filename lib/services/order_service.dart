@@ -14,7 +14,7 @@ class OrderService {
     // ------------------------------------------------
 
     if (token == null) {
-      throw Exception('User not logged in');
+      throw Exception('Nguoi dung chua dang nhap');
     }
 
     final url = Uri.parse('${ApiConfig.baseUrl}${ApiConfig.getMyOrders}');
@@ -31,7 +31,7 @@ class OrderService {
       final List<dynamic> data = json.decode(response.body);
       return data.map((json) => OrderModel.fromJson(json)).toList();
     } else {
-      throw Exception('Failed to load orders: ${response.statusCode} ${response.body}');
+      throw Exception('Khong the tai danh sach don hang: ${response.statusCode} ${response.body}');
     }
   }
 }

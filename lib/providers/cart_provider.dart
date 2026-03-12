@@ -27,7 +27,13 @@ class CartProvider with ChangeNotifier {
   }
 
   // Thêm món vào giỏ
-  void addItem(MenuItem menuItem, int quantity, List<String> options, double priceWithOptions) {
+  void addItem(
+    MenuItem menuItem,
+    int quantity,
+    List<String> options,
+    double priceWithOptions, {
+    String? otherNote,
+  }) {
     // Kiểm tra xem món này với các options y hệt đã có trong giỏ chưa
     // Nếu muốn đơn giản: Luôn thêm mới. Nếu muốn gộp: Phải so sánh list options.
     // Ở đây tôi làm cách đơn giản: Luôn thêm dòng mới để dễ quản lý topping.
@@ -37,6 +43,7 @@ class CartProvider with ChangeNotifier {
       menuItem: menuItem,
       quantity: quantity,
       selectedOptions: options,
+      otherNote: otherNote,
       pricePerItem: priceWithOptions,
     ));
     notifyListeners();

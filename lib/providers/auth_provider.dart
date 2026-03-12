@@ -26,7 +26,7 @@ class AuthProvider extends ChangeNotifier {
     final profile = await _authService.getProfile(token);
     _user =
         profile ??
-        User(fullName: "User", email: "", role: "Student", token: token);
+      User(fullName: "Nguoi dung", email: "", role: "Student", token: token);
 
     notifyListeners();
     return true;

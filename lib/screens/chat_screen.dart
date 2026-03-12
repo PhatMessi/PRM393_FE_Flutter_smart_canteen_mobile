@@ -13,7 +13,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final List<_ChatMessage> _messages = [
     _ChatMessage(
-      text: 'Hi! How can we help you today?',
+      text: 'Xin chao! Chung toi co the ho tro ban gi hom nay?',
       isMe: false,
       time: DateTime.now(),
     ),
@@ -35,7 +35,7 @@ class _ChatScreenState extends State<ChatScreen> {
       setState(() {
         _messages.add(
           _ChatMessage(
-            text: 'Got it. We will check and get back to you.',
+            text: 'Da nhan thong tin. Chung toi se kiem tra va phan hoi ban ngay.',
             isMe: false,
             time: DateTime.now(),
           ),
@@ -56,7 +56,7 @@ class _ChatScreenState extends State<ChatScreen> {
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: const Text(
-          'Messaging',
+          'Nhan tin',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
         backgroundColor: const Color(0xFFF9FAFB),
@@ -102,7 +102,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     textInputAction: TextInputAction.send,
                     onSubmitted: (_) => _send(),
                     decoration: InputDecoration(
-                      hintText: 'Type a message...',
+                      hintText: 'Nhap tin nhan...',
                       filled: true,
                       fillColor: const Color(0xFFF9FAFB),
                       border: OutlineInputBorder(

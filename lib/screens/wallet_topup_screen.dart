@@ -23,7 +23,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
     final amount = int.tryParse(_amountController.text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
     if (amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid amount')),
+        const SnackBar(content: Text('Vui long nhap so tien hop le')),
       );
       return;
     }
@@ -35,7 +35,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
       if (token == null) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please login first')),
+          const SnackBar(content: Text('Vui long dang nhap truoc')),
         );
         return;
       }
@@ -53,7 +53,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
       if (response.statusCode == 200) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Top up successful')),
+          const SnackBar(content: Text('Nap tien thanh cong')),
         );
         Navigator.pop(context, true);
       } else {
@@ -67,7 +67,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
 
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Top up failed: $message')),
+          SnackBar(content: Text('Nap tien that bai: $message')),
         );
       }
     } finally {
@@ -92,7 +92,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
         backgroundColor: scaffoldBg,
         elevation: 0,
         title: const Text(
-          'Top Up',
+          'Nap tien',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         iconTheme: const IconThemeData(color: Colors.black),
@@ -104,7 +104,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Amount',
+              'So tien',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 10),
@@ -112,7 +112,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
               controller: _amountController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                hintText: 'e.g. 50000',
+                hintText: 'Vi du: 50000',
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide.none),
@@ -155,7 +155,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                       )
-                    : const Text('Top up now', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    : const Text('Nap tien ngay', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               ),
             ),
           ],

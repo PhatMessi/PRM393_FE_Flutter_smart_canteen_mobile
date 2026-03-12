@@ -2,11 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 import 'checkout_screen.dart';
+import 'home_screen.dart';
 import '../utils/image_helper.dart';
 import '../utils/money.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
+
+  void _handleBack(BuildContext context) {
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+      return;
+    }
+
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +28,7 @@ class CartScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
-        title: const Text("Your Tray", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+        title: const Text("Khay cua ban", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -25,7 +37,7 @@ class CartScreen extends StatelessWidget {
           decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
           child: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => _handleBack(context),
           ),
         ),
       ),
@@ -34,7 +46,7 @@ class CartScreen extends StatelessWidget {
           // 1. LIST ITEMS
           Expanded(
             child: cart.items.isEmpty
-                ? const Center(child: Text("Your tray is empty!"))
+              ? const Center(child: Text("Khay cua ban dang trong!"))
                 : ListView.builder(
                     padding: const EdgeInsets.all(20),
                     itemCount: cart.items.length + 1, // +1 cho nút "Add more items"
@@ -43,9 +55,9 @@ class CartScreen extends StatelessWidget {
                         // Nút Add more items ở cuối list
                         return Center(
                           child: TextButton.icon(
-                            onPressed: () => Navigator.pop(context), // Quay về Home chọn tiếp
+                            onPressed: () => _handleBack(context), // Quay về Home chọn tiếp
                             icon: const Icon(Icons.add_circle, color: brandGreen),
-                            label: const Text("Add more items", style: TextStyle(color: Colors.grey)),
+                            label: const Text("Them mon khac", style: TextStyle(color: Colors.grey)),
                           ),
                         );
                       }
@@ -94,11 +106,11 @@ class CartScreen extends StatelessWidget {
                                     ],
                                   ),
                                   // Hiển thị Options (Sốt, toppings)
-                                  if (item.selectedOptions.isNotEmpty)
+                                  if (item.orderItemNote != null)
                                     Padding(
                                       padding: const EdgeInsets.only(top: 4, bottom: 4),
                                       child: Text(
-                                        item.selectedOptions.join(", "),
+                                        item.orderItemNote ?? "Mac dinh",
                                         style: const TextStyle(color: Colors.grey, fontSize: 12),
                                         maxLines: 2, overflow: TextOverflow.ellipsis,
                                       ),
@@ -152,14 +164,14 @@ class CartScreen extends StatelessWidget {
             ),
             child: Column(
               children: [
-                _buildSummaryRow("Subtotal", Money.vnd(cart.subtotal)),
+                _buildSummaryRow("Tam tinh", Money.vnd(cart.subtotal)),
                 const SizedBox(height: 10),
-                _buildSummaryRow("Tax (5%)", Money.vnd(cart.tax)),
+                _buildSummaryRow("Thue (5%)", Money.vnd(cart.tax)),
                 const Padding(padding: EdgeInsets.symmetric(vertical: 15), child: Divider()),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("Total", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    const Text("Tong cong", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                     Text(Money.vnd(cart.totalAmount), 
                       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: brandGreen)),
                   ],
@@ -169,7 +181,7 @@ class CartScreen extends StatelessWidget {
                   children: [
                     Icon(Icons.credit_card, size: 16, color: Colors.grey),
                     SizedBox(width: 8),
-                    Text("Payment via Student ID Card", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    Text("Thanh toan bang the hoc sinh", style: TextStyle(color: Colors.grey, fontSize: 12)),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -191,7 +203,7 @@ class CartScreen extends StatelessWidget {
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Checkout", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                        Text("Thanh toan", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
                         SizedBox(width: 10),
                         Icon(Icons.arrow_forward_rounded, color: Colors.white)
                       ],

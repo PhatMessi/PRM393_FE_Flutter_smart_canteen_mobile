@@ -25,7 +25,7 @@ class AuthService {
       return User(
         fullName:
             (data['fullName'] ?? data['FullName'] ?? '').toString().isEmpty
-            ? 'User'
+            ? 'Nguoi dung'
             : (data['fullName'] ?? data['FullName']).toString(),
         email: (data['email'] ?? data['Email'] ?? '').toString(),
         role: (data['role'] ?? data['Role'] ?? 'Student').toString(),
@@ -57,7 +57,7 @@ class AuthService {
             : false;
 
         if (token == null || token.isEmpty) {
-          return {'success': false, 'message': 'Login response missing token'};
+          return {'success': false, 'message': 'Phan hoi dang nhap thieu token'};
         }
 
         final prefs = await SharedPreferences.getInstance();
@@ -73,7 +73,7 @@ class AuthService {
         final profile = await getProfile(token);
         final user =
             profile ??
-            User(fullName: 'User', email: email, role: 'Student', token: token);
+            User(fullName: 'Nguoi dung', email: email, role: 'Student', token: token);
 
         return {'success': true, 'user': user};
       } else {
@@ -98,17 +98,17 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
-        return {'success': true, 'message': 'Email sent'};
+        return {'success': true, 'message': 'Da gui email'};
       } else {
         try {
           final body = jsonDecode(response.body);
-          return {'success': false, 'message': body['message'] ?? 'Failed'};
+          return {'success': false, 'message': body['message'] ?? 'That bai'};
         } catch (_) {
           return {'success': false, 'message': response.body};
         }
       }
     } catch (e) {
-      return {'success': false, 'message': 'Connection error: $e'};
+      return {'success': false, 'message': 'Loi ket noi: $e'};
     }
   }
 
