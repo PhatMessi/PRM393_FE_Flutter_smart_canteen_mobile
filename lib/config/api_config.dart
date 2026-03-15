@@ -11,8 +11,13 @@ class ApiConfig {
   // Các Endpoints
   static const String login = "/auth/login";
   static const String register = "/auth/register";
+  static const String registerRequestOtp = "/auth/register/request-otp";
   static const String getUserProfile = "/auth/profile";
-  static const String forgotPassword = "/Auth/forgot-password";
+  static const String forgotPassword = "/auth/forgot-password";
+  static const String forgotPasswordConfirm = "/auth/forgot-password/confirm";
+  static const String changePassword = "/auth/change-password";
+  static const String changePasswordRequestOtp =
+      "/auth/change-password/request-otp";
   static const String getMenu = "/Menu";
   static const String getCategories = "/Menu/categories";
   static const String getMyOrders = "/Orders/my-orders";
