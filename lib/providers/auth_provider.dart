@@ -87,6 +87,147 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> resetPasswordWithOtp({
+    required String email,
+    required String otp,
+    required String newPassword,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final result = await _authService.resetPasswordWithOtp(
+        email: email,
+        otp: otp,
+        newPassword: newPassword,
+      );
+      _isLoading = false;
+
+      if (!result['success']) {
+        _errorMessage = result['message'];
+      }
+
+      notifyListeners();
+      return result['success'] == true;
+    } catch (_) {
+      _isLoading = false;
+      _errorMessage = 'Lỗi kết nối mạng';
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> requestRegisterOtp(String email) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final result = await _authService.requestRegisterOtp(email);
+      _isLoading = false;
+
+      if (!result['success']) {
+        _errorMessage = result['message'];
+      }
+
+      notifyListeners();
+      return result['success'] == true;
+    } catch (_) {
+      _isLoading = false;
+      _errorMessage = 'Lỗi kết nối mạng';
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> registerWithOtp({
+    required String fullName,
+    required String email,
+    required String password,
+    required String otp,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final result = await _authService.registerWithOtp(
+        fullName: fullName,
+        email: email,
+        password: password,
+        otp: otp,
+      );
+
+      _isLoading = false;
+      if (!result['success']) {
+        _errorMessage = result['message'];
+      }
+
+      notifyListeners();
+      return result['success'] == true;
+    } catch (_) {
+      _isLoading = false;
+      _errorMessage = 'Lỗi kết nối mạng';
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> requestChangePasswordOtp() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final result = await _authService.requestChangePasswordOtp();
+      _isLoading = false;
+
+      if (!result['success']) {
+        _errorMessage = result['message'];
+      }
+
+      notifyListeners();
+      return result['success'] == true;
+    } catch (_) {
+      _isLoading = false;
+      _errorMessage = 'Lỗi kết nối mạng';
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> changePasswordWithOtp({
+    required String oldPassword,
+    required String newPassword,
+    required String otp,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final result = await _authService.changePasswordWithOtp(
+        oldPassword: oldPassword,
+        newPassword: newPassword,
+        otp: otp,
+      );
+
+      _isLoading = false;
+      if (!result['success']) {
+        _errorMessage = result['message'];
+      }
+
+      notifyListeners();
+      return result['success'] == true;
+    } catch (_) {
+      _isLoading = false;
+      _errorMessage = 'Lỗi kết nối mạng';
+      notifyListeners();
+      return false;
+    }
+  }
+
   // Hàm đăng xuất
   void logout() {
     _authService.logout();

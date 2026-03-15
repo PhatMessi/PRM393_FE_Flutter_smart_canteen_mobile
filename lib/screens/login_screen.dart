@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import 'change_password_otp_screen.dart';
 import 'forgot_password_screen.dart';
 import 'home_screen.dart';
+import 'register_otp_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -35,8 +37,44 @@ class _LoginScreenState extends State<LoginScreen> {
         MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } else if (context.mounted) {
-        _showSnackBar(context, authProvider.errorMessage ?? 'Đăng nhập thất bại',
-          isError: true);
+      final error = authProvider.errorMessage ?? 'Đăng nhập thất bại';
+      final lower = error.toLowerCase();
+      final shouldChangePassword =
+          (lower.contains('must') && lower.contains('password')) ||
+              lower.contains('đổi mật khẩu') ||
+              lower.contains('doi mat khau');
+
+      if (shouldChangePassword) {
+        showDialog<void>(
+          context: context,
+          builder: (ctx) {
+            return AlertDialog(
+              title: const Text('Cần đổi mật khẩu'),
+              content: Text(error),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: const Text('Đóng'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const ChangePasswordOtpScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text('Đổi mật khẩu'),
+                ),
+              ],
+            );
+          },
+        );
+        return;
+      }
+
+      _showSnackBar(context, error, isError: true);
     }
   }
 
@@ -240,7 +278,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            // TODO: Navigate to Register
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const RegisterOtpScreen(),
+                              ),
+                            );
                           },
                           child: const Text(
                             "Đăng ký ngay",
