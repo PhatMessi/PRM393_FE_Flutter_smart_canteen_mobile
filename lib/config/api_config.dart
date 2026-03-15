@@ -17,6 +17,10 @@ class ApiConfig {
   static const String getCategories = "/Menu/categories";
   static const String getMyOrders = "/Orders/my-orders";
 
+  // Favorites (per account)
+  static const String favorites = "/Favorites";
+  static const String getFavorites = favorites;
+
   static const int receiveTimeout = 15000;
   static const int connectionTimeout = 15000;
 }
