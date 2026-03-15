@@ -433,6 +433,46 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
               ),
               const SizedBox(height: 25),
 
+              // 4.0 FAVORITES ITEM
+              Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(40),
+                  border: Border.all(color: Colors.grey.shade100),
+                ),
+                child: ListTile(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/favorites');
+                  },
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.red[50],
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.favorite, color: Colors.red),
+                  ),
+                  title: const Text(
+                    'Yeu thich',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  trailing: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.arrow_forward,
+                      size: 16,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 25),
+
               // 4.1 CHAT ITEM (Messaging)
               Container(
                 padding: const EdgeInsets.all(5),
@@ -546,7 +586,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
         child: const Icon(Icons.qr_code_scanner, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: const CustomBottomNavBar(selectedIndex: 4),
+      bottomNavigationBar: const CustomBottomNavBar(selectedIndex: 3),
     );
   }
 
