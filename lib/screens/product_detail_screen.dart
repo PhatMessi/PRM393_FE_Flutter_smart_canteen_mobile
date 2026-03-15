@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 import 'cart_screen.dart';
 import 'home_screen.dart';
+import '../providers/favorites_provider.dart';
 import '../utils/image_helper.dart'; // [FIX] Import image helper
 import '../utils/money.dart';
 
@@ -29,13 +30,17 @@ class _CustomizationPreset {
   final List<_OptionGroup> optionGroups;
   final Map<String, double> extras;
 
-  const _CustomizationPreset({required this.optionGroups, required this.extras});
+  const _CustomizationPreset({
+    required this.optionGroups,
+    required this.extras,
+  });
 }
 
 class ProductDetailScreen extends StatefulWidget {
   final MenuItem menuItem;
 
-  const ProductDetailScreen({Key? key, required this.menuItem}) : super(key: key);
+  const ProductDetailScreen({Key? key, required this.menuItem})
+    : super(key: key);
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -43,13 +48,13 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int quantity = 1;
-  
+
   // --- FAKE DATA ĐỂ GIỐNG UI DESIGN (Vì Backend chưa có) ---
   // Sau này có API thì thay thế list này bằng dữ liệu từ API
   final String _calories = "520 kcal";
   final double _rating = 4.8;
   final int _reviews = 120;
-  
+
   late final _CustomizationPreset _preset;
   final Map<String, String> _selectedByGroup = {};
   final Set<String> _selectedExtras = <String>{};
@@ -61,9 +66,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       return;
     }
 
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
-    );
+    Navigator.of(
+      context,
+    ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
   }
 
   @override
@@ -120,11 +125,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             choices: ['Khong cay', 'It cay', 'Binh thuong', 'Rat cay'],
           ),
         ],
-        extras: {
-          'Them pho mai': 5000,
-          'Them trung': 7000,
-          'Them com': 5000,
-        },
+        extras: {'Them pho mai': 5000, 'Them trung': 7000, 'Them com': 5000},
       );
     }
 
@@ -150,10 +151,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             choices: ['Khong da', 'It da', 'Da vua'],
           ),
         ],
-        extras: {
-          'Them tran chau': 5000,
-          'Them milk foam': 8000,
-        },
+        extras: {'Them tran chau': 5000, 'Them milk foam': 8000},
       );
     }
 
@@ -173,10 +171,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             choices: ['Khong cay', 'Cay vua', 'Cay nhieu'],
           ),
         ],
-        extras: {
-          'Them rong bien': 4000,
-          'Them sot': 5000,
-        },
+        extras: {'Them rong bien': 4000, 'Them sot': 5000},
       );
     }
 
@@ -256,19 +251,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isFavorite = context.select<FavoritesProvider, bool>(
+      (p) => p.isFavorite(widget.menuItem.itemId),
+    );
+
     return Scaffold(
       backgroundColor: kBackgroundColor,
       body: Stack(
         children: [
           // 1. Phần nội dung cuộn được
           SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: 100), // Chừa chỗ cho BottomBar
+            padding: const EdgeInsets.only(
+              bottom: 100,
+            ), // Chừa chỗ cho BottomBar
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeaderImage(context),
-                _buildContentBody(),
-              ],
+              children: [_buildHeaderImage(context), _buildContentBody()],
             ),
           ),
 
@@ -281,20 +279,45 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildCircleIconButton(Icons.arrow_back, _handleBack),
-                _buildCircleIconButton(Icons.favorite_border, () {
-                  // TODO: Xử lý logic yêu thích sau
-                }),
+                _buildCircleIconButton(
+                  isFavorite ? Icons.favorite : Icons.favorite_border,
+                  () async {
+                    final favorites = context.read<FavoritesProvider>();
+                    final wasFavorite = favorites.isFavorite(
+                      widget.menuItem.itemId,
+                    );
+
+                    try {
+                      await favorites.toggle(widget.menuItem);
+                    } catch (_) {
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Khong the cap nhat yeu thich.'),
+                        ),
+                      );
+                      return;
+                    }
+
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          wasFavorite
+                              ? 'Da bo khoi yeu thich'
+                              : 'Da them vao yeu thich',
+                        ),
+                        backgroundColor: kPrimaryColor,
+                      ),
+                    );
+                  },
+                ),
               ],
             ),
           ),
 
           // 3. Bottom Bar (Sticky at bottom)
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: _buildBottomBar(),
-          ),
+          Positioned(bottom: 0, left: 0, right: 0, child: _buildBottomBar()),
         ],
       ),
     );
@@ -302,7 +325,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   // Widget hiển thị ảnh Header
   Widget _buildHeaderImage(BuildContext context) {
-    return SizedBox( // Dùng SizedBox thay Container
+    return SizedBox(
+      // Dùng SizedBox thay Container
       height: 300,
       width: double.infinity,
       child: buildProductImage(
@@ -321,7 +345,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         color: kBackgroundColor,
         borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
       ),
-      transform: Matrix4.translationValues(0.0, -30.0, 0.0), // Đẩy lên đè ảnh một chút
+      transform: Matrix4.translationValues(
+        0.0,
+        -30.0,
+        0.0,
+      ), // Đẩy lên đè ảnh một chút
       padding: const EdgeInsets.all(24.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -334,32 +362,54 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               Expanded(
                 child: Text(
                   widget.menuItem.name,
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87),
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
                 ),
               ),
               Text(
                 Money.vnd(widget.menuItem.price),
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87),
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
               ),
             ],
           ),
           const SizedBox(height: 8),
-          const Text("Cang tin A • Khu phia Tay", style: TextStyle(color: Colors.grey)),
+          const Text(
+            "Cang tin A • Khu phia Tay",
+            style: TextStyle(color: Colors.grey),
+          ),
 
           const SizedBox(height: 20),
           // Hàng thông tin metrics (Rating, Calories, Tag)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildMetricChip(Icons.star, "$_rating ($_reviews)", Colors.amber),
-              _buildMetricChip(Icons.local_fire_department, _calories, Colors.orange),
+              _buildMetricChip(
+                Icons.star,
+                "$_rating ($_reviews)",
+                Colors.amber,
+              ),
+              _buildMetricChip(
+                Icons.local_fire_department,
+                _calories,
+                Colors.orange,
+              ),
               _buildMetricChip(Icons.eco, "Tot cho suc khoe", Colors.green),
             ],
           ),
 
           const SizedBox(height: 24),
           // Description
-          const Text("Mo ta", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const Text(
+            "Mo ta",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 8),
           Text(
             widget.menuItem.description ?? "Chua co mo ta.",
@@ -438,7 +488,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5)),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
+          ),
         ],
       ),
       child: Row(
@@ -456,7 +510,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   if (quantity > 1) setState(() => quantity--);
                 }),
                 const SizedBox(width: 16),
-                Text("$quantity", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(
+                  "$quantity",
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(width: 16),
                 _buildQuantityBtn(Icons.add, () {
                   setState(() => quantity++);
@@ -480,7 +540,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                 final options = _buildSelectedOptions();
                 final otherNote = _otherController.text.trim();
-                
+
                 // Gọi Provider để thêm vào giỏ
                 Provider.of<CartProvider>(context, listen: false).addItem(
                   widget.menuItem,
@@ -500,31 +560,52 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       textColor: Colors.white,
                       onPressed: () {
                         if (!mounted) return;
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen()));
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const CartScreen()),
+                        );
                       },
                     ),
-                  )
+                  ),
                 );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: kPrimaryColor,
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Them vao don", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                  const Text(
+                    "Them vao don",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                   const SizedBox(width: 10),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
-                    child: Text(Money.vnd(totalPrice), style: const TextStyle(color: Colors.white)),
-                  )
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      Money.vnd(totalPrice),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -533,8 +614,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   // Các Widget nhỏ hỗ trợ (Helper Widgets)
   Widget _buildCircleIconButton(IconData icon, VoidCallback onPressed) {
     return Container(
-      decoration: BoxDecoration(color: Colors.black.withOpacity(0.5), shape: BoxShape.circle),
-      child: IconButton(icon: Icon(icon, color: Colors.white), onPressed: onPressed),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.5),
+        shape: BoxShape.circle,
+      ),
+      child: IconButton(
+        icon: Icon(icon, color: Colors.white),
+        onPressed: onPressed,
+      ),
     );
   }
 
@@ -550,7 +637,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         children: [
           Icon(icon, size: 16, color: color),
           const SizedBox(width: 6),
-          Text(text, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+          Text(
+            text,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+          ),
         ],
       ),
     );
@@ -559,11 +649,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Widget _buildSectionHeader(String title, String subtitle) {
     return Row(
       children: [
-        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
         if (subtitle.isNotEmpty) ...[
           const SizedBox(width: 8),
-          Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 14)),
-        ]
+          Text(
+            subtitle,
+            style: const TextStyle(color: Colors.grey, fontSize: 14),
+          ),
+        ],
       ],
     );
   }

@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import '../screens/home_screen.dart';
 import '../screens/transaction_history_screen.dart';
+import '../screens/favorites_screen.dart';
 import '../screens/order_history_screen.dart';
 import '../screens/user_dashboard_screen.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int selectedIndex;
 
-  const CustomBottomNavBar({
-    super.key,
-    required this.selectedIndex,
-  });
+  const CustomBottomNavBar({super.key, required this.selectedIndex});
 
   void _onItemTapped(BuildContext context, int index) {
-    if (index == selectedIndex) return; // Nếu đang ở trang đó rồi thì không làm gì
+    if (index == selectedIndex)
+      return; // Nếu đang ở trang đó rồi thì không làm gì
 
     // Sử dụng pushReplacement để không bị chồng chất màn hình (tràn ram)
     // PageRouteBuilder để tắt hiệu ứng chuyển cảnh, tạo cảm giác như chuyển Tab
@@ -34,10 +33,12 @@ class CustomBottomNavBar extends StatelessWidget {
         nextScreen = const TransactionHistoryScreen();
         break;
       case 2:
-        // YÊU CẦU CỦA BẠN: Nút Ví (Index 2) mở OrderHistoryScreen
-        nextScreen = const OrderHistoryScreen();
+        nextScreen = const FavoritesScreen();
         break;
       case 3:
+        nextScreen = const OrderHistoryScreen();
+        break;
+      case 4:
         nextScreen = const UserDashboardScreen();
         break;
       default:
@@ -63,32 +64,48 @@ class CustomBottomNavBar extends StatelessWidget {
           children: [
             // Tab 0: Home
             IconButton(
-              icon: Icon(Icons.home_filled, 
-                color: selectedIndex == 0 ? brandGreen : inactiveColor),
+              icon: Icon(
+                Icons.home_filled,
+                color: selectedIndex == 0 ? brandGreen : inactiveColor,
+              ),
               onPressed: () => _onItemTapped(context, 0),
             ),
-            
+
             // Tab 1: Receipt (Lịch sử giao dịch)
             IconButton(
-              icon: Icon(Icons.receipt_long, 
-                color: selectedIndex == 1 ? brandGreen : inactiveColor),
+              icon: Icon(
+                Icons.receipt_long,
+                color: selectedIndex == 1 ? brandGreen : inactiveColor,
+              ),
               onPressed: () => _onItemTapped(context, 1),
             ),
 
-            const SizedBox(width: 40), // Khoảng trống cho nút QR ở giữa
-
-            // Tab 2: Wallet (Lịch sử đơn hàng - THEO YÊU CẦU CỦA BẠN)
+            // Tab 2: Favorites
             IconButton(
-              icon: Icon(Icons.account_balance_wallet, 
-                color: selectedIndex == 2 ? brandGreen : inactiveColor),
+              icon: Icon(
+                Icons.favorite,
+                color: selectedIndex == 2 ? brandGreen : inactiveColor,
+              ),
               onPressed: () => _onItemTapped(context, 2),
             ),
 
-            // Tab 3: Profile (Dashboard)
+            const SizedBox(width: 40), // Khoảng trống cho nút QR ở giữa
+            // Tab 3: Orders (Lịch sử đơn hàng)
             IconButton(
-              icon: Icon(Icons.person, 
-                color: selectedIndex == 3 ? brandGreen : inactiveColor),
+              icon: Icon(
+                Icons.account_balance_wallet,
+                color: selectedIndex == 3 ? brandGreen : inactiveColor,
+              ),
               onPressed: () => _onItemTapped(context, 3),
+            ),
+
+            // Tab 4: Profile (Dashboard)
+            IconButton(
+              icon: Icon(
+                Icons.person,
+                color: selectedIndex == 4 ? brandGreen : inactiveColor,
+              ),
+              onPressed: () => _onItemTapped(context, 4),
             ),
           ],
         ),
