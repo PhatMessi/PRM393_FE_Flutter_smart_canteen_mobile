@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../screens/home_screen.dart';
 import '../screens/transaction_history_screen.dart';
-import '../screens/favorites_screen.dart';
 import '../screens/order_history_screen.dart';
 import '../screens/user_dashboard_screen.dart';
 
@@ -33,12 +32,9 @@ class CustomBottomNavBar extends StatelessWidget {
         nextScreen = const TransactionHistoryScreen();
         break;
       case 2:
-        nextScreen = const FavoritesScreen();
-        break;
-      case 3:
         nextScreen = const OrderHistoryScreen();
         break;
-      case 4:
+      case 3:
         nextScreen = const UserDashboardScreen();
         break;
       default:
@@ -80,32 +76,23 @@ class CustomBottomNavBar extends StatelessWidget {
               onPressed: () => _onItemTapped(context, 1),
             ),
 
-            // Tab 2: Favorites
+            const SizedBox(width: 40), // Khoảng trống cho nút QR ở giữa
+            // Tab 2: Orders (Lịch sử đơn hàng)
             IconButton(
               icon: Icon(
-                Icons.favorite,
+                Icons.account_balance_wallet,
                 color: selectedIndex == 2 ? brandGreen : inactiveColor,
               ),
               onPressed: () => _onItemTapped(context, 2),
             ),
 
-            const SizedBox(width: 40), // Khoảng trống cho nút QR ở giữa
-            // Tab 3: Orders (Lịch sử đơn hàng)
-            IconButton(
-              icon: Icon(
-                Icons.account_balance_wallet,
-                color: selectedIndex == 3 ? brandGreen : inactiveColor,
-              ),
-              onPressed: () => _onItemTapped(context, 3),
-            ),
-
-            // Tab 4: Profile (Dashboard)
+            // Tab 3: Profile (Dashboard)
             IconButton(
               icon: Icon(
                 Icons.person,
-                color: selectedIndex == 4 ? brandGreen : inactiveColor,
+                color: selectedIndex == 3 ? brandGreen : inactiveColor,
               ),
-              onPressed: () => _onItemTapped(context, 4),
+              onPressed: () => _onItemTapped(context, 3),
             ),
           ],
         ),

@@ -5,7 +5,6 @@ import '../models/menu_item.dart';
 import '../providers/favorites_provider.dart';
 import '../utils/image_helper.dart';
 import '../utils/money.dart';
-import '../widgets/custom_bottom_nav_bar.dart';
 import 'product_detail_screen.dart';
 
 const Color kPrimaryColor = Color(0xFF2ED162);
@@ -121,13 +120,6 @@ class FavoritesScreen extends StatelessWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: kPrimaryColor,
-        child: const Icon(Icons.qr_code_scanner, color: Colors.white),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: const CustomBottomNavBar(selectedIndex: 2),
     );
   }
 }

@@ -131,7 +131,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         ],
       ),
       // Giữ BottomBar để đồng bộ trải nghiệm
-      bottomNavigationBar: const CustomBottomNavBar(selectedIndex: 3),
+      bottomNavigationBar: const CustomBottomNavBar(selectedIndex: 2),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: const Color(0xFF2ED162),
