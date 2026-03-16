@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../models/notification_model.dart';
 import '../services/notification_service.dart';
+import '../utils/vn_time.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -107,7 +108,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final n = items[index];
-                final timeText = DateFormat('dd/MM HH:mm').format(n.createdAt.toLocal());
+                final timeText = DateFormat('dd/MM HH:mm').format(VnTime.toVn(n.createdAt));
 
                 return Container(
                   padding: const EdgeInsets.all(14),

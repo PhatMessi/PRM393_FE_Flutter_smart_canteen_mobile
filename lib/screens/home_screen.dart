@@ -10,6 +10,7 @@ import 'product_detail_screen.dart'; // <--- 1. BỔ SUNG IMPORT NÀY
 import 'notifications_screen.dart';
 import 'cart_screen.dart';
 import '../services/auth_service.dart';
+import '../services/local_notification_service.dart';
 import '../services/realtime_service.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../utils/image_helper.dart'; // [FIX] Import Helper
@@ -48,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _orderReadySub?.cancel();
     _orderReadySub = RealtimeService.instance.orderReady.listen((event) {
       if (!mounted) return;
+      LocalNotificationService.instance.showStudentOrderReady(orderId: event.orderId, message: event.message);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(event.message.isNotEmpty ? event.message : 'Đơn #${event.orderId} đã sẵn sàng')),
       );

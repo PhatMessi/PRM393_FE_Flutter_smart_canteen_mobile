@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../models/order_model.dart';
 import '../utils/image_helper.dart';
 import '../utils/money.dart';
+import '../utils/vn_time.dart';
 
 class OrderDetailScreen extends StatelessWidget {
   final OrderModel order;
@@ -12,7 +13,7 @@ class OrderDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateText = DateFormat('dd/MM/yyyy HH:mm').format(order.orderDate.toLocal());
+    final dateText = DateFormat('dd/MM/yyyy HH:mm').format(VnTime.toVn(order.orderDate));
     final subtotal = order.orderItems.fold<double>(
       0,
       (sum, item) => sum + (item.price * item.quantity),
@@ -41,7 +42,7 @@ class OrderDetailScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   _infoRow(
                     'Thoi gian nhan',
-                    DateFormat('dd/MM/yyyy HH:mm').format(order.pickupTime!.toLocal()),
+                    DateFormat('dd/MM/yyyy HH:mm').format(VnTime.toVn(order.pickupTime!)),
                   ),
                 ],
                 if (order.rejectionReason != null && order.rejectionReason!.trim().isNotEmpty) ...[

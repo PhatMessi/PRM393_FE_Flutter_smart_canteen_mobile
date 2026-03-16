@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 import '../services/wallet_service.dart';
@@ -9,6 +10,7 @@ import '../config/api_config.dart';
 import 'wallet_topup_screen.dart';
 import '../utils/image_helper.dart';
 import '../utils/money.dart';
+import '../utils/vn_time.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -22,37 +24,104 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   double _walletBalance = 0.0;
   bool _isLoading = true;
 
-  String _selectedTime = "12:00 PM";
-  final List<String> _pickupTimes = [
-    "12:00 PM",
-    "12:15 PM",
-    "12:30 PM",
-    "12:45 PM",
-  ];
+  late List<DateTime> _pickupSlotsUtc;
+  late DateTime _selectedPickupUtc;
 
-  DateTime _pickupTimeFromSelection() {
-    final now = DateTime.now();
-    final parts = _selectedTime.split(' ');
-    final timePart = parts.isNotEmpty ? parts[0] : '12:00';
-    final ampm = parts.length > 1 ? parts[1].toUpperCase() : 'PM';
+  bool _sameMinuteUtc(DateTime a, DateTime b) {
+    final au = a.toUtc();
+    final bu = b.toUtc();
+    return au.year == bu.year &&
+        au.month == bu.month &&
+        au.day == bu.day &&
+        au.hour == bu.hour &&
+        au.minute == bu.minute;
+  }
 
-    final hm = timePart.split(':');
-    final hour12 = int.tryParse(hm.isNotEmpty ? hm[0] : '12') ?? 12;
-    final minute = int.tryParse(hm.length > 1 ? hm[1] : '0') ?? 0;
+  Future<void> _pickCustomPickupTime() async {
+    final nowVn = VnTime.now();
+    final maxVn = nowVn.add(const Duration(hours: 3));
 
-    int hour24;
-    if (ampm == 'AM') {
-      hour24 = hour12 % 12;
-    } else {
-      hour24 = (hour12 % 12) + 12;
+    final initialVn = VnTime.toVn(_selectedPickupUtc);
+    final initial = TimeOfDay(hour: initialVn.hour, minute: initialVn.minute);
+
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: initial,
+    );
+
+    if (!mounted || picked == null) return;
+
+    // Build VN DateTime for today. If it's already passed, treat as next day.
+    var candidateVn = DateTime(
+      nowVn.year,
+      nowVn.month,
+      nowVn.day,
+      picked.hour,
+      picked.minute,
+    );
+
+    if (candidateVn.isBefore(nowVn)) {
+      candidateVn = candidateVn.add(const Duration(days: 1));
     }
 
-    var pickup = DateTime(now.year, now.month, now.day, hour24, minute);
-    // Ensure pickup time is in the future (backend enforces this).
-    if (!pickup.isAfter(now)) {
-      pickup = pickup.add(const Duration(days: 1));
+    if (candidateVn.isAfter(maxVn) || candidateVn.isBefore(nowVn)) {
+      final fmt = DateFormat('HH:mm');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Giờ nhận chỉ được trong 3 giờ tới (tối đa ${fmt.format(maxVn)}).',
+            ),
+          ),
+        );
+      }
+      return;
     }
-    return pickup;
+
+    final utc = VnTime.utcFromVnWall(
+      candidateVn.year,
+      candidateVn.month,
+      candidateVn.day,
+      candidateVn.hour,
+      candidateVn.minute,
+    );
+
+    setState(() {
+      _selectedPickupUtc = utc;
+    });
+  }
+
+  List<DateTime> _buildPickupSlotsUtc() {
+    final nowUtc = DateTime.now().toUtc();
+    final nowVn = nowUtc.add(VnTime.offset);
+
+    // Round up to next 15-minute mark in Vietnam time.
+    final minute = nowVn.minute;
+    final remainder = minute % 15;
+    final addMinutes = remainder == 0 ? 15 : (15 - remainder);
+    final baseVn = DateTime(
+      nowVn.year,
+      nowVn.month,
+      nowVn.day,
+      nowVn.hour,
+      nowVn.minute,
+    ).add(Duration(minutes: addMinutes));
+
+    final slots = <DateTime>[];
+    for (var i = 0; i < 4; i++) {
+      final vnSlot = baseVn.add(Duration(minutes: i * 15));
+      final utcSlot = VnTime.utcFromVnWall(
+        vnSlot.year,
+        vnSlot.month,
+        vnSlot.day,
+        vnSlot.hour,
+        vnSlot.minute,
+      );
+      slots.add(utcSlot);
+    }
+
+    // Ensure all slots are in the future (UTC).
+    return slots.where((s) => s.isAfter(nowUtc)).toList();
   }
 
   String _extractErrorMessage(String body) {
@@ -76,6 +145,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   @override
   void initState() {
     super.initState();
+    _pickupSlotsUtc = _buildPickupSlotsUtc();
+    _selectedPickupUtc = _pickupSlotsUtc.isNotEmpty
+        ? _pickupSlotsUtc.first
+        : DateTime.now().toUtc().add(const Duration(minutes: 30));
     _fetchWalletBalance();
   }
 
@@ -135,7 +208,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             )
             .toList(),
         // Use user selected pickup time
-        "pickupTime": _pickupTimeFromSelection().toIso8601String(),
+        // Always send UTC (with 'Z') so backend doesn't misinterpret timezone.
+        "pickupTime": _selectedPickupUtc.toIso8601String(),
       };
 
       final response = await http.post(
@@ -372,43 +446,53 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     ],
                   ),
                   const SizedBox(height: 15),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: _pickupTimes.map((time) {
-                        bool isSelected = time == _selectedTime;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 10),
-                          child: GestureDetector(
-                            onTap: () => setState(() => _selectedTime = time),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 12,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isSelected ? brandGreen : Colors.white,
-                                borderRadius: BorderRadius.circular(30),
-                                border: Border.all(
-                                  color: isSelected
-                                      ? Colors.transparent
-                                      : Colors.grey.shade300,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: _pickupSlotsUtc.map((slotUtc) {
+                              final label = DateFormat('HH:mm').format(VnTime.toVn(slotUtc));
+                              final isSelected = _sameMinuteUtc(slotUtc, _selectedPickupUtc);
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 10),
+                                child: GestureDetector(
+                                  onTap: () => setState(() => _selectedPickupUtc = slotUtc),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 12,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: isSelected ? brandGreen : Colors.white,
+                                      borderRadius: BorderRadius.circular(30),
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? Colors.transparent
+                                            : Colors.grey.shade300,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      label,
+                                      style: TextStyle(
+                                        color: isSelected ? Colors.white : Colors.black87,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              child: Text(
-                                time,
-                                style: TextStyle(
-                                  color: isSelected
-                                      ? Colors.white
-                                      : Colors.black87,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
+                              );
+                            }).toList(),
                           ),
-                        );
-                      }).toList(),
-                    ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      TextButton(
+                        onPressed: _pickCustomPickupTime,
+                        child: const Text('Chọn giờ khác'),
+                      ),
+                    ],
                   ),
 
                   const SizedBox(height: 30),

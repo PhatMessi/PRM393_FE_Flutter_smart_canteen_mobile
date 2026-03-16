@@ -2,12 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 import '../models/order_model.dart';
 import '../services/auth_service.dart';
 import '../services/kitchen_order_service.dart';
+import '../services/local_notification_service.dart';
 import '../services/realtime_service.dart';
 import '../utils/money.dart';
+import '../utils/vn_time.dart';
 
 class KitchenOrdersScreen extends StatefulWidget {
   const KitchenOrdersScreen({super.key});
@@ -43,6 +46,7 @@ class _KitchenOrdersScreenState extends State<KitchenOrdersScreen> {
     _newOrderSub = RealtimeService.instance.kitchenNewOrders.listen((event) {
       if (!mounted) return;
       SystemSound.play(SystemSoundType.alert);
+      LocalNotificationService.instance.showKitchenNewOrder(orderId: event.orderId);
       _showNewOrderPopup(event.orderId);
       _refresh();
     });
@@ -224,7 +228,14 @@ class _OrdersTab extends StatelessWidget {
             );
           }
 
-          final orders = snapshot.data ?? const [];
+          final orders = List<OrderModel>.from(snapshot.data ?? const []);
+          orders.sort((a, b) {
+            final aKey = a.pickupTime ?? a.orderDate;
+            final bKey = b.pickupTime ?? b.orderDate;
+            final byPickup = aKey.compareTo(bKey);
+            if (byPickup != 0) return byPickup;
+            return a.orderDate.compareTo(b.orderDate);
+          });
           if (orders.isEmpty) {
             return ListView(
               children: [
@@ -240,7 +251,13 @@ class _OrdersTab extends StatelessWidget {
             separatorBuilder: (_, __) => const SizedBox(height: 10),
             itemBuilder: (context, index) {
               final o = orders[index];
-              final time = o.orderDate.toLocal();
+              final fmt = DateFormat('HH:mm');
+              final pickupVn = VnTime.toVn(o.pickupTime ?? o.orderDate);
+              final createdVn = VnTime.toVn(o.orderDate);
+
+                final rightTime = (o.pickupTime == null)
+                  ? 'Đặt ${fmt.format(createdVn)}'
+                  : 'Nhận ${fmt.format(pickupVn)} (đặt ${fmt.format(createdVn)})';
 
               return Card(
                 child: Padding(
@@ -252,7 +269,7 @@ class _OrdersTab extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text('#${o.orderId}', style: const TextStyle(fontWeight: FontWeight.bold)),
-                          Text('${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}'),
+                          Text(rightTime),
                         ],
                       ),
                       const SizedBox(height: 6),
