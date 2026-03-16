@@ -45,6 +45,7 @@ dependencies:
   intl: ^0.20.2
   qr_flutter: ^4.1.0
   url_launcher: ^6.3.0
+  signalr_netcore: ^1.4.4
 
 dev_dependencies:
   flutter_test:

@@ -4,6 +4,7 @@ class OrderModel {
   final DateTime? pickupTime; // Có thể null
   final double totalPrice;
   final String status; // Pending, Ready, Completed, Rejected
+  final String? kitchenStatus; // Pending, Cooking, Complete (cho role bếp)
   final String? rejectionReason; // Lý do từ chối
   final List<OrderItemModel> orderItems;
 
@@ -13,6 +14,7 @@ class OrderModel {
     this.pickupTime,
     required this.totalPrice,
     required this.status,
+    this.kitchenStatus,
     this.rejectionReason,
     required this.orderItems,
   });
@@ -23,6 +25,8 @@ class OrderModel {
     final pickupTimeRaw = json['pickupTime'] ?? json['PickupTime'];
     final totalPriceRaw = json['totalPrice'] ?? json['TotalPrice'] ?? 0;
     final statusRaw = json['status'] ?? json['Status'] ?? '';
+    final kitchenStatusRaw =
+      json['kitchenStatus'] ?? json['KitchenStatus'];
     final rejectionReasonRaw = json['rejectionReason'] ?? json['RejectionReason'];
     final orderItemsRaw = json['orderItems'] ?? json['OrderItems'] ?? const [];
 
@@ -32,6 +36,7 @@ class OrderModel {
       pickupTime: pickupTimeRaw != null ? DateTime.tryParse(pickupTimeRaw.toString()) : null,
       totalPrice: (totalPriceRaw as num).toDouble(),
       status: statusRaw.toString(),
+      kitchenStatus: kitchenStatusRaw?.toString(),
       rejectionReason: rejectionReasonRaw?.toString(),
       orderItems: (orderItemsRaw is List ? orderItemsRaw : const [])
           .map((item) => OrderItemModel.fromJson(item as Map<String, dynamic>))

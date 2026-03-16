@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
@@ -7,6 +9,8 @@ import '../models/menu_item.dart';
 import 'product_detail_screen.dart'; // <--- 1. BỔ SUNG IMPORT NÀY
 import 'notifications_screen.dart';
 import 'cart_screen.dart';
+import '../services/auth_service.dart';
+import '../services/realtime_service.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../utils/image_helper.dart'; // [FIX] Import Helper
 import '../utils/money.dart';
@@ -20,6 +24,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final MenuService _menuService = MenuService();
+  final AuthService _authService = AuthService();
+  StreamSubscription<OrderReadyEvent>? _orderReadySub;
   
   List<Category> _categories = [];
   List<MenuItem> _menuItems = [];
@@ -30,6 +36,28 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _fetchData();
+    _startRealtime();
+  }
+
+  Future<void> _startRealtime() async {
+    final token = await _authService.getToken();
+    if (!mounted || token == null || token.isEmpty) return;
+
+    await RealtimeService.instance.start(token: token);
+
+    _orderReadySub?.cancel();
+    _orderReadySub = RealtimeService.instance.orderReady.listen((event) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(event.message.isNotEmpty ? event.message : 'Đơn #${event.orderId} đã sẵn sàng')),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _orderReadySub?.cancel();
+    super.dispose();
   }
 
   Future<void> _fetchData() async {
