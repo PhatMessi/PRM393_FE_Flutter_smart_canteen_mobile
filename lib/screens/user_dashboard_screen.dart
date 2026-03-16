@@ -5,11 +5,13 @@ import '../providers/auth_provider.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import 'chat_screen.dart';
 import 'notifications_screen.dart';
+import 'login_screen.dart';
 import 'transaction_history_screen.dart';
 import 'wallet_topup_screen.dart';
 import '../models/transaction_model.dart';
 import '../services/wallet_service.dart';
 import '../utils/money.dart';
+import '../utils/vn_time.dart';
 
 class UserDashboardScreen extends StatefulWidget {
   const UserDashboardScreen({super.key});
@@ -217,24 +219,50 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                       ),
                     ],
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const NotificationsScreen(),
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const NotificationsScreen(),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.notifications_none, size: 24),
                         ),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.notifications_none, size: 24),
-                    ),
-                  ),
+                      const SizedBox(width: 10),
+                      GestureDetector(
+                        onTap: () async {
+                          await Provider.of<AuthProvider>(
+                            context,
+                            listen: false,
+                          ).logout();
+                          if (!context.mounted) return;
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(builder: (_) => const LoginScreen()),
+                            (_) => false,
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.logout, size: 22),
+                        ),
+                      ),
+                    ],
+                  )
                 ],
               ),
               const SizedBox(height: 25),
@@ -600,7 +628,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
         ? Icons.account_balance_wallet
         : (t.type == 'Refund' ? Icons.undo : Icons.fastfood);
 
-    final timeText = DateFormat('dd/MM • HH:mm').format(t.date.toLocal());
+    final timeText = DateFormat('dd/MM • HH:mm').format(VnTime.toVn(t.date));
     final title = t.description.isNotEmpty ? t.description : t.type;
 
     return Container(

@@ -1,3 +1,5 @@
+import '../utils/server_time.dart';
+
 class OrderModel {
   final int orderId;
   final DateTime orderDate;
@@ -32,8 +34,8 @@ class OrderModel {
 
     return OrderModel(
       orderId: orderIdRaw is int ? orderIdRaw : int.tryParse(orderIdRaw.toString()) ?? 0,
-      orderDate: DateTime.parse(orderDateRaw?.toString() ?? DateTime.now().toIso8601String()),
-      pickupTime: pickupTimeRaw != null ? DateTime.tryParse(pickupTimeRaw.toString()) : null,
+      orderDate: ServerTime.parseUtc(orderDateRaw),
+      pickupTime: pickupTimeRaw != null ? ServerTime.parseUtc(pickupTimeRaw, fallback: DateTime.now().toUtc()) : null,
       totalPrice: (totalPriceRaw as num).toDouble(),
       status: statusRaw.toString(),
       kitchenStatus: kitchenStatusRaw?.toString(),

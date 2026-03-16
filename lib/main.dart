@@ -3,13 +3,16 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart'; // Import Google Fonts
 import 'providers/auth_provider.dart';
+import 'services/local_notification_service.dart';
 import 'screens/splash_screen.dart';
 import 'screens/favorites_screen.dart';
 import 'providers/cart_provider.dart';
 import 'providers/order_provider.dart';
 import 'providers/favorites_provider.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await LocalNotificationService.instance.initAndRequestPermissions();
   runApp(const MyApp());
 }
 

@@ -229,8 +229,8 @@ class AuthProvider extends ChangeNotifier {
   }
 
   // Hàm đăng xuất
-  void logout() {
-    _authService.logout();
+  Future<void> logout() async {
+    await _authService.logout();
     _user = null;
     notifyListeners();
   }

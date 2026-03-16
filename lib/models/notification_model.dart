@@ -1,3 +1,5 @@
+import '../utils/server_time.dart';
+
 class NotificationModel {
   final int notificationId;
   final String title;
@@ -38,12 +40,7 @@ class NotificationModel {
         json['CreatedDate'];
     final link = (json['link'] ?? json['Link'])?.toString();
 
-    DateTime createdAt;
-    if (createdAtRaw is String && createdAtRaw.isNotEmpty) {
-      createdAt = DateTime.tryParse(createdAtRaw) ?? DateTime.now();
-    } else {
-      createdAt = DateTime.now();
-    }
+    final createdAt = ServerTime.parseUtc(createdAtRaw);
 
     final isRead = (json['isRead'] ?? json['IsRead'] ?? false) == true;
 

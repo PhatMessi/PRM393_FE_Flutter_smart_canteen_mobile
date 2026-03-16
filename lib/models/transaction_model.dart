@@ -1,3 +1,5 @@
+import '../utils/server_time.dart';
+
 class TransactionModel {
   final int transactionId;
   final String type; // "Payment", "TopUp", "Refund"
@@ -23,7 +25,7 @@ class TransactionModel {
       type: json['type'] ?? 'Unknown',
       amount: (json['amount'] ?? 0).toDouble(),
       status: json['status'] ?? 'Unknown',
-      date: DateTime.parse(json['transactionDate'] ?? DateTime.now().toIso8601String()),
+      date: ServerTime.parseUtc(json['transactionDate']),
       description: json['description'] ?? '',
       orderId: json['orderId'],
     );

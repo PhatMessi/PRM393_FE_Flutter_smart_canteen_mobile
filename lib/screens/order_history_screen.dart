@@ -8,6 +8,7 @@ import 'map_screen.dart';
 import 'order_detail_screen.dart';
 import '../utils/image_helper.dart';
 import '../utils/money.dart';
+import '../utils/vn_time.dart';
 
 class OrderHistoryScreen extends StatefulWidget {
   const OrderHistoryScreen({super.key});
@@ -233,8 +234,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   ),
                 ],
               ),
-              Text(
-                "#${order.orderId} • ${DateFormat('HH:mm').format(order.orderDate.toLocal())}",
+                Text(
+                  "#${order.orderId} • ${DateFormat('HH:mm').format(VnTime.toVn(order.orderDate))}",
                 style: const TextStyle(color: Colors.grey, fontSize: 12),
               ),
             ],
