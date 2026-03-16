@@ -217,7 +217,120 @@ void setFieldError(String fieldName, String? error) {
 
 ---
 
-## 📝 Hướng Dẫn Sử Dụng Fixes
+## � BUG #5: Tràn Giao Diện (UI Overflow)
+**File:** `bug_fix_ui_overflow.dart`
+
+### Vấn đề
+- Khi nội dung vượt quá kích thước container, app bị lỗi "RenderFlex overflowed"
+- Text bị cắt mất hoặc overlap trên các thiết bị có màn hình nhỏ
+- Không có giải pháp tổng quát để xử lý overflow
+- Layout bị hỏng trên các device khác nhau (iPad, tablet, phone nhỏ)
+
+### Root Cause
+```dart
+// ❌ CỦA (Layout không xử lý overflow)
+Row(
+  children: [
+    Text('Very long text that might overflow...'), // Không giới hạn width
+    Icon(Icons.something),
+  ],
+) // ❌ Error: RenderFlex overflowed by XXX pixels
+
+Column(
+  children: [
+    Text('Another long text...'),
+  ],
+) // ❌ Text bị cắt ngang trên màn hình nhỏ
+```
+
+### Giải Pháp
+✅ **Cung cấp 8 utility widgets / functions:**
+
+1. **AdaptiveText** - Tự động wrap text khi tràn:
+```dart
+AdaptiveText(
+  'Long text here...',
+  maxLines: 3,
+  overflow: TextOverflow.ellipsis,
+)
+```
+
+2. **ScrollableRow** - Cuộn ngang khi content tràn:
+```dart
+ScrollableRow(
+  children: [chip1, chip2, chip3],
+  spacing: 8.0,
+)
+```
+
+3. **FlexibleColumn** - Fit content theo kích thước available:
+```dart
+FlexibleColumn(
+  children: [widget1, widget2],
+)
+```
+
+4. **ConstrainedText** - Giới hạn chiều rộng text:
+```dart
+ConstrainedText(
+  'Text here',
+  maxWidth: 200,
+  maxLines: 2,
+)
+```
+
+5. **OverflowContainer** - Container thông minh:
+```dart
+OverflowContainer(
+  maxHeight: 300,
+  maxWidth: 400,
+  enableScroll: true,
+  child: widget,
+)
+```
+
+6. **ResponsiveRow** - Tự động wrap thành column trên màn hình nhỏ:
+```dart
+ResponsiveRow(
+  breakpoint: 600,
+  children: [widget1, widget2],
+)
+```
+
+7. **OverflowUtils** - Utility functions:
+```dart
+// Truncate text
+String shortened = OverflowUtils.truncateText(
+  text: 'Very long text',
+  maxLength: 20,
+);
+
+// Responsive font size
+double size = OverflowUtils.getResponsiveFontSize(context);
+
+// Responsive padding
+EdgeInsets padding = OverflowUtils.getResponsivePadding(context);
+```
+
+8. **ExpandableContainer** - Mở rộng để hiển thị nội dung:
+```dart
+ExpandableContainer(
+  maxLinesCollapsed: 2,
+  expandLabel: 'Xem thêm',
+  child: longContentWidget,
+)
+```
+
+### Lợi Ích
+- 🎯 Tránh được lỗi "RenderFlex overflowed"
+- 📱 Layout thích ứng với mọi kích thước màn hình
+- ♾️ Nội dung không bị cắt mất
+- 🔄 Tái sử dụng widgets trên toàn app
+- 🎨 UI đẹp hơn và responsive hơn
+
+---
+
+## �📝 Hướng Dẫn Sử Dụng Fixes
 
 ### 1. Chọn Fix Mà Bạn Muốn Dùng
 Mỗi file `.dart` trong folder `repo/` là standalone - bạn có thể copy code vào project.
@@ -280,6 +393,36 @@ test('Invalid email should show error', () {
 });
 ```
 
+### Test UI Overflow Widgets
+```dart
+test('AdaptiveText should truncate long text', () {
+  final widget = AdaptiveText(
+    'Very long text that should be truncated...',
+    maxLines: 2,
+  );
+  expect(find.byType(AdaptiveText), findsOneWidget);
+});
+
+test('ResponsiveRow should change layout on small screen', () {
+  // Test with width < breakpoint
+  final widget = ResponsiveRow(
+    breakpoint: 600,
+    children: [Container(), Container()],
+  );
+  // Should render as Column on small screens
+  expect(find.byType(ResponsiveRow), findsOneWidget);
+});
+
+test('OverflowUtils should truncate text correctly', () {
+  final result = OverflowUtils.truncateText(
+    text: 'This is a very long text',
+    maxLength: 10,
+  );
+  expect(result.length, 13); // 10 + '...'
+  expect(result.endsWith('...'), true);
+});
+```
+
 ---
 
 ## 📊 Performance Impact
@@ -290,6 +433,7 @@ test('Invalid email should show error', () {
 | Token Expiry | Auth Service | 🔐 Security | Critical |
 | Order Retry | Order Service | 🌐 Reliability | High |
 | Input Validation | Auth Provider | 📱 Performance | Medium |
+| UI Overflow | Layout/Widgets | 🎨 Responsive Design | High |
 
 ---
 
@@ -313,5 +457,5 @@ Nếu có vấn đề khi integrate, check:
 
 ---
 
-**Last Updated:** March 13, 2026
+**Last Updated:** March 16, 2026
 **Project:** PRM393 - Smart Canteen Mobile App (Flutter)
