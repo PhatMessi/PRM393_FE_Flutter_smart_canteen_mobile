@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../config/api_config.dart';
 import '../services/auth_service.dart';
@@ -16,11 +19,139 @@ class WalletTopUpScreen extends StatefulWidget {
 class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
   final _amountController = TextEditingController(text: '50000');
   bool _isSubmitting = false;
+  Timer? _statusTimer;
 
   static const _quickAmounts = <int>[50000, 100000, 200000, 500000];
 
+  @override
+  void dispose() {
+    _statusTimer?.cancel();
+    _amountController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _openCheckoutUrl(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return;
+    await launchUrl(uri, mode: LaunchMode.platformDefault);
+  }
+
+  Future<void> _showPayosDialog({
+    required int amount,
+    required int orderCode,
+    required String checkoutUrl,
+    required String qrCode,
+  }) async {
+    final statusText = ValueNotifier<String>('Dang cho thanh toan...');
+    bool dialogShown = false;
+
+    Future<void> poll() async {
+      try {
+        final token = await AuthService().getToken();
+        if (token == null) return;
+
+        final url = Uri.parse(
+          '${ApiConfig.baseUrl}/wallet/topup/payos/$orderCode/status?sync=true',
+        );
+        final resp = await http.get(
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        );
+
+        if (resp.statusCode != 200) return;
+
+        final data = jsonDecode(resp.body);
+        final status = (data['status'] ?? '').toString();
+        final processed = (data['isProcessed'] ?? false) == true;
+
+        if (!mounted) return;
+
+        if (status.toLowerCase() == 'paid' && processed) {
+          statusText.value = 'Trang thai: Paid';
+          _statusTimer?.cancel();
+          if (dialogShown &&
+              Navigator.of(context, rootNavigator: true).canPop()) {
+            Navigator.of(context, rootNavigator: true).pop(true);
+          }
+        } else {
+          statusText.value = 'Trang thai: $status';
+        }
+      } catch (_) {}
+    }
+
+    _statusTimer?.cancel();
+    _statusTimer = Timer.periodic(const Duration(seconds: 3), (_) => poll());
+    await poll();
+
+    if (!mounted) return;
+
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        dialogShown = true;
+        return AlertDialog(
+          title: const Text('Thanh toan PayOS'),
+          content: SizedBox(
+            width: 280,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('So tien: ${amount.toString()} d'),
+                const SizedBox(height: 12),
+                if (qrCode.isNotEmpty)
+                  SizedBox.square(
+                    dimension: 220,
+                    child: QrImageView(data: qrCode, version: QrVersions.auto),
+                  )
+                else
+                  const Text('Khong co du lieu QR'),
+                const SizedBox(height: 12),
+                ValueListenableBuilder<String>(
+                  valueListenable: statusText,
+                  builder: (context, value, _) => Text(value),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                _statusTimer?.cancel();
+                Navigator.pop(dialogContext, false);
+              },
+              child: const Text('Dong'),
+            ),
+            ElevatedButton(
+              onPressed: () => _openCheckoutUrl(checkoutUrl),
+              child: const Text('Mo trang thanh toan'),
+            ),
+          ],
+        );
+      },
+    );
+
+    _statusTimer?.cancel();
+    statusText.dispose();
+
+    if (result == true) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Nap tien thanh cong')));
+      Navigator.pop(context, true);
+    }
+  }
+
   Future<void> _submit() async {
-    final amount = int.tryParse(_amountController.text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+    final amount =
+        int.tryParse(
+          _amountController.text.replaceAll(RegExp(r'[^0-9]'), ''),
+        ) ??
+        0;
     if (amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Vui long nhap so tien hop le')),
@@ -40,7 +171,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
         return;
       }
 
-      final url = Uri.parse('${ApiConfig.baseUrl}/wallet/topup');
+      final url = Uri.parse('${ApiConfig.baseUrl}/wallet/topup/payos');
       final response = await http.post(
         url,
         headers: {
@@ -51,34 +182,41 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
       );
 
       if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final orderCode = (data['orderCode'] as num).toInt();
+        final checkoutUrl = (data['checkoutUrl'] ?? '').toString();
+        final qrCode = (data['qrCode'] ?? '').toString();
+
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Nap tien thanh cong')),
+        await _showPayosDialog(
+          amount: amount,
+          orderCode: orderCode,
+          checkoutUrl: checkoutUrl,
+          qrCode: qrCode,
         );
-        Navigator.pop(context, true);
       } else {
         String message = response.body;
         try {
           final data = jsonDecode(response.body);
           if (data is Map<String, dynamic>) {
-            message = (data['message'] ?? data['Message'] ?? data['error'] ?? data['Error'] ?? response.body).toString();
+            message =
+                (data['message'] ??
+                        data['Message'] ??
+                        data['error'] ??
+                        data['Error'] ??
+                        response.body)
+                    .toString();
           }
         } catch (_) {}
 
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Nap tien that bai: $message')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Nap tien that bai: $message')));
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
-  }
-
-  @override
-  void dispose() {
-    _amountController.dispose();
-    super.dispose();
   }
 
   @override
@@ -115,7 +253,10 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
                 hintText: 'Vi du: 50000',
                 filled: true,
                 fillColor: Colors.white,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide.none),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(18),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
             const SizedBox(height: 14),
@@ -125,12 +266,18 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
               children: _quickAmounts
                   .map(
                     (v) => OutlinedButton(
-                      onPressed: _isSubmitting ? null : () => setState(() => _amountController.text = v.toString()),
+                      onPressed: _isSubmitting
+                          ? null
+                          : () => setState(
+                              () => _amountController.text = v.toString(),
+                            ),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.black,
                         backgroundColor: Colors.white,
                         side: BorderSide(color: Colors.grey.shade200),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
                       ),
                       child: Text('${v.toString()} đ'),
                     ),
@@ -145,7 +292,9 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: brandGreen,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   elevation: 0,
                 ),
@@ -153,9 +302,18 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
                     ? const SizedBox(
                         height: 20,
                         width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
                       )
-                    : const Text('Nap tien ngay', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    : const Text(
+                        'Nap tien ngay',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
               ),
             ),
           ],

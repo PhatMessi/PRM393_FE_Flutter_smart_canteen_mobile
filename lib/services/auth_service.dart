@@ -77,11 +77,78 @@ class AuthService {
 
         return {'success': true, 'user': user};
       } else {
-        final errorData = jsonDecode(response.body);
-        return {'success': false, 'message': errorData['message']};
+        final decoded = _tryDecodeJson(response.body);
+        return {
+          'success': false,
+          'message': _readMessage(decoded) ?? response.body,
+        };
       }
     } catch (e) {
       return {'success': false, 'message': 'Lỗi kết nối: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> requestRegisterOtp(String email) async {
+    final url = Uri.parse(ApiConfig.baseUrl + ApiConfig.registerRequestOtp);
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email}),
+      );
+
+      final decoded = _tryDecodeJson(response.body);
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': _readMessage(decoded) ?? 'Da gui OTP',
+        };
+      }
+
+      return {
+        'success': false,
+        'message': _readMessage(decoded) ?? response.body,
+      };
+    } catch (e) {
+      return {'success': false, 'message': 'Loi ket noi: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> registerWithOtp({
+    required String fullName,
+    required String email,
+    required String password,
+    required String otp,
+  }) async {
+    final url = Uri.parse(ApiConfig.baseUrl + ApiConfig.register);
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'fullName': fullName,
+          'email': email,
+          'password': password,
+          'otp': otp,
+        }),
+      );
+
+      final decoded = _tryDecodeJson(response.body);
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': _readMessage(decoded) ?? 'Dang ky thanh cong',
+        };
+      }
+
+      return {
+        'success': false,
+        'message': _readMessage(decoded) ?? response.body,
+      };
+    } catch (e) {
+      return {'success': false, 'message': 'Loi ket noi: $e'};
     }
   }
 
@@ -98,11 +165,21 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
+        try {
+          final body = jsonDecode(response.body);
+          if (body is Map<String, dynamic>) {
+            final msg = (body['message'] ?? body['Message'] ?? 'Da gui email').toString();
+            return {'success': true, 'message': msg};
+          }
+        } catch (_) {}
         return {'success': true, 'message': 'Da gui email'};
       } else {
         try {
           final body = jsonDecode(response.body);
-          return {'success': false, 'message': body['message'] ?? 'That bai'};
+          return {
+            'success': false,
+            'message': (body['message'] ?? body['Message'] ?? 'That bai').toString(),
+          };
         } catch (_) {
           return {'success': false, 'message': response.body};
         }
@@ -110,6 +187,134 @@ class AuthService {
     } catch (e) {
       return {'success': false, 'message': 'Loi ket noi: $e'};
     }
+  }
+
+  Future<Map<String, dynamic>> resetPasswordWithOtp({
+    required String email,
+    required String otp,
+    required String newPassword,
+  }) async {
+    final url = Uri.parse(ApiConfig.baseUrl + ApiConfig.forgotPasswordConfirm);
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': email,
+          'otp': otp,
+          'newPassword': newPassword,
+        }),
+      );
+
+      final decoded = _tryDecodeJson(response.body);
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': _readMessage(decoded) ?? 'Đặt lại mật khẩu thành công',
+        };
+      }
+
+      return {
+        'success': false,
+        'message': _readMessage(decoded) ?? response.body,
+      };
+    } catch (e) {
+      return {'success': false, 'message': 'Loi ket noi: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> requestChangePasswordOtp() async {
+    final token = await getToken();
+    if (token == null || token.isEmpty) {
+      return {'success': false, 'message': 'Chua dang nhap'};
+    }
+
+    final url = Uri.parse(ApiConfig.baseUrl + ApiConfig.changePasswordRequestOtp);
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      final decoded = _tryDecodeJson(response.body);
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': _readMessage(decoded) ?? 'Da gui OTP',
+        };
+      }
+
+      return {
+        'success': false,
+        'message': _readMessage(decoded) ?? response.body,
+      };
+    } catch (e) {
+      return {'success': false, 'message': 'Loi ket noi: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> changePasswordWithOtp({
+    required String oldPassword,
+    required String newPassword,
+    required String otp,
+  }) async {
+    final token = await getToken();
+    if (token == null || token.isEmpty) {
+      return {'success': false, 'message': 'Chua dang nhap'};
+    }
+
+    final url = Uri.parse(ApiConfig.baseUrl + ApiConfig.changePassword);
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'oldPassword': oldPassword,
+          'newPassword': newPassword,
+          'otp': otp,
+        }),
+      );
+
+      final decoded = _tryDecodeJson(response.body);
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': _readMessage(decoded) ?? 'Doi mat khau thanh cong',
+        };
+      }
+
+      return {
+        'success': false,
+        'message': _readMessage(decoded) ?? response.body,
+      };
+    } catch (e) {
+      return {'success': false, 'message': 'Loi ket noi: $e'};
+    }
+  }
+
+  dynamic _tryDecodeJson(String body) {
+    try {
+      return jsonDecode(body);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  String? _readMessage(dynamic decoded) {
+    if (decoded is Map<String, dynamic>) {
+      final v = decoded['message'] ?? decoded['Message'];
+      if (v != null) return v.toString();
+    }
+    return null;
   }
 
   // Hàm đăng xuất (Xóa token)
