@@ -1,10 +1,16 @@
 import 'dart:convert';
+<<<<<<< HEAD
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+=======
+
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
 
 import '../config/api_config.dart';
 import '../services/auth_service.dart';
@@ -19,6 +25,7 @@ class WalletTopUpScreen extends StatefulWidget {
 class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
   final _amountController = TextEditingController(text: '50000');
   bool _isSubmitting = false;
+<<<<<<< HEAD
   Timer? _statusTimer;
 
   static const _quickAmounts = <int>[50000, 100000, 200000, 500000];
@@ -152,6 +159,13 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
           _amountController.text.replaceAll(RegExp(r'[^0-9]'), ''),
         ) ??
         0;
+=======
+
+  static const _quickAmounts = <int>[50000, 100000, 200000, 500000];
+
+  Future<void> _submit() async {
+    final amount = int.tryParse(_amountController.text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
     if (amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Vui long nhap so tien hop le')),
@@ -171,7 +185,11 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
         return;
       }
 
+<<<<<<< HEAD
       final url = Uri.parse('${ApiConfig.baseUrl}/wallet/topup/payos');
+=======
+      final url = Uri.parse('${ApiConfig.baseUrl}/wallet/topup');
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
       final response = await http.post(
         url,
         headers: {
@@ -182,6 +200,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
       );
 
       if (response.statusCode == 200) {
+<<<<<<< HEAD
         final data = jsonDecode(response.body);
         final orderCode = (data['orderCode'] as num).toInt();
         final checkoutUrl = (data['checkoutUrl'] ?? '').toString();
@@ -194,11 +213,19 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
           checkoutUrl: checkoutUrl,
           qrCode: qrCode,
         );
+=======
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Nap tien thanh cong')),
+        );
+        Navigator.pop(context, true);
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
       } else {
         String message = response.body;
         try {
           final data = jsonDecode(response.body);
           if (data is Map<String, dynamic>) {
+<<<<<<< HEAD
             message =
                 (data['message'] ??
                         data['Message'] ??
@@ -206,13 +233,22 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
                         data['Error'] ??
                         response.body)
                     .toString();
+=======
+            message = (data['message'] ?? data['Message'] ?? data['error'] ?? data['Error'] ?? response.body).toString();
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
           }
         } catch (_) {}
 
         if (!mounted) return;
+<<<<<<< HEAD
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Nap tien that bai: $message')));
+=======
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Nap tien that bai: $message')),
+        );
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
@@ -220,6 +256,15 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
   }
 
   @override
+<<<<<<< HEAD
+=======
+  void dispose() {
+    _amountController.dispose();
+    super.dispose();
+  }
+
+  @override
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
   Widget build(BuildContext context) {
     const Color brandGreen = Color(0xFF2ED162);
     const Color scaffoldBg = Color(0xFFF9FAFB);
@@ -253,10 +298,14 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
                 hintText: 'Vi du: 50000',
                 filled: true,
                 fillColor: Colors.white,
+<<<<<<< HEAD
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(18),
                   borderSide: BorderSide.none,
                 ),
+=======
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide.none),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
               ),
             ),
             const SizedBox(height: 14),
@@ -266,18 +315,26 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
               children: _quickAmounts
                   .map(
                     (v) => OutlinedButton(
+<<<<<<< HEAD
                       onPressed: _isSubmitting
                           ? null
                           : () => setState(
                               () => _amountController.text = v.toString(),
                             ),
+=======
+                      onPressed: _isSubmitting ? null : () => setState(() => _amountController.text = v.toString()),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.black,
                         backgroundColor: Colors.white,
                         side: BorderSide(color: Colors.grey.shade200),
+<<<<<<< HEAD
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
+=======
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                       ),
                       child: Text('${v.toString()} đ'),
                     ),
@@ -292,9 +349,13 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: brandGreen,
                   foregroundColor: Colors.white,
+<<<<<<< HEAD
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
+=======
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   elevation: 0,
                 ),
@@ -302,6 +363,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
                     ? const SizedBox(
                         height: 20,
                         width: 20,
+<<<<<<< HEAD
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           color: Colors.white,
@@ -314,6 +376,11 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
                           fontSize: 16,
                         ),
                       ),
+=======
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      )
+                    : const Text('Nap tien ngay', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
               ),
             ),
           ],

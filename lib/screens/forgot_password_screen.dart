@@ -18,7 +18,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
     if (email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
+<<<<<<< HEAD
         const SnackBar(content: Text("Vui lòng nhập địa chỉ email")),
+=======
+        const SnackBar(content: Text("Vui long nhap dia chi email")),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
       );
       return;
     }
@@ -34,7 +38,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           context: context,
           builder: (ctx) => AlertDialog(
             title: const Text("Kiem tra email"),
+<<<<<<< HEAD
             content: const Text("Chúng tôi đã gửi hướng dẫn khôi phục mật khẩu đến email của bạn."),
+=======
+            content: const Text("Chung toi da gui huong dan khoi phuc mat khau den email cua ban."),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
             actions: [
               TextButton(
                 onPressed: () {
@@ -72,7 +80,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         ),
         centerTitle: true,
         title: const Text(
+<<<<<<< HEAD
           "Đặt lại mật khẩu",
+=======
+          "Dat lai mat khau",
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
         ),
       ),
@@ -119,7 +131,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                 // 2. Tiêu đề & Mô tả
                 const Text(
+<<<<<<< HEAD
                   "Quên mật khẩu?",
+=======
+                  "Quen mat khau?",
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -130,7 +146,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20),
                   child: Text(
+<<<<<<< HEAD
                     "Đừng lo! Hay nhập email đã liên kết với tài khoản canteen của bạn.",
+=======
+                    "Dung lo! Hay nhap email da lien ket voi tai khoan canteen cua ban.",
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
@@ -146,7 +166,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: const Text(
+<<<<<<< HEAD
                     "Địa chỉ email",
+=======
+                    "Dia chi email",
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                   ),
                 ),
@@ -196,7 +220,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         child: auth.isLoading
                             ? const CircularProgressIndicator(color: Colors.white)
                             : const Text(
+<<<<<<< HEAD
                                 "Gửi hướng dẫn",
+=======
+                                "Gui huong dan",
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -214,7 +242,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
+<<<<<<< HEAD
                       "Cần hỗ trợ? ",
+=======
+                      "Can ho tro? ",
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                     ),
                     Icon(Icons.open_in_new, size: 14, color: Colors.grey[800]),

@@ -37,19 +37,27 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
+<<<<<<< HEAD
         title: const Text(
           "Lich su don hang",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
+=======
+        title: const Text("Lich su don hang", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
         backgroundColor: const Color(0xFFF9FAFB),
         elevation: 0,
         centerTitle: false,
         automaticallyImplyLeading: false, // Tắt nút back mặc định
         actions: [
+<<<<<<< HEAD
           IconButton(
             onPressed: () {},
             icon: const Icon(Icons.tune, color: Colors.black),
           ), // Nút Filter
+=======
+          IconButton(onPressed: () {}, icon: const Icon(Icons.tune, color: Colors.black)) // Nút Filter
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
         ],
       ),
       body: Column(
@@ -72,6 +80,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     });
                   },
                   child: Container(
+<<<<<<< HEAD
                     padding: const EdgeInsets.symmetric(
                       horizontal: 24,
                       vertical: 10,
@@ -84,6 +93,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                       border: isSelected
                           ? null
                           : Border.all(color: Colors.grey.shade300),
+=======
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: isSelected ? const Color(0xFF2ED162) : Colors.white,
+                      borderRadius: BorderRadius.circular(25),
+                      border: isSelected ? null : Border.all(color: Colors.grey.shade300),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                     ),
                     child: Center(
                       child: Text(
@@ -104,6 +120,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           // 2. LIST ORDERS
           Expanded(
             child: orderProvider.isLoading
+<<<<<<< HEAD
                 ? const Center(
                     child: CircularProgressIndicator(color: Color(0xFF2ED162)),
                   )
@@ -127,6 +144,29 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                       return _buildOrderCard(displayedOrders[index]);
                     },
                   ),
+=======
+                ? const Center(child: CircularProgressIndicator(color: Color(0xFF2ED162)))
+                : (orderProvider.error != null)
+                    ? Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Text(
+                            orderProvider.error!,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: Colors.grey),
+                          ),
+                        ),
+                      )
+                : displayedOrders.isEmpty
+                    ? const Center(child: Text("Khong co don hang nao"))
+                    : ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: displayedOrders.length,
+                        itemBuilder: (context, index) {
+                          return _buildOrderCard(displayedOrders[index]);
+                        },
+                      ),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
           ),
         ],
       ),
@@ -144,7 +184,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   void _openOrderDetail(OrderModel order) {
     Navigator.push(
       context,
+<<<<<<< HEAD
       MaterialPageRoute(builder: (_) => OrderDetailScreen(order: order)),
+=======
+      MaterialPageRoute(
+        builder: (_) => OrderDetailScreen(order: order),
+      ),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
     );
   }
 
@@ -188,12 +234,17 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 
     final firstItem = order.orderItems.isNotEmpty ? order.orderItems[0] : null;
     final otherItemsCount = order.orderItems.length - 1;
+<<<<<<< HEAD
+=======
+
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
+<<<<<<< HEAD
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -201,6 +252,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             offset: const Offset(0, 4),
           ),
         ],
+=======
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -211,6 +265,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             children: [
               Row(
                 children: [
+<<<<<<< HEAD
                   if (statusIcon != null)
                     Icon(statusIcon, size: 16, color: statusColor)
                   else
@@ -231,6 +286,12 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                       fontSize: 12,
                     ),
                   ),
+=======
+                  if (statusIcon != null) Icon(statusIcon, size: 16, color: statusColor)
+                  else Container(width: 8, height: 8, decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle)),
+                  const SizedBox(width: 8),
+                  Text(statusText, style: TextStyle(color: statusColor, fontWeight: FontWeight.bold, fontSize: 12)),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                 ],
               ),
               Text(
@@ -283,6 +344,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
+<<<<<<< HEAD
                       firstItem != null
                           ? (otherItemsCount > 0
                                 ? "${firstItem.menuItemName} + $otherItemsCount mon khac"
@@ -309,6 +371,23 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   ],
                 ),
               ),
+=======
+                      firstItem != null 
+                        ? (otherItemsCount > 0 ? "${firstItem.menuItemName} + $otherItemsCount mon khac" : firstItem.menuItemName)
+                        : "Khong ro mon",
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      firstItem?.note ?? "Mac dinh", 
+                      style: const TextStyle(color: Colors.grey, fontSize: 13)
+                    ),
+                    const SizedBox(height: 8),
+                    Text(Money.vnd(order.totalPrice), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  ],
+                ),
+              )
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
             ],
           ),
           const SizedBox(height: 16),
@@ -330,9 +409,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF2ED162),
                       foregroundColor: Colors.white,
+<<<<<<< HEAD
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
                       ),
+=======
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
@@ -345,9 +428,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                       backgroundColor: Colors.grey.shade100,
                       foregroundColor: Colors.black,
                       elevation: 0,
+<<<<<<< HEAD
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
                       ),
+=======
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                     child: const Text("Xem chi tiet"),
@@ -364,9 +451,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   backgroundColor: Colors.grey.shade100,
                   foregroundColor: Colors.black,
                   elevation: 0,
+<<<<<<< HEAD
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(25),
                   ),
+=======
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
                 child: const Text("Xem chi tiet"),
@@ -382,9 +473,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                       backgroundColor: Colors.grey.shade100,
                       foregroundColor: Colors.black,
                       elevation: 0,
+<<<<<<< HEAD
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
                       ),
+=======
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                     ),
                     child: const Text("Danh gia"),
                   ),
@@ -399,16 +494,28 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                       backgroundColor: const Color(0xFFD4F8E2), // Màu xanh nhạt
                       foregroundColor: const Color(0xFF2ED162),
                       elevation: 0,
+<<<<<<< HEAD
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
                       ),
+=======
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                     ),
                   ),
                 ),
               ],
+<<<<<<< HEAD
             ),
+=======
+            )
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
         ],
       ),
     );
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8

@@ -4,7 +4,10 @@ import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 import 'cart_screen.dart';
 import 'home_screen.dart';
+<<<<<<< HEAD
 import '../providers/favorites_provider.dart';
+=======
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
 import '../utils/image_helper.dart'; // [FIX] Import image helper
 import '../utils/money.dart';
 
@@ -30,17 +33,25 @@ class _CustomizationPreset {
   final List<_OptionGroup> optionGroups;
   final Map<String, double> extras;
 
+<<<<<<< HEAD
   const _CustomizationPreset({
     required this.optionGroups,
     required this.extras,
   });
+=======
+  const _CustomizationPreset({required this.optionGroups, required this.extras});
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
 }
 
 class ProductDetailScreen extends StatefulWidget {
   final MenuItem menuItem;
 
+<<<<<<< HEAD
   const ProductDetailScreen({Key? key, required this.menuItem})
     : super(key: key);
+=======
+  const ProductDetailScreen({Key? key, required this.menuItem}) : super(key: key);
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -48,13 +59,21 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int quantity = 1;
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
   // --- FAKE DATA ĐỂ GIỐNG UI DESIGN (Vì Backend chưa có) ---
   // Sau này có API thì thay thế list này bằng dữ liệu từ API
   final String _calories = "520 kcal";
   final double _rating = 4.8;
   final int _reviews = 120;
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
   late final _CustomizationPreset _preset;
   final Map<String, String> _selectedByGroup = {};
   final Set<String> _selectedExtras = <String>{};
@@ -66,9 +85,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       return;
     }
 
+<<<<<<< HEAD
     Navigator.of(
       context,
     ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
+=======
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+    );
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
   }
 
   @override
@@ -125,7 +150,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             choices: ['Khong cay', 'It cay', 'Binh thuong', 'Rat cay'],
           ),
         ],
+<<<<<<< HEAD
         extras: {'Them pho mai': 5000, 'Them trung': 7000, 'Them com': 5000},
+=======
+        extras: {
+          'Them pho mai': 5000,
+          'Them trung': 7000,
+          'Them com': 5000,
+        },
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
       );
     }
 
@@ -151,7 +184,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             choices: ['Khong da', 'It da', 'Da vua'],
           ),
         ],
+<<<<<<< HEAD
         extras: {'Them tran chau': 5000, 'Them milk foam': 8000},
+=======
+        extras: {
+          'Them tran chau': 5000,
+          'Them milk foam': 8000,
+        },
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
       );
     }
 
@@ -171,7 +211,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             choices: ['Khong cay', 'Cay vua', 'Cay nhieu'],
           ),
         ],
+<<<<<<< HEAD
         extras: {'Them rong bien': 4000, 'Them sot': 5000},
+=======
+        extras: {
+          'Them rong bien': 4000,
+          'Them sot': 5000,
+        },
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
       );
     }
 
@@ -251,22 +298,35 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
     final isFavorite = context.select<FavoritesProvider, bool>(
       (p) => p.isFavorite(widget.menuItem.itemId),
     );
 
+=======
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
     return Scaffold(
       backgroundColor: kBackgroundColor,
       body: Stack(
         children: [
           // 1. Phần nội dung cuộn được
           SingleChildScrollView(
+<<<<<<< HEAD
             padding: const EdgeInsets.only(
               bottom: 100,
             ), // Chừa chỗ cho BottomBar
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [_buildHeaderImage(context), _buildContentBody()],
+=======
+            padding: const EdgeInsets.only(bottom: 100), // Chừa chỗ cho BottomBar
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeaderImage(context),
+                _buildContentBody(),
+              ],
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
             ),
           ),
 
@@ -279,6 +339,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildCircleIconButton(Icons.arrow_back, _handleBack),
+<<<<<<< HEAD
                 _buildCircleIconButton(
                   isFavorite ? Icons.favorite : Icons.favorite_border,
                   () async {
@@ -312,12 +373,26 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     );
                   },
                 ),
+=======
+                _buildCircleIconButton(Icons.favorite_border, () {
+                  // TODO: Xử lý logic yêu thích sau
+                }),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
               ],
             ),
           ),
 
           // 3. Bottom Bar (Sticky at bottom)
+<<<<<<< HEAD
           Positioned(bottom: 0, left: 0, right: 0, child: _buildBottomBar()),
+=======
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: _buildBottomBar(),
+          ),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
         ],
       ),
     );
@@ -325,8 +400,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   // Widget hiển thị ảnh Header
   Widget _buildHeaderImage(BuildContext context) {
+<<<<<<< HEAD
     return SizedBox(
       // Dùng SizedBox thay Container
+=======
+    return SizedBox( // Dùng SizedBox thay Container
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
       height: 300,
       width: double.infinity,
       child: buildProductImage(
@@ -345,11 +424,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         color: kBackgroundColor,
         borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
       ),
+<<<<<<< HEAD
       transform: Matrix4.translationValues(
         0.0,
         -30.0,
         0.0,
       ), // Đẩy lên đè ảnh một chút
+=======
+      transform: Matrix4.translationValues(0.0, -30.0, 0.0), // Đẩy lên đè ảnh một chút
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
       padding: const EdgeInsets.all(24.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -362,34 +445,47 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               Expanded(
                 child: Text(
                   widget.menuItem.name,
+<<<<<<< HEAD
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
                   ),
+=======
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                 ),
               ),
               Text(
                 Money.vnd(widget.menuItem.price),
+<<<<<<< HEAD
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
                 ),
+=======
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
               ),
             ],
           ),
           const SizedBox(height: 8),
+<<<<<<< HEAD
           const Text(
             "Cang tin A • Khu phia Tay",
             style: TextStyle(color: Colors.grey),
           ),
+=======
+          const Text("Cang tin A • Khu phia Tay", style: TextStyle(color: Colors.grey)),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
 
           const SizedBox(height: 20),
           // Hàng thông tin metrics (Rating, Calories, Tag)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+<<<<<<< HEAD
               _buildMetricChip(
                 Icons.star,
                 "$_rating ($_reviews)",
@@ -400,16 +496,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 _calories,
                 Colors.orange,
               ),
+=======
+              _buildMetricChip(Icons.star, "$_rating ($_reviews)", Colors.amber),
+              _buildMetricChip(Icons.local_fire_department, _calories, Colors.orange),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
               _buildMetricChip(Icons.eco, "Tot cho suc khoe", Colors.green),
             ],
           ),
 
           const SizedBox(height: 24),
           // Description
+<<<<<<< HEAD
           const Text(
             "Mo ta",
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
+=======
+          const Text("Mo ta", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
           const SizedBox(height: 8),
           Text(
             widget.menuItem.description ?? "Chua co mo ta.",
@@ -488,11 +592,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
+<<<<<<< HEAD
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, -5),
           ),
+=======
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5)),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
         ],
       ),
       child: Row(
@@ -510,6 +618,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   if (quantity > 1) setState(() => quantity--);
                 }),
                 const SizedBox(width: 16),
+<<<<<<< HEAD
                 Text(
                   "$quantity",
                   style: const TextStyle(
@@ -517,6 +626,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+=======
+                Text("$quantity", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                 const SizedBox(width: 16),
                 _buildQuantityBtn(Icons.add, () {
                   setState(() => quantity++);
@@ -540,7 +652,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                 final options = _buildSelectedOptions();
                 final otherNote = _otherController.text.trim();
+<<<<<<< HEAD
 
+=======
+                
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                 // Gọi Provider để thêm vào giỏ
                 Provider.of<CartProvider>(context, listen: false).addItem(
                   widget.menuItem,
@@ -560,6 +676,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       textColor: Colors.white,
                       onPressed: () {
                         if (!mounted) return;
+<<<<<<< HEAD
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (_) => const CartScreen()),
@@ -567,18 +684,29 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       },
                     ),
                   ),
+=======
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen()));
+                      },
+                    ),
+                  )
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                 );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: kPrimaryColor,
                 padding: const EdgeInsets.symmetric(vertical: 16),
+<<<<<<< HEAD
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
+=======
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+<<<<<<< HEAD
                   const Text(
                     "Them vao don",
                     style: TextStyle(
@@ -606,6 +734,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
             ),
           ),
+=======
+                  const Text("Them vao don", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                  const SizedBox(width: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
+                    child: Text(Money.vnd(totalPrice), style: const TextStyle(color: Colors.white)),
+                  )
+                ],
+              ),
+            ),
+          )
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
         ],
       ),
     );
@@ -614,6 +755,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   // Các Widget nhỏ hỗ trợ (Helper Widgets)
   Widget _buildCircleIconButton(IconData icon, VoidCallback onPressed) {
     return Container(
+<<<<<<< HEAD
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.5),
         shape: BoxShape.circle,
@@ -622,6 +764,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         icon: Icon(icon, color: Colors.white),
         onPressed: onPressed,
       ),
+=======
+      decoration: BoxDecoration(color: Colors.black.withOpacity(0.5), shape: BoxShape.circle),
+      child: IconButton(icon: Icon(icon, color: Colors.white), onPressed: onPressed),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
     );
   }
 
@@ -637,10 +783,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         children: [
           Icon(icon, size: 16, color: color),
           const SizedBox(width: 6),
+<<<<<<< HEAD
           Text(
             text,
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
           ),
+=======
+          Text(text, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
         ],
       ),
     );
@@ -649,6 +799,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Widget _buildSectionHeader(String title, String subtitle) {
     return Row(
       children: [
+<<<<<<< HEAD
         Text(
           title,
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -660,6 +811,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             style: const TextStyle(color: Colors.grey, fontSize: 14),
           ),
         ],
+=======
+        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        if (subtitle.isNotEmpty) ...[
+          const SizedBox(width: 8),
+          Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 14)),
+        ]
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
       ],
     );
   }
@@ -670,4 +828,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       child: Icon(icon, size: 20, color: Colors.black87),
     );
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8

@@ -4,10 +4,15 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart'; // Import Google Fonts
 import 'providers/auth_provider.dart';
 import 'screens/splash_screen.dart';
+<<<<<<< HEAD
 import 'screens/favorites_screen.dart';
 import 'providers/cart_provider.dart';
 import 'providers/order_provider.dart';
 import 'providers/favorites_provider.dart';
+=======
+import 'providers/cart_provider.dart';
+import 'providers/order_provider.dart';
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
 
 void main() {
   runApp(const MyApp());
@@ -23,6 +28,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
+<<<<<<< HEAD
         ChangeNotifierProxyProvider<AuthProvider, FavoritesProvider>(
           create: (_) => FavoritesProvider(),
           update: (context, auth, favorites) {
@@ -32,6 +38,8 @@ class MyApp extends StatelessWidget {
             return favorites;
           },
         ),
+=======
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -46,20 +54,36 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           useMaterial3: true,
           // Màu xanh lá chủ đạo như trong hình
+<<<<<<< HEAD
           primaryColor: const Color(0xFF1ED760),
+=======
+          primaryColor: const Color(0xFF1ED760), 
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
           colorScheme: ColorScheme.fromSeed(
             seedColor: const Color(0xFF1ED760),
             primary: const Color(0xFF1ED760),
           ),
           // Sử dụng Font Poppins cho hiện đại (hoặc DM Sans)
+<<<<<<< HEAD
           textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
           scaffoldBackgroundColor: const Color(
             0xFFF8F9FA,
           ), // Màu nền trắng xám nhẹ
         ),
         routes: {'/favorites': (_) => const FavoritesScreen()},
+=======
+          textTheme: GoogleFonts.poppinsTextTheme(
+            Theme.of(context).textTheme,
+          ),
+          scaffoldBackgroundColor: const Color(0xFFF8F9FA), // Màu nền trắng xám nhẹ
+        ),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
         home: const SplashScreen(),
       ),
     );
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8

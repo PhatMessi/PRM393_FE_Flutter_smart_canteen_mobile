@@ -66,10 +66,14 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                   contentPadding: EdgeInsets.zero,
                   leading: const CircleAvatar(
                     backgroundColor: Color(0xFFE8F9EF),
+<<<<<<< HEAD
                     child: Icon(
                       Icons.account_balance_wallet,
                       color: Color(0xFF2ED162),
                     ),
+=======
+                    child: Icon(Icons.account_balance_wallet, color: Color(0xFF2ED162)),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                   ),
                   title: const Text('Nap tien vao vi'),
                   subtitle: const Text('Bo sung so du de thanh toan don hang'),
@@ -89,10 +93,14 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                   contentPadding: EdgeInsets.zero,
                   leading: CircleAvatar(
                     backgroundColor: Colors.purple.shade50,
+<<<<<<< HEAD
                     child: const Icon(
                       Icons.chat_bubble_outline,
                       color: Colors.purple,
                     ),
+=======
+                    child: const Icon(Icons.chat_bubble_outline, color: Colors.purple),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                   ),
                   title: const Text('Nhan tin ho tro'),
                   subtitle: const Text('Can tro giup khi can giao dich'),
@@ -361,9 +369,13 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
+<<<<<<< HEAD
                           const SnackBar(
                             content: Text('Ma QR cua toi: sap co'),
                           ),
+=======
+                          const SnackBar(content: Text('Ma QR cua toi: sap co')),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                         );
                       },
                       icon: const Icon(Icons.qr_code, color: Colors.black),
@@ -433,6 +445,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
               ),
               const SizedBox(height: 25),
 
+<<<<<<< HEAD
               // 4.0 FAVORITES ITEM
               Container(
                 padding: const EdgeInsets.all(5),
@@ -473,6 +486,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
               ),
               const SizedBox(height: 25),
 
+=======
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
               // 4.1 CHAT ITEM (Messaging)
               Container(
                 padding: const EdgeInsets.all(5),
@@ -591,8 +606,12 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   }
 
   Widget _buildTransactionRow(TransactionModel t, Color brandGreen) {
+<<<<<<< HEAD
     final isNegative =
         t.type == 'Payment' || t.type == 'Withdrawal' || t.type == 'Thanh toan';
+=======
+    final isNegative = t.type == 'Payment' || t.type == 'Withdrawal' || t.type == 'Thanh toan';
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
     final iconColor = t.type == 'TopUp' || t.type == 'Nap tien'
         ? brandGreen
         : (t.type == 'Refund' ? Colors.purple : Colors.orange);

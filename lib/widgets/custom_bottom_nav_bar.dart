@@ -7,11 +7,21 @@ import '../screens/user_dashboard_screen.dart';
 class CustomBottomNavBar extends StatelessWidget {
   final int selectedIndex;
 
+<<<<<<< HEAD
   const CustomBottomNavBar({super.key, required this.selectedIndex});
 
   void _onItemTapped(BuildContext context, int index) {
     if (index == selectedIndex)
       return; // Nếu đang ở trang đó rồi thì không làm gì
+=======
+  const CustomBottomNavBar({
+    super.key,
+    required this.selectedIndex,
+  });
+
+  void _onItemTapped(BuildContext context, int index) {
+    if (index == selectedIndex) return; // Nếu đang ở trang đó rồi thì không làm gì
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
 
     // Sử dụng pushReplacement để không bị chồng chất màn hình (tràn ram)
     // PageRouteBuilder để tắt hiệu ứng chuyển cảnh, tạo cảm giác như chuyển Tab
@@ -32,6 +42,10 @@ class CustomBottomNavBar extends StatelessWidget {
         nextScreen = const TransactionHistoryScreen();
         break;
       case 2:
+<<<<<<< HEAD
+=======
+        // YÊU CẦU CỦA BẠN: Nút Ví (Index 2) mở OrderHistoryScreen
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
         nextScreen = const OrderHistoryScreen();
         break;
       case 3:
@@ -60,6 +74,7 @@ class CustomBottomNavBar extends StatelessWidget {
           children: [
             // Tab 0: Home
             IconButton(
+<<<<<<< HEAD
               icon: Icon(
                 Icons.home_filled,
                 color: selectedIndex == 0 ? brandGreen : inactiveColor,
@@ -73,25 +88,49 @@ class CustomBottomNavBar extends StatelessWidget {
                 Icons.receipt_long,
                 color: selectedIndex == 1 ? brandGreen : inactiveColor,
               ),
+=======
+              icon: Icon(Icons.home_filled, 
+                color: selectedIndex == 0 ? brandGreen : inactiveColor),
+              onPressed: () => _onItemTapped(context, 0),
+            ),
+            
+            // Tab 1: Receipt (Lịch sử giao dịch)
+            IconButton(
+              icon: Icon(Icons.receipt_long, 
+                color: selectedIndex == 1 ? brandGreen : inactiveColor),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
               onPressed: () => _onItemTapped(context, 1),
             ),
 
             const SizedBox(width: 40), // Khoảng trống cho nút QR ở giữa
+<<<<<<< HEAD
             // Tab 2: Orders (Lịch sử đơn hàng)
             IconButton(
               icon: Icon(
                 Icons.account_balance_wallet,
                 color: selectedIndex == 2 ? brandGreen : inactiveColor,
               ),
+=======
+
+            // Tab 2: Wallet (Lịch sử đơn hàng - THEO YÊU CẦU CỦA BẠN)
+            IconButton(
+              icon: Icon(Icons.account_balance_wallet, 
+                color: selectedIndex == 2 ? brandGreen : inactiveColor),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
               onPressed: () => _onItemTapped(context, 2),
             ),
 
             // Tab 3: Profile (Dashboard)
             IconButton(
+<<<<<<< HEAD
               icon: Icon(
                 Icons.person,
                 color: selectedIndex == 3 ? brandGreen : inactiveColor,
               ),
+=======
+              icon: Icon(Icons.person, 
+                color: selectedIndex == 3 ? brandGreen : inactiveColor),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
               onPressed: () => _onItemTapped(context, 3),
             ),
           ],
@@ -99,4 +138,8 @@ class CustomBottomNavBar extends StatelessWidget {
       ),
     );
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8

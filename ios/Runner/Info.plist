@@ -45,6 +45,7 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+<<<<<<< HEAD
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -54,5 +55,7 @@
 			</array>
 		</dict>
 	</array>
+=======
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
 </dict>
 </plist>

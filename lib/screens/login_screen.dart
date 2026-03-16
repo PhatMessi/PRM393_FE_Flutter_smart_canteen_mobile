@@ -23,7 +23,11 @@ class _LoginScreenState extends State<LoginScreen> {
     final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
+<<<<<<< HEAD
       _showSnackBar(context, 'Vui lòng nhập email và mật khẩu', isError: true);
+=======
+      _showSnackBar(context, 'Vui long nhap email va mat khau', isError: true);
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
       return;
     }
 
@@ -35,7 +39,11 @@ class _LoginScreenState extends State<LoginScreen> {
         MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } else if (context.mounted) {
+<<<<<<< HEAD
         _showSnackBar(context, authProvider.errorMessage ?? 'Đăng nhập thất bại',
+=======
+        _showSnackBar(context, authProvider.errorMessage ?? 'Dang nhap that bai',
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
           isError: true);
     }
   }
@@ -86,7 +94,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 20),
                     const Text(
+<<<<<<< HEAD
                       "Chào mừng đến",
+=======
+                      "Chao mung den",
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -97,7 +109,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 5),
                     
                     Text(
+<<<<<<< HEAD
                       "Đăng nhập Canteen Thông Minh",
+=======
+                      "Dang nhap Cang Tin Thong Minh",
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                       style: TextStyle(
                         fontSize: 16,
                         color: primaryColor.withOpacity(0.8), // Màu xanh rêu nhạt
@@ -109,7 +125,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     // --- 2. FORM SECTION ---
                     
                     // Email Field
+<<<<<<< HEAD
                     _buildLabel("Email học sinh"),
+=======
+                    _buildLabel("Email hoc sinh"),
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                     const SizedBox(height: 8),
                     _buildInputField(
                       controller: _emailController,
@@ -121,11 +141,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 20),
 
                     // Password Field
+<<<<<<< HEAD
                     _buildLabel("Mật khẩu"),
                     const SizedBox(height: 8),
                     _buildInputField(
                       controller: _passwordController,
                       hintText: "Nhập mật khẩu",
+=======
+                    _buildLabel("Mat khau"),
+                    const SizedBox(height: 8),
+                    _buildInputField(
+                      controller: _passwordController,
+                      hintText: "Nhap mat khau",
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                       icon: Icons.lock_outline_rounded,
                       obscureText: _obscurePassword,
                       isPassword: true,
@@ -148,7 +176,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           );
                         },
                         child: const Text(
+<<<<<<< HEAD
                           "Quên mật khẩu?",
+=======
+                          "Quen mat khau?",
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                           style: TextStyle(
                             color: Color(0xFF588157),
                             fontWeight: FontWeight.w600,
@@ -182,7 +214,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
+<<<<<<< HEAD
                                     "Đăng nhập",
+=======
+                                    "Dang nhap",
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -203,7 +239,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         Expanded(child: Divider(color: Colors.grey[300])),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
+<<<<<<< HEAD
                             child: Text("Hoặc tiếp tục với",
+=======
+                            child: Text("Hoac tiep tuc voi",
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                               style: TextStyle(color: textGray)),
                         ),
                         Expanded(child: Divider(color: Colors.grey[300])),
@@ -235,7 +275,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
+<<<<<<< HEAD
                           "Chưa có tài khoản? ",
+=======
+                          "Chua co tai khoan? ",
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                           style: TextStyle(color: textGray, fontSize: 14),
                         ),
                         GestureDetector(
@@ -243,7 +287,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             // TODO: Navigate to Register
                           },
                           child: const Text(
+<<<<<<< HEAD
                             "Đăng ký ngay",
+=======
+                            "Dang ky ngay",
+>>>>>>> e4d461e2e105481c2ac08024809f60dafe47eaf8
                             style: TextStyle(
                               color: textDark,
                               fontWeight: FontWeight.bold,
