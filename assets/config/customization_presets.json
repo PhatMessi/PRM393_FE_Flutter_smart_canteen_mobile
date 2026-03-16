@@ -1,0 +1,37 @@
+{
+  "default": { "optionGroups": [], "extras": {} },
+  "categories": {
+    "1": {
+      "optionGroups": [
+        {
+          "key": "sauce",
+          "title": "Lua chon sot",
+          "required": false,
+          "choices": ["Sot cay mayo", "Sot BBQ", "Sot mat ong"]
+        },
+        {
+          "key": "spice",
+          "title": "Muc do cay",
+          "required": false,
+          "choices": ["Khong cay", "It cay", "Binh thuong", "Rat cay"]
+        }
+      ],
+      "extras": { "Them pho mai": 5000, "Them trung": 7000, "Them com": 5000 }
+    },
+    "2": {
+      "optionGroups": [
+        { "key": "size", "title": "Kich co", "required": true, "choices": ["M", "L"] },
+        { "key": "sweet", "title": "Do ngot", "required": true, "choices": ["0%", "30%", "50%", "70%", "100%"] },
+        { "key": "ice", "title": "Luong da", "required": true, "choices": ["Khong da", "It da", "Da vua"] }
+      ],
+      "extras": { "Them tran chau": 5000, "Them milk foam": 8000 }
+    },
+    "3": {
+      "optionGroups": [
+        { "key": "sauce", "title": "Sot cham", "required": false, "choices": ["Khong", "Mayonnaise", "Sot pho mai", "Sot me"] },
+        { "key": "spice", "title": "Muc do cay", "required": false, "choices": ["Khong cay", "Cay vua", "Cay nhieu"] }
+      ],
+      "extras": { "Them rong bien": 4000, "Them sot": 5000 }
+    }
+  }
+}

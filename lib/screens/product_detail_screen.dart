@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../models/menu_item.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
@@ -55,7 +58,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   final double _rating = 4.8;
   final int _reviews = 120;
 
-  late final _CustomizationPreset _preset;
+  _CustomizationPreset _preset = const _CustomizationPreset(
+    optionGroups: [],
+    extras: {},
+  );
   final Map<String, String> _selectedByGroup = {};
   final Set<String> _selectedExtras = <String>{};
   final TextEditingController _otherController = TextEditingController();
@@ -74,7 +80,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   void initState() {
     super.initState();
-    _preset = _buildPreset(widget.menuItem);
+    _initPreset();
+  }
+
+  Future<void> _initPreset() async {
+    final preset = await _loadPresetFromAssets(widget.menuItem);
+    if (!mounted) return;
+
+    setState(() {
+      _applyPreset(preset);
+    });
+  }
+
+  void _applyPreset(_CustomizationPreset preset) {
+    _preset = preset;
+    _selectedByGroup.clear();
+    _selectedExtras.clear();
 
     for (final group in _preset.optionGroups) {
       if (group.required && group.choices.isNotEmpty) {
@@ -98,84 +119,83 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     return (widget.menuItem.price + extrasTotal) * quantity;
   }
 
-  _CustomizationPreset _buildPreset(MenuItem item) {
-    final name = (item.categoryName ?? '').toLowerCase();
-    final categoryId = item.categoryId;
-
-    final isMainDish =
-        categoryId == 1 || name.contains('món chính') || name.contains('main');
-    final isDrink =
-        categoryId == 2 || name.contains('đồ uống') || name.contains('drink');
-    final isSnack =
-        categoryId == 3 || name.contains('ăn vặt') || name.contains('snack');
-
-    if (isMainDish) {
-      return const _CustomizationPreset(
-        optionGroups: [
-          _OptionGroup(
-            key: 'sauce',
-            title: 'Lua chon sot',
-            required: false,
-            choices: ['Sot cay mayo', 'Sot BBQ', 'Sot mat ong'],
-          ),
-          _OptionGroup(
-            key: 'spice',
-            title: 'Muc do cay',
-            required: false,
-            choices: ['Khong cay', 'It cay', 'Binh thuong', 'Rat cay'],
-          ),
-        ],
-        extras: {'Them pho mai': 5000, 'Them trung': 7000, 'Them com': 5000},
+  Future<_CustomizationPreset> _loadPresetFromAssets(MenuItem item) async {
+    try {
+      final raw = await rootBundle.loadString(
+        'assets/config/customization_presets.json',
       );
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map<String, dynamic>) {
+        return const _CustomizationPreset(optionGroups: [], extras: {});
+      }
+
+      final categories = decoded['categories'];
+      final defaultPreset = decoded['default'];
+
+      Map<String, dynamic>? presetJson;
+      if (categories is Map) {
+        final byCategory = categories[item.categoryId.toString()];
+        if (byCategory is Map) {
+          presetJson = Map<String, dynamic>.from(byCategory);
+        }
+      }
+
+      if (presetJson == null && defaultPreset is Map) {
+        presetJson = Map<String, dynamic>.from(defaultPreset);
+      }
+
+      if (presetJson == null) {
+        return const _CustomizationPreset(optionGroups: [], extras: {});
+      }
+
+      return _presetFromJson(presetJson);
+    } catch (_) {
+      return const _CustomizationPreset(optionGroups: [], extras: {});
+    }
+  }
+
+  _CustomizationPreset _presetFromJson(Map<String, dynamic> json) {
+    final groupsRaw = json['optionGroups'];
+    final extrasRaw = json['extras'];
+
+    final groups = <_OptionGroup>[];
+    if (groupsRaw is List) {
+      for (final g in groupsRaw) {
+        if (g is! Map) continue;
+        final map = Map<String, dynamic>.from(g);
+        final choicesRaw = map['choices'];
+        final choices = <String>[];
+        if (choicesRaw is List) {
+          for (final c in choicesRaw) {
+            if (c == null) continue;
+            choices.add(c.toString());
+          }
+        }
+
+        groups.add(
+          _OptionGroup(
+            key: (map['key'] ?? '').toString(),
+            title: (map['title'] ?? '').toString(),
+            required: (map['required'] == true),
+            choices: choices,
+          ),
+        );
+      }
     }
 
-    if (isDrink) {
-      return const _CustomizationPreset(
-        optionGroups: [
-          _OptionGroup(
-            key: 'size',
-            title: 'Kich co',
-            required: true,
-            choices: ['M', 'L'],
-          ),
-          _OptionGroup(
-            key: 'sweet',
-            title: 'Do ngot',
-            required: true,
-            choices: ['0%', '30%', '50%', '70%', '100%'],
-          ),
-          _OptionGroup(
-            key: 'ice',
-            title: 'Luong da',
-            required: true,
-            choices: ['Khong da', 'It da', 'Da vua'],
-          ),
-        ],
-        extras: {'Them tran chau': 5000, 'Them milk foam': 8000},
-      );
+    final extras = <String, double>{};
+    if (extrasRaw is Map) {
+      for (final entry in extrasRaw.entries) {
+        final key = entry.key.toString();
+        final value = entry.value;
+        final parsed = (value is num) ? value.toDouble() : double.tryParse(value.toString());
+        if (parsed != null) {
+          extras[key] = parsed;
+        }
+      }
     }
 
-    if (isSnack) {
-      return const _CustomizationPreset(
-        optionGroups: [
-          _OptionGroup(
-            key: 'sauce',
-            title: 'Sot cham',
-            required: false,
-            choices: ['Khong', 'Mayonnaise', 'Sot pho mai', 'Sot me'],
-          ),
-          _OptionGroup(
-            key: 'spice',
-            title: 'Muc do cay',
-            required: false,
-            choices: ['Khong cay', 'Cay vua', 'Cay nhieu'],
-          ),
-        ],
-        extras: {'Them rong bien': 4000, 'Them sot': 5000},
-      );
-    }
-
-    return const _CustomizationPreset(optionGroups: [], extras: {});
+    return _CustomizationPreset(optionGroups: groups, extras: extras);
   }
 
   List<String> _buildSelectedOptions() {
