@@ -35,6 +35,16 @@ class ApiConfig {
   static const String favorites = "/Favorites";
   static const String getFavorites = favorites;
 
+  // Promotions / vouchers
+  static const String promotionsActive = "/promotions/active";
+  static const String promotionsSaved = "/promotions/saved";
+  static const String promotionsSave = "/promotions/save";
+  static const String promotionsApply = "/promotions/apply";
+  static const String promotionsCheckinQr = "/promotions/qr/checkin";
+
+    // Admin promotions (SystemAdmin)
+    static const String adminPromotions = "/admin/promotions";
+
   static const int receiveTimeout = 15000;
   static const int connectionTimeout = 15000;
 }

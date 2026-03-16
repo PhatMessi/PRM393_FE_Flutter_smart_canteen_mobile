@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import 'change_password_otp_screen.dart';
 import 'forgot_password_screen.dart';
+import 'admin_home_screen.dart';
 import 'home_screen.dart';
 import 'kitchen_orders_screen.dart';
 import 'register_otp_screen.dart';
@@ -35,10 +36,16 @@ class _LoginScreenState extends State<LoginScreen> {
     if (success && context.mounted) {
       final role = authProvider.user?.role ?? 'Student';
       final isKitchen = role.toLowerCase() == 'kitchen';
+      final isAdmin = role.toLowerCase() == 'systemadmin';
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => isKitchen ? const KitchenOrdersScreen() : const HomeScreen(),
+          builder: (context) =>
+              isKitchen
+                  ? const KitchenOrdersScreen()
+                  : isAdmin
+                      ? const AdminHomeScreen()
+                      : const HomeScreen(),
         ),
       );
     } else if (context.mounted) {

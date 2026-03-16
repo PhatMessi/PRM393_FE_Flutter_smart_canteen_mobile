@@ -5,21 +5,53 @@ import '../models/menu_item.dart';
 class CartProvider with ChangeNotifier {
   final List<CartItem> _items = [];
 
+  String? _promotionCode;
+  double _promotionDiscount = 0.0;
+
+  static const double _vatRate = 0.10;
+
   List<CartItem> get items => _items;
 
-  // Tính tổng tiền hàng (chưa thuế)
-  double get subtotal {
+  String? get promotionCode => _promotionCode;
+  double get promotionDiscount => _promotionDiscount;
+
+  // Tổng thanh toán (giá món đã bao gồm VAT 10%)
+  double get totalAmount {
     return _items.fold(0.0, (sum, item) => sum + item.totalPrice);
   }
 
-  // Tính thuế 5% như trong hình
-  double get tax {
-    return subtotal * 0.05;
+  // Tổng thanh toán sau khi áp voucher (giá đã gồm VAT)
+  double get finalTotal {
+    final total = totalAmount;
+    final discounted = total - _promotionDiscount;
+    return discounted < 0 ? 0.0 : discounted;
   }
 
-  // Tổng thanh toán
-  double get totalAmount {
-    return subtotal + tax;
+  // Tạm tính (giá trước VAT)
+  double get subtotal {
+    final total = finalTotal;
+    if (total <= 0) return 0.0;
+    return (total / (1 + _vatRate)).roundToDouble();
+  }
+
+  // Thuế VAT (đã nằm trong totalAmount)
+  double get tax {
+    final total = finalTotal;
+    if (total <= 0) return 0.0;
+    return total - subtotal;
+  }
+
+  void setPromotion({String? code, required double discount}) {
+    final normalized = (code ?? '').trim();
+    _promotionCode = normalized.isEmpty ? null : normalized;
+    _promotionDiscount = discount < 0 ? 0.0 : discount;
+    notifyListeners();
+  }
+
+  void clearPromotion() {
+    _promotionCode = null;
+    _promotionDiscount = 0.0;
+    notifyListeners();
   }
 
   int get itemCount {
@@ -70,6 +102,8 @@ class CartProvider with ChangeNotifier {
   // Xóa sạch giỏ hàng (sau khi checkout)
   void clearCart() {
     _items.clear();
+    _promotionCode = null;
+    _promotionDiscount = 0.0;
     notifyListeners();
   }
 }

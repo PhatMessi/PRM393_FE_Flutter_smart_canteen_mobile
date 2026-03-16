@@ -4,6 +4,7 @@ import 'package:intl/intl.dart'; // Cần thêm package intl
 import '../providers/order_provider.dart';
 import '../models/order_model.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
+import 'qr_scan_screen.dart';
 import 'map_screen.dart';
 import 'order_detail_screen.dart';
 import '../utils/image_helper.dart';
@@ -134,7 +135,12 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       // Giữ BottomBar để đồng bộ trải nghiệm
       bottomNavigationBar: const CustomBottomNavBar(selectedIndex: 2),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const QrScanScreen()),
+          );
+        },
         backgroundColor: const Color(0xFF2ED162),
         child: const Icon(Icons.qr_code_scanner, color: Colors.white),
       ),

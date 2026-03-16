@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import 'admin_home_screen.dart';
 import 'home_screen.dart';
 import 'kitchen_orders_screen.dart';
 import 'login_screen.dart';
@@ -33,8 +34,16 @@ class _SplashScreenState extends State<SplashScreen> {
     if (isLoggedIn) {
       final role = authProvider.user?.role ?? 'Student';
       final isKitchen = role.toLowerCase() == 'kitchen';
+      final isAdmin = role.toLowerCase() == 'systemadmin';
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => isKitchen ? const KitchenOrdersScreen() : const HomeScreen()),
+        MaterialPageRoute(
+          builder: (_) =>
+              isKitchen
+                  ? const KitchenOrdersScreen()
+                  : isAdmin
+                      ? const AdminHomeScreen()
+                      : const HomeScreen(),
+        ),
       );
     } else {
       Navigator.of(context).pushReplacement(
