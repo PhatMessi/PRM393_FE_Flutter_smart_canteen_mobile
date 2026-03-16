@@ -1,176 +1,131 @@
-# 📋 BUG FIXES SUMMARY - Smart Canteen Mobile App
+# BUG FIXES SUMMARY - Smart Canteen Mobile App
 
-## Tổng Quan
-Đây là tập hợp các bug fix được phát hiện và khắc phục cho dự án Smart Canteen Mobile App.
-Mỗi file trong folder `repo/` chứa một vấn đề cụ thể và giải pháp hoàn chỉnh.
+## Tổng quan
+
+Tài liệu này tổng hợp chức năng của tất cả file hiện có trong thư mục `repo/`.
+Mục tiêu giúp review nhanh:
+
+* File nào đang sửa bug gì
+* Có thể tái sử dụng ở đâu
+* Mức độ phụ thuộc với code chính
+
+**Last Updated:** March 16, 2026
+**Project:** PRM393 - Smart Canteen Mobile App (Flutter)
 
 ---
 
-## 🐛 BUG #1: Xử Lý Trùng Lặp Sản Phẩm Trong Giỏ Hàng
+# 📂 Danh sách File Fix Bug
+
+## 1️⃣ Cart Duplicate Items
+
 **File:** `bug_fix_cart_duplicate_items.dart`
 
-### Vấn Đề
-- Khi user thêm cùng một sản phẩm với cùng options (topping, kích cỡ, v.v.) vào giỏ nhiều lần
-- App tạo ra nhiều dòng riêng biệt thay vì gộp chúng lại
-- Gây nhầm lẫn UX và quản lý đơn hàng phức tạp
+### Vấn đề
 
-### Root Cause
-```dart
-// ❌ CỦA (Cart Provider gốc)
-void addItem(...) {
-  _items.add(CartItem(...)); // Luôn thêm mới, không kiểm tra trùng
-}
-```
+Khi thêm cùng một món ăn với cùng options nhiều lần, giỏ hàng tạo **nhiều dòng item trùng nhau**.
 
-### Giải Pháp
-✅ Thêm hàm `_optionsEqual()` để so sánh options một cách chính xác
-✅ Thêm hàm `_itemExists()` để kiểm tra sản phẩm đã tồn tại chưa
-✅ Merge số lượng nếu sản phẩm đã tồn tại:
-```dart
-if (existingIndex >= 0) {
-  _items[existingIndex].quantity += quantity; // Gộp số lượng
-} else {
-  _items.add(...); // Thêm mới nếu không tồn tại
-}
-```
+### Giải pháp
 
-### Lợi Ích
-- ✨ UX tốt hơn: giỏ hàng sạch gọn
-- 📊 Quản lý đơn hàng chính xác hơn
-- 💰 Tính toán chi phí đúng chính xác
+* So sánh options bằng `_optionsEqual()`
+* Sort options để tránh sai do thứ tự
+* Nếu item đã tồn tại → tăng `quantity`
+* Nếu chưa → tạo item mới
+
+### Lợi ích
+
+* Giỏ hàng gọn gàng
+* Tổng giá chính xác
+* UX tốt hơn
+
+### Phụ thuộc
+
+* `CartItem`
+* `MenuItem`
+* `ChangeNotifier`
 
 ---
 
-## 🐛 BUG #2: Token Hết Hạn Không Được Xử Lý
+## 2️⃣ Auth Token Expiry Handling
+
 **File:** `bug_fix_auth_token_expiry.dart`
 
-### Vấn Đề
-- Khi token JWT hết hạn, app không tự động kiểm tra
-- User bị stuck trên màn hình mà không hiểu tại sao request thất bại
-- Không có cơ chế logout tự động khi token hết hạn
+### Vấn đề
 
-### Root Cause
-```dart
-// ❌ CỦA (Auth Service gốc)
-Future<String?> getToken() async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getString(_tokenKey); // Lấy đơn giản mà không kiểm tra
-}
+Token hết hạn nhưng app vẫn dùng → user bị **stuck login**.
 
-// API call không xử lý 401 Unauthorized
-if (response.statusCode == 200) { ... }
-// Nếu là 401, không biết làm gì
-```
+### Giải pháp
 
-### Giải Pháp
-✅ Thêm tracking thời gian hết hạn cho token:
-```dart
-final expireTime = DateTime.now().add(Duration(hours: 24));
-await prefs.setString(_tokenExpireKey, expireTime.toIso8601String());
-```
+* Lưu thời điểm hết hạn `_tokenExpireKey`
+* Kiểm tra `isTokenValid()` trước khi trả token
+* Khi gặp `401` → `clearToken()`
+* Thêm timeout request
+* Parse JSON an toàn
 
-✅ Kiểm tra token còn hiệu lực:
-```dart
-Future<bool> isTokenValid() async {
-  if (expireTime == null) return true;
-  return DateTime.now().isBefore(expireDateTime);
-}
-```
+### Lợi ích
 
-✅ Xử lý 401 response tự động logout:
-```dart
-if (response.statusCode == 401) {
-  await clearToken(); // Tự động logout
-  return null;
-}
-```
+* Tránh lỗi đăng nhập treo
+* Auth flow ổn định
+* Debug dễ hơn
 
-### Lợi Ích
-- 🔐 Quản lý phiên an toàn hơn
-- 👤 Tự động logout khi hết hạn
-- 🔄 User không bị stuck nữa
+### Phụ thuộc
+
+* `ApiConfig`
+* `User`
+* `http`
+* `shared_preferences`
 
 ---
 
-## 🐛 BUG #3: Network Timeout Và Offline Handling
+## 3️⃣ Order Service Retry
+
 **File:** `bug_fix_order_service_retry.dart`
 
-### Vấn Đề
-- Khi network chậm, request fetch orders timeout mà không có thông báo rõ
-- Không có retry logic khi API fail
-- Khi offline, app toàn bộ không hoạt động được
-- User tưởng app bị crash
+### Vấn đề
 
-### Root Cause
-```dart
-// ❌ CỦA (Order Service gốc)
-final response = await http.get(url, headers: {...});
-// Không set timeout, không catch timeout exception
-// Không retry, không cache data
+Request lấy danh sách order dễ fail khi mạng yếu.
 
-if (response.statusCode == 200) { ... }
-// Nếu fail, toàn bộ là lỗi, không fallback
-```
+### Giải pháp
 
-### Giải Pháp
-✅ Thêm timeout handling:
-```dart
-.timeout(
-  const Duration(seconds: 15),
-  onTimeout: () => throw TimeoutException('Request timeout'),
-)
-```
+* Timeout request: **15s**
+* Retry tối đa **3 lần**
+* Cache kết quả thành công
+* Fallback sang cache khi offline
 
-✅ Thêm retry logic tự động:
-```dart
-Future<List<OrderModel>> fetchMyOrdersWithRetry({int retryCount = 0}) {
-  try {
-    return await fetchMyOrders();
-  } catch (e) {
-    if (retryCount < 3) { // Retry tối đa 3 lần
-      await Future.delayed(Duration(seconds: 2 * (retryCount + 1)));
-      return fetchMyOrdersWithRetry(retryCount: retryCount + 1);
-    }
-  }
-}
-```
+### Lợi ích
 
-✅ Cache data để sử dụng offline:
-```dart
-await _cacheOrders(orders); // Lưu sau mỗi request thành công
-final cached = await _getCachedOrders(); // Dùng khi fail
-```
+* App vẫn hiển thị dữ liệu khi mạng yếu
+* UX ổn định hơn
 
-### Lợi Ích
-- 🌐 Xử lý network không ổn định tốt hơn
-- 📱 Có thể hiển thị dữ liệu cũ khi offline
-- 🔄 Tự động retry khi network chuyên quay hay lỗi tạm thời
-- 📊 Debug dễ hơn với logging chi tiết
+### Phụ thuộc
+
+* `ApiConfig`
+* `OrderModel`
+* `AuthService`
+* `http`
+* `shared_preferences`
 
 ---
 
-## 🐛 BUG #4: Thiếu Validation Nhập Liệu
+## 4️⃣ Input Validation
+
 **File:** `bug_fix_input_validation.dart`
 
-### Vấn Đề
-- Form đăng nhập không validate email format
-- Không check password strength
-- User có thể nhập data không hợp lệ, phí API call
-- Không hiển thị lỗi từng field cụ thể
+### Vấn đề
+
+Form đăng nhập không validate input.
 
 ### Root Cause
+
 ```dart
-// ❌ CỦA (Auth Provider gốc)
 Future<bool> login(String email, String password) async {
-  // Validation? Không có. Cứ call API luôn
   final result = await _authService.login(email, password);
-  
-  // Lỗi chỉ biết khi API response lỗi
 }
 ```
 
-### Giải Pháp
-✅ Thêm email validation:
+### Giải pháp
+
+#### Validate email
+
 ```dart
 String? validateEmail(String email) {
   final emailRegex = RegExp(
@@ -183,19 +138,21 @@ String? validateEmail(String email) {
 }
 ```
 
-✅ Validate password strength:
+#### Validate password
+
 ```dart
 String? validatePassword(String password, {bool isLogin = true}) {
   if (password.length < 6) return 'Phải ít nhất 6 ký tự';
   if (!isLogin) {
-    if (!password.contains(RegExp(r'[A-Z]'))) 
+    if (!password.contains(RegExp(r'[A-Z]')))
       return 'Phải chứa chữ hoa';
   }
   return null;
 }
 ```
 
-✅ Store và hiển thị lỗi từng field:
+#### Store lỗi từng field
+
 ```dart
 Map<String, String?> _fieldErrors = {};
 
@@ -203,259 +160,196 @@ void setFieldError(String fieldName, String? error) {
   _fieldErrors[fieldName] = error;
   notifyListeners();
 }
-
-// UI có thể hiển thị: 
-// emailError = fieldErrors['email'];
-// passwordError = fieldErrors['password'];
 ```
 
-### Lợi Ích
-- ✅ Validation trước khi call API (tiết kiệm)
-- 📍 Hiển thị lỗi rõ ràng từng field
-- 🔐 Password strength yêu cầu khi đăng ký
-- 💡 User experience tốt hơn
+### Lợi ích
+
+* Validation trước khi call API
+* Hiển thị lỗi rõ ràng
+* UX tốt hơn
 
 ---
 
-## � BUG #5: Tràn Giao Diện (UI Overflow)
+## 5️⃣ Search & Filter Service
+
+**File:** `bug_fix_search_filter.dart`
+
+### Chức năng
+
+* Tìm kiếm menu theo keyword
+* Filter theo category
+* Filter theo khoảng giá
+* Chỉ lấy món còn hàng
+
+### Tính năng
+
+* Chuẩn hóa text (`trim + lowercase`)
+* `Debouncer` để giảm spam search
+* `applyFiltersLazy()` cho performance
+* Mini test trong `main()`
+
+### Phụ thuộc
+
+File **độc lập hoàn toàn**
+
+---
+
+## 6️⃣ Safe Percentage Calculation
+
+**File:** `bug_fix_percentage_calculation.dart`
+
+### Vấn đề
+
+Tính phần trăm có thể gây:
+
+* `NaN`
+* `Infinity`
+* chia cho 0
+
+### Giải pháp
+
+```dart
+double safePercentage(double part, double total) {
+  if (total <= 0) return 0.0;
+}
+```
+
+### Tính năng
+
+* Clamp `part` trong `[0, total]`
+* Làm tròn số thập phân
+* Self-test trong `main()`
+
+### Phụ thuộc
+
+Không phụ thuộc project.
+
+---
+
+## 7️⃣ UI Image Helper
+
+**File:** `canteen_ui.dart`
+
+### Chức năng
+
+Helper hiển thị hình ảnh món ăn an toàn.
+
+### Tính năng
+
+* Convert path backend → URL
+* Detect static images (`uploads`, `images`)
+* Map demo URL → local assets
+* Fallback icon khi lỗi ảnh
+
+### Phụ thuộc
+
+* `flutter/material.dart`
+* `ApiConfig`
+
+---
+
+# 🖥 UI Overflow Fix
+
 **File:** `bug_fix_ui_overflow.dart`
 
 ### Vấn đề
-- Khi nội dung vượt quá kích thước container, app bị lỗi "RenderFlex overflowed"
-- Text bị cắt mất hoặc overlap trên các thiết bị có màn hình nhỏ
-- Không có giải pháp tổng quát để xử lý overflow
-- Layout bị hỏng trên các device khác nhau (iPad, tablet, phone nhỏ)
 
-### Root Cause
-```dart
-// ❌ CỦA (Layout không xử lý overflow)
-Row(
-  children: [
-    Text('Very long text that might overflow...'), // Không giới hạn width
-    Icon(Icons.something),
-  ],
-) // ❌ Error: RenderFlex overflowed by XXX pixels
+Flutter layout lỗi:
 
-Column(
-  children: [
-    Text('Another long text...'),
-  ],
-) // ❌ Text bị cắt ngang trên màn hình nhỏ
+```
+RenderFlex overflowed by XX pixels
 ```
 
-### Giải Pháp
-✅ **Cung cấp 8 utility widgets / functions:**
+### Nguyên nhân
 
-1. **AdaptiveText** - Tự động wrap text khi tràn:
+Text hoặc widget vượt quá container.
+
+### Giải pháp
+
+Cung cấp **8 utility widgets**
+
+1️⃣ AdaptiveText
+2️⃣ ScrollableRow
+3️⃣ FlexibleColumn
+4️⃣ ConstrainedText
+5️⃣ OverflowContainer
+6️⃣ ResponsiveRow
+7️⃣ OverflowUtils
+8️⃣ ExpandableContainer
+
+### Ví dụ
+
 ```dart
 AdaptiveText(
-  'Long text here...',
+  'Long text...',
   maxLines: 3,
   overflow: TextOverflow.ellipsis,
 )
 ```
 
-2. **ScrollableRow** - Cuộn ngang khi content tràn:
-```dart
-ScrollableRow(
-  children: [chip1, chip2, chip3],
-  spacing: 8.0,
-)
-```
+### Lợi ích
 
-3. **FlexibleColumn** - Fit content theo kích thước available:
-```dart
-FlexibleColumn(
-  children: [widget1, widget2],
-)
-```
-
-4. **ConstrainedText** - Giới hạn chiều rộng text:
-```dart
-ConstrainedText(
-  'Text here',
-  maxWidth: 200,
-  maxLines: 2,
-)
-```
-
-5. **OverflowContainer** - Container thông minh:
-```dart
-OverflowContainer(
-  maxHeight: 300,
-  maxWidth: 400,
-  enableScroll: true,
-  child: widget,
-)
-```
-
-6. **ResponsiveRow** - Tự động wrap thành column trên màn hình nhỏ:
-```dart
-ResponsiveRow(
-  breakpoint: 600,
-  children: [widget1, widget2],
-)
-```
-
-7. **OverflowUtils** - Utility functions:
-```dart
-// Truncate text
-String shortened = OverflowUtils.truncateText(
-  text: 'Very long text',
-  maxLength: 20,
-);
-
-// Responsive font size
-double size = OverflowUtils.getResponsiveFontSize(context);
-
-// Responsive padding
-EdgeInsets padding = OverflowUtils.getResponsivePadding(context);
-```
-
-8. **ExpandableContainer** - Mở rộng để hiển thị nội dung:
-```dart
-ExpandableContainer(
-  maxLinesCollapsed: 2,
-  expandLabel: 'Xem thêm',
-  child: longContentWidget,
-)
-```
-
-### Lợi Ích
-- 🎯 Tránh được lỗi "RenderFlex overflowed"
-- 📱 Layout thích ứng với mọi kích thước màn hình
-- ♾️ Nội dung không bị cắt mất
-- 🔄 Tái sử dụng widgets trên toàn app
-- 🎨 UI đẹp hơn và responsive hơn
+* Tránh crash UI
+* Responsive mọi màn hình
+* Tái sử dụng widget
 
 ---
 
-## �📝 Hướng Dẫn Sử Dụng Fixes
+# 📊 Phân Loại Theo Mức Độ Độc Lập
 
-### 1. Chọn Fix Mà Bạn Muốn Dùng
-Mỗi file `.dart` trong folder `repo/` là standalone - bạn có thể copy code vào project.
+## Độc lập hoàn toàn
 
-### 2. Integrate Vào Project
-Thay thế class gốc bằng class `Fixed` hoặc merge code:
-```dart
-// Thay đổi import
-import 'path/to/bug_fix_xxx.dart';
+* `bug_fix_search_filter.dart`
+* `bug_fix_percentage_calculation.dart`
 
-// Sử dụng class mới
-final provider = CartProviderFixed();
-```
+## Phụ thuộc code dự án
 
-### 3. Cập Nhật Dependencies (Nếu Cần)
-Các fix không thêm dependency mới, sử dụng packages sẵn có:
-- `shared_preferences` (đã có)
-- `http` (đã có)
-- `flutter` (đã có)
+* `bug_fix_cart_duplicate_items.dart`
+* `bug_fix_auth_token_expiry.dart`
+* `bug_fix_order_service_retry.dart`
+* `bug_fix_input_validation.dart`
+* `canteen_ui.dart`
+* `bug_fix_ui_overflow.dart`
 
 ---
 
-## 🧪 Testing Recommendations
+# 🧪 Ví dụ Unit Test
 
-### Test Cart Duplicate Items
-```dart
-test('Adding same item twice should merge quantities', () {
-  provider.addItem(item, 1, options, price);
-  provider.addItem(item, 1, options, price);
-  expect(provider.items.length, 1); // 1 item, quantity = 2
-  expect(provider.items[0].quantity, 2);
-});
-```
-
-### Test Token Expiry
-```dart
-test('Expired token should return null', () async {
-  final auth = AuthServiceFixed();
-  // Simulate token expiry
-  final isValid = await auth.isTokenValid();
-  expect(isValid, false);
-});
-```
-
-### Test Order Service Retry
-```dart
-test('Should retry on timeout', () async {
-  // Test with slow network
-  final orders = await service.fetchMyOrdersWithRetry();
-  expect(orders.isNotEmpty, true); // Should succeed after retry
-});
-```
-
-### Test Input Validation
-```dart
-test('Invalid email should show error', () {
-  final error = provider.validateEmail('invalid-email');
-  expect(error, isNotNull);
-  expect(error, contains('không hợp lệ'));
-});
-```
-
-### Test UI Overflow Widgets
 ```dart
 test('AdaptiveText should truncate long text', () {
   final widget = AdaptiveText(
-    'Very long text that should be truncated...',
+    'Very long text...',
     maxLines: 2,
   );
   expect(find.byType(AdaptiveText), findsOneWidget);
 });
-
-test('ResponsiveRow should change layout on small screen', () {
-  // Test with width < breakpoint
-  final widget = ResponsiveRow(
-    breakpoint: 600,
-    children: [Container(), Container()],
-  );
-  // Should render as Column on small screens
-  expect(find.byType(ResponsiveRow), findsOneWidget);
-});
-
-test('OverflowUtils should truncate text correctly', () {
-  final result = OverflowUtils.truncateText(
-    text: 'This is a very long text',
-    maxLength: 10,
-  );
-  expect(result.length, 13); // 10 + '...'
-  expect(result.endsWith('...'), true);
-});
 ```
 
 ---
 
-## 📊 Performance Impact
+# 📊 Performance Impact
 
-| Fix | Component | Impact | Priority |
-|-----|-----------|--------|----------|
-| Cart Duplicate | CartProvider | ✅ Better UX | High |
-| Token Expiry | Auth Service | 🔐 Security | Critical |
-| Order Retry | Order Service | 🌐 Reliability | High |
-| Input Validation | Auth Provider | 📱 Performance | Medium |
-| UI Overflow | Layout/Widgets | 🎨 Responsive Design | High |
-
----
-
-## 🚀 Next Steps
-
-1. **Review code** - Kiểm tra từng fix xem phù hợp không
-2. **Test locally** - Run code trên emulator/device
-3. **Integrate** - Merge vào main codebase
-4. **Deploy** - Push lên production
-5. **Monitor** - Theo dõi crash logs trên Firebase etc.
+| Fix              | Component     | Impact        | Priority |
+| ---------------- | ------------- | ------------- | -------- |
+| Cart Duplicate   | CartProvider  | Better UX     | High     |
+| Token Expiry     | Auth Service  | Security      | Critical |
+| Order Retry      | Order Service | Reliability   | High     |
+| Input Validation | Auth Provider | Performance   | Medium   |
+| UI Overflow      | Layout        | Responsive UI | High     |
 
 ---
 
-## 📞 Questions & Issues
+# 🚀 Next Steps
 
-Nếu có vấn đề khi integrate, check:
-- [ ] Tất cả imports đúng?
-- [ ] Các models có match không?
-- [ ] API endpoints còn hợp lệ không?
-- [ ] Version packages có compatible không?
+1️⃣ Review code
+2️⃣ Test locally
+3️⃣ Integrate vào project
+4️⃣ Deploy
+5️⃣ Monitor logs
 
 ---
 
-**Last Updated:** March 16, 2026
-**Project:** PRM393 - Smart Canteen Mobile App (Flutter)
+# 📌 Ghi chú
+
+* Tài liệu phản ánh trạng thái hiện tại của thư mục `repo/`
+* Khi thêm file fix mới cần cập nhật lại tài liệu này
