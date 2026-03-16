@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import 'change_password_otp_screen.dart';
 import 'forgot_password_screen.dart';
 import 'home_screen.dart';
+import 'kitchen_orders_screen.dart';
 import 'register_otp_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -32,9 +33,13 @@ class _LoginScreenState extends State<LoginScreen> {
     bool success = await authProvider.login(email, password);
 
     if (success && context.mounted) {
+      final role = authProvider.user?.role ?? 'Student';
+      final isKitchen = role.toLowerCase() == 'kitchen';
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(
+          builder: (context) => isKitchen ? const KitchenOrdersScreen() : const HomeScreen(),
+        ),
       );
     } else if (context.mounted) {
       final error = authProvider.errorMessage ?? 'Đăng nhập thất bại';
