@@ -11,7 +11,7 @@ class OrderDetailScreen extends StatelessWidget {
 
   const OrderDetailScreen({super.key, required this.order});
 
-  static const double _vatRate = 0.05;
+  static const double _vatRate = 0.10;
 
   @override
   Widget build(BuildContext context) {
@@ -123,7 +123,7 @@ class OrderDetailScreen extends StatelessWidget {
               children: [
                 _moneyRow('Tam tinh', Money.vnd(subtotal)),
                 const SizedBox(height: 8),
-                _moneyRow('Thue (5%)', Money.vnd(tax)),
+                _moneyRow('Thue (10%)', Money.vnd(tax)),
                 const Divider(height: 20),
                 _moneyRow(
                   'Tong thanh toan',

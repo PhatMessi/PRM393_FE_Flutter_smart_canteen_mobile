@@ -15,6 +15,7 @@ import '../services/realtime_service.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../utils/image_helper.dart'; // [FIX] Import Helper
 import '../utils/money.dart';
+import 'qr_scan_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -403,7 +404,12 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: const CustomBottomNavBar(selectedIndex: 0),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const QrScanScreen()),
+          );
+        },
         backgroundColor: brandGreen,
         shape: const CircleBorder(),
         child: const Icon(Icons.qr_code_scanner, color: Colors.white),
