@@ -166,7 +166,7 @@ class CartScreen extends StatelessWidget {
               children: [
                 _buildSummaryRow("Tam tinh", Money.vnd(cart.subtotal)),
                 const SizedBox(height: 10),
-                _buildSummaryRow("Thue (5%)", Money.vnd(cart.tax)),
+                _buildSummaryRow("Thue (10%)", Money.vnd(cart.tax)),
                 const Padding(padding: EdgeInsets.symmetric(vertical: 15), child: Divider()),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

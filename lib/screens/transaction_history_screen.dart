@@ -3,6 +3,7 @@ import 'package:intl/intl.dart'; // Cần thêm package intl vào pubspec.yaml n
 import '../models/transaction_model.dart';
 import '../services/wallet_service.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
+import 'qr_scan_screen.dart';
 import '../utils/money.dart';
 import 'home_screen.dart';
 
@@ -283,7 +284,12 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
 
       // --- BOTTOM NAVIGATION BAR (Giống Home, Active tại icon Receipt) ---
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const QrScanScreen()),
+          );
+        },
         backgroundColor: brandGreen,
         child: const Icon(Icons.qr_code_scanner, color: Colors.white),
       ),

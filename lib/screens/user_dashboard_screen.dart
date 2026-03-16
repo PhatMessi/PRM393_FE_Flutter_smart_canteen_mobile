@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
+import 'qr_scan_screen.dart';
 import 'chat_screen.dart';
 import 'notifications_screen.dart';
 import 'login_screen.dart';
@@ -12,6 +13,7 @@ import '../models/transaction_model.dart';
 import '../services/wallet_service.dart';
 import '../utils/money.dart';
 import '../utils/vn_time.dart';
+import 'promotions_screen.dart';
 
 class UserDashboardScreen extends StatefulWidget {
   const UserDashboardScreen({super.key});
@@ -502,6 +504,50 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
               const SizedBox(height: 25),
 
               // 4.1 CHAT ITEM (Messaging)
+              // 4.05 VOUCHER ITEM
+              Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(40),
+                  border: Border.all(color: Colors.grey.shade100),
+                ),
+                child: ListTile(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const PromotionsScreen()),
+                    );
+                  },
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.green[50],
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.local_offer, color: Color(0xFF2ED162)),
+                  ),
+                  title: const Text(
+                    'Voucher',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  trailing: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.arrow_forward,
+                      size: 16,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 25),
+
+              // 4.1 CHAT ITEM (Messaging)
               Container(
                 padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
@@ -609,7 +655,12 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
 
       // --- BOTTOM NAVIGATION BAR (Copy y chang từ HomeScreen) ---
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const QrScanScreen()),
+          );
+        },
         backgroundColor: brandGreen,
         child: const Icon(Icons.qr_code_scanner, color: Colors.white),
       ),

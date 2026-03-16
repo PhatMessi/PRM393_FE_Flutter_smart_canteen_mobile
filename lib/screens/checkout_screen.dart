@@ -11,6 +11,9 @@ import 'wallet_topup_screen.dart';
 import '../utils/image_helper.dart';
 import '../utils/money.dart';
 import '../utils/vn_time.dart';
+import '../models/promotion_model.dart';
+import '../services/menu_service.dart';
+import '../services/promotions_service.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -21,6 +24,12 @@ class CheckoutScreen extends StatefulWidget {
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
   final WalletService _walletService = WalletService();
+  final PromotionsService _promotionsService = PromotionsService();
+  final MenuService _menuService = MenuService();
+
+  final TextEditingController _voucherController = TextEditingController();
+  bool _applyingVoucher = false;
+
   double _walletBalance = 0.0;
   bool _isLoading = true;
 
@@ -152,6 +161,97 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _fetchWalletBalance();
   }
 
+  @override
+  void dispose() {
+    _voucherController.dispose();
+    super.dispose();
+  }
+
+  List<CartLineDto> _cartLinesFromProvider(CartProvider cart) {
+    final Map<int, int> qtyById = {};
+    for (final item in cart.items) {
+      final id = item.menuItem.itemId;
+      qtyById[id] = (qtyById[id] ?? 0) + item.quantity;
+    }
+    return qtyById.entries
+        .where((e) => e.value > 0)
+        .map((e) => CartLineDto(menuItemId: e.key, quantity: e.value))
+        .toList();
+  }
+
+  Future<void> _applyVoucher(BuildContext context, {required String code}) async {
+    final cart = Provider.of<CartProvider>(context, listen: false);
+
+    setState(() => _applyingVoucher = true);
+    final (ok, result, msg) = await _promotionsService.applyPromotion(
+      code: code,
+      items: _cartLinesFromProvider(cart),
+    );
+    if (!mounted) return;
+    setState(() => _applyingVoucher = false);
+
+    if (!ok || result == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+      return;
+    }
+
+    if (result.canApply) {
+      cart.setPromotion(code: code, discount: result.discountAmount.toDouble());
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.message.isNotEmpty ? result.message : 'Da ap dung voucher.')),
+      );
+      return;
+    }
+
+    if (result.itemsToAdd.isNotEmpty) {
+      final shouldBuyNow = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Voucher'),
+          content: Text(result.message),
+          actions: [
+            TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Huy')),
+            TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Mua ngay')),
+          ],
+        ),
+      );
+
+      if (shouldBuyNow == true) {
+        final allMenu = await _menuService.getMenuItems();
+        final menuById = {for (final m in allMenu) m.itemId: m};
+        for (final add in result.itemsToAdd) {
+          final menuItem = menuById[add.menuItemId];
+          if (menuItem == null) continue;
+          if (add.quantity <= 0) continue;
+          cart.addItem(menuItem, add.quantity, const [], menuItem.price);
+        }
+
+        final (ok2, result2, msg2) = await _promotionsService.applyPromotion(
+          code: code,
+          items: _cartLinesFromProvider(cart),
+        );
+
+        if (!mounted) return;
+        if (!ok2 || result2 == null) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg2)));
+          return;
+        }
+
+        if (result2.canApply) {
+          cart.setPromotion(code: code, discount: result2.discountAmount.toDouble());
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(result2.message.isNotEmpty ? result2.message : 'Da ap dung voucher.')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result2.message)));
+        }
+      }
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result.message)));
+  }
+
   Future<void> _fetchWalletBalance() async {
     final balance = await _walletService.getBalance();
     if (mounted) {
@@ -165,7 +265,34 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Future<void> _processPayment(BuildContext context) async {
     final cart = Provider.of<CartProvider>(context, listen: false);
 
-    if (_walletBalance < cart.totalAmount) {
+    // Re-validate voucher right before payment to avoid stale discounts.
+    if (cart.promotionCode != null && cart.promotionCode!.trim().isNotEmpty) {
+      final code = cart.promotionCode!.trim();
+      final (ok, result, msg) = await _promotionsService.applyPromotion(
+        code: code,
+        items: _cartLinesFromProvider(cart),
+      );
+
+      if (!mounted) return;
+
+      if (!ok || result == null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+        return;
+      }
+
+      if (!result.canApply) {
+        cart.clearPromotion();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result.message)));
+        return;
+      }
+
+      final newDiscount = result.discountAmount.toDouble();
+      if (newDiscount != cart.promotionDiscount) {
+        cart.setPromotion(code: code, discount: newDiscount);
+      }
+    }
+
+    if (_walletBalance < cart.finalTotal) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text("So du khong du! Vui long nap them vao vi."),
@@ -211,6 +338,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         // Always send UTC (with 'Z') so backend doesn't misinterpret timezone.
         "pickupTime": _selectedPickupUtc.toIso8601String(),
       };
+
+      if (cart.promotionCode != null && cart.promotionCode!.trim().isNotEmpty) {
+        orderData['promotionCode'] = cart.promotionCode!.trim();
+      }
 
       final response = await http.post(
         Uri.parse('${ApiConfig.baseUrl}/orders'),
@@ -285,7 +416,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
     const Color brandGreen = Color(0xFF00E676);
-    bool isSufficient = _walletBalance >= cart.totalAmount;
+    bool isSufficient = _walletBalance >= cart.finalTotal;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
@@ -496,10 +627,86 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ),
 
                   const SizedBox(height: 30),
+                  // 4. VOUCHER
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Voucher',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 10),
+                        if (cart.promotionCode != null)
+                          Row(
+                            children: [
+                              Expanded(child: Text('Dang ap dung: ${cart.promotionCode}')),
+                              TextButton(
+                                onPressed: () {
+                                  cart.clearPromotion();
+                                  _voucherController.clear();
+                                },
+                                child: const Text('Bo'),
+                              ),
+                            ],
+                          )
+                        else
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: _voucherController,
+                                  decoration: const InputDecoration(
+                                    hintText: 'Nhap ma voucher',
+                                    border: OutlineInputBorder(),
+                                    isDense: true,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              ElevatedButton(
+                                onPressed: _applyingVoucher
+                                    ? null
+                                    : () {
+                                        final code = _voucherController.text.trim();
+                                        if (code.isEmpty) return;
+                                        _applyVoucher(context, code: code);
+                                      },
+                                style: ElevatedButton.styleFrom(backgroundColor: brandGreen),
+                                child: _applyingVoucher
+                                    ? const SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                      )
+                                    : const Text('Ap dung', style: TextStyle(color: Colors.white)),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
                   // 4. SUMMARY
                   _buildSummaryRow("Tam tinh", Money.vnd(cart.subtotal)),
                   const SizedBox(height: 10),
-                  _buildSummaryRow("Thue (5%)", Money.vnd(cart.tax)),
+                  _buildSummaryRow("Thue (10%)", Money.vnd(cart.tax)),
+                  if (cart.promotionDiscount > 0) ...[
+                    const SizedBox(height: 10),
+                    _buildSummaryRow("Giam gia", '-${Money.vnd(cart.promotionDiscount)}'),
+                  ],
                   const Divider(height: 30),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -512,7 +719,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         ),
                       ),
                       Text(
-                        Money.vnd(cart.totalAmount),
+                        Money.vnd(cart.finalTotal),
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -543,7 +750,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           const Icon(Icons.arrow_forward, color: Colors.white),
                           const SizedBox(width: 10),
                           Text(
-                            "Thanh toan ${Money.vnd(cart.totalAmount)}",
+                            "Thanh toan ${Money.vnd(cart.finalTotal)}",
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
