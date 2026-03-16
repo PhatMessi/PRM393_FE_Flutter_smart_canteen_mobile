@@ -8,6 +8,11 @@ class ApiConfig {
       ? "http://localhost:5090/api"
       : "http://10.0.2.2:5090/api";
 
+  // SignalR hub (không có /api)
+  static const String realtimeHubUrl = kIsWeb
+      ? "http://localhost:5090/hubs/realtime"
+      : "http://10.0.2.2:5090/hubs/realtime";
+
   // Các Endpoints
   static const String login = "/auth/login";
   static const String register = "/auth/register";
@@ -21,6 +26,10 @@ class ApiConfig {
   static const String getMenu = "/Menu";
   static const String getCategories = "/Menu/categories";
   static const String getMyOrders = "/Orders/my-orders";
+
+  // Kitchen
+  static const String kitchenUnconfirmedOrders = "/kitchen/orders/unconfirmed";
+  static const String kitchenCookingOrders = "/kitchen/orders/cooking";
 
   // Favorites (per account)
   static const String favorites = "/Favorites";
