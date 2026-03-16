@@ -11,14 +11,14 @@ class OrderDetailScreen extends StatelessWidget {
 
   const OrderDetailScreen({super.key, required this.order});
 
+  static const double _vatRate = 0.05;
+
   @override
   Widget build(BuildContext context) {
     final dateText = DateFormat('dd/MM/yyyy HH:mm').format(VnTime.toVn(order.orderDate));
-    final subtotal = order.orderItems.fold<double>(
-      0,
-      (sum, item) => sum + (item.price * item.quantity),
-    );
-    final tax = (order.totalPrice - subtotal) > 0 ? (order.totalPrice - subtotal) : 0;
+    final total = order.totalPrice;
+    final subtotal = total <= 0 ? 0.0 : (total / (1 + _vatRate)).roundToDouble();
+    final tax = total <= 0 ? 0.0 : (total - subtotal);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
@@ -123,7 +123,7 @@ class OrderDetailScreen extends StatelessWidget {
               children: [
                 _moneyRow('Tam tinh', Money.vnd(subtotal)),
                 const SizedBox(height: 8),
-                _moneyRow('Thue', Money.vnd(tax)),
+                _moneyRow('Thue (5%)', Money.vnd(tax)),
                 const Divider(height: 20),
                 _moneyRow(
                   'Tong thanh toan',

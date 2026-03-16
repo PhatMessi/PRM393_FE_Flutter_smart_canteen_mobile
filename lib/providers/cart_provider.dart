@@ -5,21 +5,27 @@ import '../models/menu_item.dart';
 class CartProvider with ChangeNotifier {
   final List<CartItem> _items = [];
 
+  static const double _vatRate = 0.05;
+
   List<CartItem> get items => _items;
 
-  // Tính tổng tiền hàng (chưa thuế)
-  double get subtotal {
+  // Tổng thanh toán (giá món đã bao gồm VAT 5%)
+  double get totalAmount {
     return _items.fold(0.0, (sum, item) => sum + item.totalPrice);
   }
 
-  // Tính thuế 5% như trong hình
-  double get tax {
-    return subtotal * 0.05;
+  // Tạm tính (giá trước VAT)
+  double get subtotal {
+    final total = totalAmount;
+    if (total <= 0) return 0.0;
+    return (total / (1 + _vatRate)).roundToDouble();
   }
 
-  // Tổng thanh toán
-  double get totalAmount {
-    return subtotal + tax;
+  // Thuế VAT (đã nằm trong totalAmount)
+  double get tax {
+    final total = totalAmount;
+    if (total <= 0) return 0.0;
+    return total - subtotal;
   }
 
   int get itemCount {
