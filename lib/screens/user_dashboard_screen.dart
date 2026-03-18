@@ -250,7 +250,9 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                           ).logout();
                           if (!context.mounted) return;
                           Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(builder: (_) => const LoginScreen()),
+                            MaterialPageRoute(
+                              builder: (_) => const LoginScreen(),
+                            ),
                             (_) => false,
                           );
                         },
@@ -264,7 +266,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                         ),
                       ),
                     ],
-                  )
+                  ),
                 ],
               ),
               const SizedBox(height: 25),
@@ -369,15 +371,20 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                         Icons.account_balance_wallet,
                         color: Colors.black,
                       ),
-                      label: const Text(
-                        "Nap tien",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
+                      label: const FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          "Nap tien",
+                          maxLines: 1,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: brandGreen,
+                        minimumSize: const Size(0, 52),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
@@ -397,15 +404,20 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                         );
                       },
                       icon: const Icon(Icons.qr_code, color: Colors.black),
-                      label: const Text(
-                        "Ma QR cua toi",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
+                      label: const FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          "Ma QR cua toi",
+                          maxLines: 1,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
+                        minimumSize: const Size(0, 52),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
@@ -516,7 +528,9 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const PromotionsScreen()),
+                      MaterialPageRoute(
+                        builder: (_) => const PromotionsScreen(),
+                      ),
                     );
                   },
                   leading: Container(
@@ -525,7 +539,10 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                       color: Colors.green[50],
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.local_offer, color: Color(0xFF2ED162)),
+                    child: const Icon(
+                      Icons.local_offer,
+                      color: Color(0xFF2ED162),
+                    ),
                   ),
                   title: const Text(
                     'Voucher',

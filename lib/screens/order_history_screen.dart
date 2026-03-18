@@ -240,8 +240,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   ),
                 ],
               ),
-                Text(
-                  "#${order.orderId} • ${DateFormat('HH:mm').format(VnTime.toVn(order.orderDate))}",
+              Text(
+                "#${order.orderId} • ${DateFormat('HH:mm').format(VnTime.toVn(order.orderDate))}",
                 style: const TextStyle(color: Colors.grey, fontSize: 12),
               ),
             ],
@@ -333,13 +333,17 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                       );
                     },
                     icon: const Icon(Icons.location_on, size: 18),
-                    label: const Text("Theo doi don"),
+                    label: const FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text("Theo doi don", maxLines: 1),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF2ED162),
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
                       ),
+                      minimumSize: const Size(0, 44),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
@@ -355,9 +359,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
                       ),
+                      minimumSize: const Size(0, 44),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    child: const Text("Xem chi tiet"),
+                    child: const FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text("Xem chi tiet", maxLines: 1),
+                    ),
                   ),
                 ),
               ],

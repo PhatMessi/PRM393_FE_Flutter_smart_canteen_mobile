@@ -118,16 +118,31 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
             ),
           ),
           actions: [
-            TextButton(
-              onPressed: () {
-                _statusTimer?.cancel();
-                Navigator.pop(dialogContext, false);
-              },
-              child: const Text('Dong'),
-            ),
-            ElevatedButton(
-              onPressed: () => _openCheckoutUrl(checkoutUrl),
-              child: const Text('Mo trang thanh toan'),
+            SizedBox(
+              width: double.infinity,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () {
+                        _statusTimer?.cancel();
+                        Navigator.pop(dialogContext, false);
+                      },
+                      child: const Text('Dong'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => _openCheckoutUrl(checkoutUrl),
+                      child: const FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text('Mo trang thanh toan'),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         );

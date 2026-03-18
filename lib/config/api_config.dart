@@ -1,17 +1,12 @@
-import 'package:flutter/foundation.dart'; // 1. Thêm thư viện này để check kIsWeb
-
 class ApiConfig {
-  // 2. Logic tự động:
-  // - Nếu là Web: dùng localhost:5090
-  // - Nếu là Android: dùng 10.0.2.2:5090
-  static const String baseUrl = kIsWeb
-      ? "http://localhost:5090/api"
-      : "http://10.0.2.2:5090/api";
+  // Backend Render
+  // NOTE: baseUrl ends with `/api` (controllers), hub url does not.
+  static const String baseUrl =
+      "https://prm393-be-smartcanteensystemwebapp.onrender.com/api";
 
   // SignalR hub (không có /api)
-  static const String realtimeHubUrl = kIsWeb
-      ? "http://localhost:5090/hubs/realtime"
-      : "http://10.0.2.2:5090/hubs/realtime";
+  static const String realtimeHubUrl =
+      "https://prm393-be-smartcanteensystemwebapp.onrender.com/hubs/realtime";
 
   // Các Endpoints
   static const String login = "/auth/login";
@@ -42,8 +37,8 @@ class ApiConfig {
   static const String promotionsApply = "/promotions/apply";
   static const String promotionsCheckinQr = "/promotions/qr/checkin";
 
-    // Admin promotions (SystemAdmin)
-    static const String adminPromotions = "/admin/promotions";
+  // Admin promotions (SystemAdmin)
+  static const String adminPromotions = "/admin/promotions";
 
   static const int receiveTimeout = 15000;
   static const int connectionTimeout = 15000;
