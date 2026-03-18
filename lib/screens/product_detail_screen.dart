@@ -188,7 +188,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       for (final entry in extrasRaw.entries) {
         final key = entry.key.toString();
         final value = entry.value;
-        final parsed = (value is num) ? value.toDouble() : double.tryParse(value.toString());
+        final parsed = (value is num)
+            ? value.toDouble()
+            : double.tryParse(value.toString());
         if (parsed != null) {
           extras[key] = parsed;
         }
@@ -573,7 +575,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 // Hiển thị thông báo hoặc chuyển sang giỏ hàng
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text("Da them ${widget.menuItem.name} vao khay!"),
+                    behavior: SnackBarBehavior.floating,
+                    margin: EdgeInsets.fromLTRB(
+                      16,
+                      0,
+                      16,
+                      96 + MediaQuery.of(context).padding.bottom,
+                    ),
+                    content: Text(
+                      "Da them ${widget.menuItem.name} vao khay!",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     backgroundColor: kPrimaryColor,
                     action: SnackBarAction(
                       label: "XEM KHAY",
@@ -599,12 +612,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    "Them vao don",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                  const Expanded(
+                    child: Text(
+                      "Them vao don",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -617,9 +635,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Text(
-                      Money.vnd(totalPrice),
-                      style: const TextStyle(color: Colors.white),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 140),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          Money.vnd(totalPrice),
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
                     ),
                   ),
                 ],

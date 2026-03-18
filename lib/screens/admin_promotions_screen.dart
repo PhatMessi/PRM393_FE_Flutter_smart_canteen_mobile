@@ -19,7 +19,9 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
 
   final TextEditingController _codeCtl = TextEditingController();
   final TextEditingController _descCtl = TextEditingController();
-  final TextEditingController _discountPercentCtl = TextEditingController(text: '0');
+  final TextEditingController _discountPercentCtl = TextEditingController(
+    text: '0',
+  );
   final TextEditingController _discountAmountCtl = TextEditingController();
   final TextEditingController _minOrderCtl = TextEditingController();
   final TextEditingController _maxDiscountCtl = TextEditingController();
@@ -75,7 +77,13 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
 
     if (!mounted || picked == null) return;
     setState(() {
-      final merged = DateTime(picked.year, picked.month, picked.day, current.hour, current.minute);
+      final merged = DateTime(
+        picked.year,
+        picked.month,
+        picked.day,
+        current.hour,
+        current.minute,
+      );
       if (isStart) {
         _startDate = merged;
       } else {
@@ -121,8 +129,14 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
                 DropdownButtonFormField<String>(
                   value: _createType,
                   items: const [
-                    DropdownMenuItem(value: 'PercentBill', child: Text('Giam % bill')),
-                    DropdownMenuItem(value: 'AmountBill', child: Text('Giam so tien bill')),
+                    DropdownMenuItem(
+                      value: 'PercentBill',
+                      child: Text('Giam % bill'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'AmountBill',
+                      child: Text('Giam so tien bill'),
+                    ),
                   ],
                   onChanged: (v) {
                     if (v == null) return;
@@ -141,31 +155,43 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
                   TextField(
                     controller: _discountAmountCtl,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: 'Discount amount'),
+                    decoration: const InputDecoration(
+                      labelText: 'Discount amount',
+                    ),
                   ),
                 const SizedBox(height: 8),
                 TextField(
                   controller: _minOrderCtl,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Min order (optional)'),
+                  decoration: const InputDecoration(
+                    labelText: 'Min order (optional)',
+                  ),
                 ),
                 const SizedBox(height: 8),
                 TextField(
                   controller: _maxDiscountCtl,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Max discount (optional)'),
+                  decoration: const InputDecoration(
+                    labelText: 'Max discount (optional)',
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
                     Expanded(child: Text('Start: ${fmt.format(_startDate)}')),
-                    TextButton(onPressed: () => _pickDate(isStart: true), child: const Text('Chon')),
+                    TextButton(
+                      onPressed: () => _pickDate(isStart: true),
+                      child: const Text('Chon'),
+                    ),
                   ],
                 ),
                 Row(
                   children: [
                     Expanded(child: Text('End: ${fmt.format(_endDate)}')),
-                    TextButton(onPressed: () => _pickDate(isStart: false), child: const Text('Chon')),
+                    TextButton(
+                      onPressed: () => _pickDate(isStart: false),
+                      child: const Text('Chon'),
+                    ),
                   ],
                 ),
                 SwitchListTile(
@@ -210,7 +236,9 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
                   isActive: _createActive,
                 );
                 if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(msg)));
                 if (ok) {
                   Navigator.of(ctx).pop();
                   _refresh();
@@ -252,11 +280,34 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
   }
 
   Future<void> _showQr(PromotionModel promo) async {
+    if (!mounted) return;
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
     final (ok, payload, msg) = await _service.getQrPayload(promo.promotionId);
+
+    if (mounted && Navigator.of(context, rootNavigator: true).canPop()) {
+      Navigator.of(context, rootNavigator: true).pop();
+    }
     if (!mounted) return;
 
     if (!ok || payload == null || payload.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+      return;
+    }
+
+    final validation = QrValidator.validate(
+      data: payload,
+      version: QrVersions.auto,
+      errorCorrectionLevel: QrErrorCorrectLevel.M,
+    );
+    if (validation.status != QrValidationStatus.valid) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Khong the tao QR: ${validation.error}')),
+      );
       return;
     }
 
@@ -275,16 +326,21 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: QrImageView(
-                    data: payload,
-                    version: QrVersions.auto,
-                    size: 220,
-                    gapless: false,
-                    errorCorrectionLevel: QrErrorCorrectLevel.M,
+                  child: SizedBox.square(
+                    dimension: 220,
+                    child: QrImageView(
+                      data: payload,
+                      version: QrVersions.auto,
+                      gapless: false,
+                      errorCorrectionLevel: QrErrorCorrectLevel.M,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
-                SelectableText(payload),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 160),
+                  child: SingleChildScrollView(child: SelectableText(payload)),
+                ),
               ],
             ),
           ),
@@ -330,14 +386,8 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
         title: const Text('Quan ly voucher'),
         centerTitle: true,
         actions: [
-          IconButton(
-            onPressed: _openCreateDialog,
-            icon: const Icon(Icons.add),
-          ),
-          IconButton(
-            onPressed: _refresh,
-            icon: const Icon(Icons.refresh),
-          ),
+          IconButton(onPressed: _openCreateDialog, icon: const Icon(Icons.add)),
+          IconButton(onPressed: _refresh, icon: const Icon(Icons.refresh)),
         ],
       ),
       body: FutureBuilder<List<PromotionModel>>(
@@ -374,7 +424,10 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
                         Expanded(
                           child: Text(
                             p.code,
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
                         ),
                         Switch(
@@ -394,7 +447,10 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
                         Expanded(
                           child: Text(
                             'Het han: ${fmt.format(p.endDate.toLocal())} • ${_discountText(p)}',
-                            style: const TextStyle(color: Colors.grey, fontSize: 12),
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
                         TextButton(
