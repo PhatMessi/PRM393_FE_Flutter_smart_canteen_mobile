@@ -66,7 +66,10 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                   contentPadding: EdgeInsets.zero,
                   leading: const CircleAvatar(
                     backgroundColor: Color(0xFFE8F9EF),
-                    child: Icon(Icons.account_balance_wallet, color: Color(0xFF2ED162)),
+                    child: Icon(
+                      Icons.account_balance_wallet,
+                      color: Color(0xFF2ED162),
+                    ),
                   ),
                   title: const Text('Nap tien vao vi'),
                   subtitle: const Text('Bo sung so du de thanh toan don hang'),
@@ -86,7 +89,10 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                   contentPadding: EdgeInsets.zero,
                   leading: CircleAvatar(
                     backgroundColor: Colors.purple.shade50,
-                    child: const Icon(Icons.chat_bubble_outline, color: Colors.purple),
+                    child: const Icon(
+                      Icons.chat_bubble_outline,
+                      color: Colors.purple,
+                    ),
                   ),
                   title: const Text('Nhan tin ho tro'),
                   subtitle: const Text('Can tro giup khi can giao dich'),
@@ -355,7 +361,9 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Ma QR cua toi: sap co')),
+                          const SnackBar(
+                            content: Text('Ma QR cua toi: sap co'),
+                          ),
                         );
                       },
                       icon: const Icon(Icons.qr_code, color: Colors.black),
@@ -409,6 +417,46 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                   //   "Gui tien cho ban be",
                   //   style: TextStyle(fontSize: 12, color: Colors.grey),
                   // ),
+                  trailing: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.arrow_forward,
+                      size: 16,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 25),
+
+              // 4.0 FAVORITES ITEM
+              Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(40),
+                  border: Border.all(color: Colors.grey.shade100),
+                ),
+                child: ListTile(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/favorites');
+                  },
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.red[50],
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.favorite, color: Colors.red),
+                  ),
+                  title: const Text(
+                    'Yeu thich',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   trailing: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
@@ -543,7 +591,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   }
 
   Widget _buildTransactionRow(TransactionModel t, Color brandGreen) {
-    final isNegative = t.type == 'Payment' || t.type == 'Withdrawal' || t.type == 'Thanh toan';
+    final isNegative =
+        t.type == 'Payment' || t.type == 'Withdrawal' || t.type == 'Thanh toan';
     final iconColor = t.type == 'TopUp' || t.type == 'Nap tien'
         ? brandGreen
         : (t.type == 'Refund' ? Colors.purple : Colors.orange);

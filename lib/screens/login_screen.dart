@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import 'change_password_otp_screen.dart';
 import 'forgot_password_screen.dart';
 import 'home_screen.dart';
+import 'register_otp_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      _showSnackBar(context, 'Vui long nhap email va mat khau', isError: true);
+      _showSnackBar(context, 'Vui lòng nhập email và mật khẩu', isError: true);
       return;
     }
 
@@ -35,8 +37,44 @@ class _LoginScreenState extends State<LoginScreen> {
         MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } else if (context.mounted) {
-        _showSnackBar(context, authProvider.errorMessage ?? 'Dang nhap that bai',
-          isError: true);
+      final error = authProvider.errorMessage ?? 'Đăng nhập thất bại';
+      final lower = error.toLowerCase();
+      final shouldChangePassword =
+          (lower.contains('must') && lower.contains('password')) ||
+              lower.contains('đổi mật khẩu') ||
+              lower.contains('doi mat khau');
+
+      if (shouldChangePassword) {
+        showDialog<void>(
+          context: context,
+          builder: (ctx) {
+            return AlertDialog(
+              title: const Text('Cần đổi mật khẩu'),
+              content: Text(error),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: const Text('Đóng'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const ChangePasswordOtpScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text('Đổi mật khẩu'),
+                ),
+              ],
+            );
+          },
+        );
+        return;
+      }
+
+      _showSnackBar(context, error, isError: true);
     }
   }
 
@@ -86,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 20),
                     const Text(
-                      "Chao mung den",
+                      "Chào mừng đến",
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -97,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 5),
                     
                     Text(
-                      "Dang nhap Cang Tin Thong Minh",
+                      "Đăng nhập Canteen Thông Minh",
                       style: TextStyle(
                         fontSize: 16,
                         color: primaryColor.withOpacity(0.8), // Màu xanh rêu nhạt
@@ -109,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     // --- 2. FORM SECTION ---
                     
                     // Email Field
-                    _buildLabel("Email hoc sinh"),
+                    _buildLabel("Email học sinh"),
                     const SizedBox(height: 8),
                     _buildInputField(
                       controller: _emailController,
@@ -121,11 +159,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 20),
 
                     // Password Field
-                    _buildLabel("Mat khau"),
+                    _buildLabel("Mật khẩu"),
                     const SizedBox(height: 8),
                     _buildInputField(
                       controller: _passwordController,
-                      hintText: "Nhap mat khau",
+                      hintText: "Nhập mật khẩu",
                       icon: Icons.lock_outline_rounded,
                       obscureText: _obscurePassword,
                       isPassword: true,
@@ -148,7 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           );
                         },
                         child: const Text(
-                          "Quen mat khau?",
+                          "Quên mật khẩu?",
                           style: TextStyle(
                             color: Color(0xFF588157),
                             fontWeight: FontWeight.w600,
@@ -182,7 +220,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    "Dang nhap",
+                                    "Đăng nhập",
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -203,7 +241,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Expanded(child: Divider(color: Colors.grey[300])),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Text("Hoac tiep tuc voi",
+                            child: Text("Hoặc tiếp tục với",
                               style: TextStyle(color: textGray)),
                         ),
                         Expanded(child: Divider(color: Colors.grey[300])),
@@ -235,15 +273,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "Chua co tai khoan? ",
+                          "Chưa có tài khoản? ",
                           style: TextStyle(color: textGray, fontSize: 14),
                         ),
                         GestureDetector(
                           onTap: () {
-                            // TODO: Navigate to Register
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const RegisterOtpScreen(),
+                              ),
+                            );
                           },
                           child: const Text(
-                            "Dang ky ngay",
+                            "Đăng ký ngay",
                             style: TextStyle(
                               color: textDark,
                               fontWeight: FontWeight.bold,

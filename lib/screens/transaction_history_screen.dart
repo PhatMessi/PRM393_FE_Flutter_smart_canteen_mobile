@@ -31,9 +31,9 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
       return;
     }
 
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
-    );
+    Navigator.of(
+      context,
+    ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
   }
 
   @override
@@ -325,7 +325,8 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
   }
 
   Widget _buildTransactionItem(TransactionModel t) {
-    bool isNegative = t.type == "Payment" || t.type == "Withdrawal" || t.type == "Thanh toan";
+    bool isNegative =
+        t.type == "Payment" || t.type == "Withdrawal" || t.type == "Thanh toan";
     Color iconColor = t.type == "TopUp" || t.type == "Nap tien"
         ? const Color(0xFF2ED162)
         : (t.type == "Refund" ? Colors.purple : Colors.orange);

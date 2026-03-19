@@ -5,7 +5,8 @@ class MenuItem {
   final double price;
   final String? imageUrl;
   final int categoryId;
-  final String? categoryName; // Backend có thể trả về hoặc không, xử lý null an toàn
+  final String?
+  categoryName; // Backend có thể trả về hoặc không, xử lý null an toàn
 
   MenuItem({
     required this.itemId,
@@ -29,6 +30,18 @@ class MenuItem {
       categoryName: json['categoryName'] ?? json['CategoryName'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'itemId': itemId,
+      'name': name,
+      'description': description,
+      'price': price,
+      'imageUrl': imageUrl,
+      'categoryId': categoryId,
+      'categoryName': categoryName,
+    };
+  }
 }
 
 class Category {
@@ -42,7 +55,12 @@ class Category {
     // Nếu không có mới thử đọc 'name' hoặc 'Name'
     return Category(
       categoryId: json['categoryId'] ?? json['CategoryId'] ?? 0,
-      name: json['CategoryName'] ?? json['categoryName'] ?? json['name'] ?? json['Name'] ?? 'Unknown',
+      name:
+          json['CategoryName'] ??
+          json['categoryName'] ??
+          json['name'] ??
+          json['Name'] ??
+          'Unknown',
     );
   }
 }
