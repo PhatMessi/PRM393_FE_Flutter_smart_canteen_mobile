@@ -1,23 +1,7 @@
-import 'package:flutter/foundation.dart';
-
 class ApiConfig {
-  // Toggle backend:
-  // - Default (debug/test): local (web: localhost, android emulator: 10.0.2.2)
-  // - To use Render: add `--dart-define=USE_RENDER=true`
-  static const bool useRender = bool.fromEnvironment(
-    'USE_RENDER',
-    defaultValue: false,
-  );
-
-  static const String _renderHost =
+  // Always use deployed backend (no local fallback)
+  static const String _host =
       'https://prm393-be-smartcanteensystemwebapp.onrender.com';
-  static const String _localWebHost = 'http://localhost:5090';
-  static const String _localAndroidHost = 'http://10.0.2.2:5090';
-
-  static String get _host {
-    if (useRender) return _renderHost;
-    return kIsWeb ? _localWebHost : _localAndroidHost;
-  }
 
   // NOTE: baseUrl ends with `/api` (controllers), hub url does not.
   static String get baseUrl => '$_host/api';
