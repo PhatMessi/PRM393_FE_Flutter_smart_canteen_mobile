@@ -26,7 +26,7 @@ class AuthProvider extends ChangeNotifier {
     final profile = await _authService.getProfile(token);
     _user =
         profile ??
-      User(fullName: "Nguoi dung", email: "", role: "Student", token: token);
+        User(fullName: "Nguoi dung", email: "", role: "Student", token: token);
 
     notifyListeners();
     return true;
@@ -58,6 +58,33 @@ class AuthProvider extends ChangeNotifier {
       }
     } catch (e) {
       _errorMessage = "Đã xảy ra lỗi không mong muốn.";
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> loginWithGoogle() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final result = await _authService.loginWithGoogle();
+
+      if (result['success']) {
+        _user = result['user'];
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      }
+
+      _errorMessage = result['message'];
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    } catch (_) {
+      _errorMessage = 'Đã xảy ra lỗi không mong muốn.';
       _isLoading = false;
       notifyListeners();
       return false;

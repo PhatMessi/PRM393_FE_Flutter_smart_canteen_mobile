@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart'; // Import mới
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import '../config/api_config.dart';
 import '../models/user_model.dart'; // Import Model mới
 
@@ -83,6 +86,109 @@ class AuthService {
           'message': _readMessage(decoded) ?? response.body,
         };
       }
+    } catch (e) {
+      return {'success': false, 'message': 'Lỗi kết nối: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> loginWithGoogle() async {
+    try {
+      final googleSignIn = GoogleSignIn(
+        scopes: const <String>['email', 'profile'],
+        // If GOOGLE_WEB_CLIENT_ID is provided, request idToken for server verification.
+        // With Firebase configured (google-services.json + Google provider enabled), Android can also work without this.
+        serverClientId: ApiConfig.googleWebClientId.isNotEmpty ? ApiConfig.googleWebClientId : null,
+      );
+
+      final account = await googleSignIn.signIn();
+      if (account == null) {
+        return {'success': false, 'message': 'Đã hủy đăng nhập Google.'};
+      }
+
+      final auth = await account.authentication;
+      final idToken = auth.idToken;
+      final accessToken = auth.accessToken;
+
+      if (idToken != null && idToken.isNotEmpty && accessToken != null && accessToken.isNotEmpty) {
+        final credential = fb_auth.GoogleAuthProvider.credential(
+          idToken: idToken,
+          accessToken: accessToken,
+        );
+        await fb_auth.FirebaseAuth.instance.signInWithCredential(credential);
+      }
+
+      if (idToken == null || idToken.isEmpty) {
+        return {
+          'success': false,
+          'message':
+              'Không lấy được Google idToken. Hãy kiểm tra: (1) Firebase Android đã cấu hình đúng (google-services.json đúng project, đã Enable Google Sign-In trong Firebase Auth, đã add SHA-1), hoặc (2) truyền Web Client ID qua `--dart-define=GOOGLE_WEB_CLIENT_ID=...`. Package hiện tại: com.example.smart_canteen_mobile.',
+        };
+      }
+
+      final url = Uri.parse(ApiConfig.baseUrl + ApiConfig.googleLogin);
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'idToken': idToken}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final token = (data is Map<String, dynamic>)
+            ? data['token']?.toString()
+            : null;
+        final mustChangePassword = (data is Map<String, dynamic>)
+            ? (data['mustChangePassword'] == true)
+            : false;
+
+        if (token == null || token.isEmpty) {
+          return {
+            'success': false,
+            'message': 'Phan hoi dang nhap Google thieu token',
+          };
+        }
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('user_token', token);
+
+        if (mustChangePassword) {
+          return {
+            'success': false,
+            'message': 'Bạn cần đổi mật khẩu trước khi sử dụng hệ thống.',
+          };
+        }
+
+        final profile = await getProfile(token);
+        final user = profile ??
+            User(
+              fullName: account.displayName ?? 'Nguoi dung',
+              email: account.email,
+              role: 'Student',
+              token: token,
+            );
+
+        return {'success': true, 'user': user};
+      }
+
+      final decoded = _tryDecodeJson(response.body);
+      return {
+        'success': false,
+        'message': _readMessage(decoded) ?? response.body,
+      };
+    } on PlatformException catch (e) {
+      final text = (e.message?.isNotEmpty == true) ? e.message! : e.toString();
+      if (text.contains('ApiException: 10') || text.contains('statusCode: 10')) {
+        return {
+          'success': false,
+          'message':
+              'Google Sign-In bị lỗi cấu hình (ApiException: 10). Kiểm tra lại OAuth Android Client trên Google Cloud: package name phải là com.example.smart_canteen_mobile và SHA-1 phải đúng (ví dụ: 23:E2:F8:4E:...).',
+        };
+      }
+
+      return {
+        'success': false,
+        'message': 'Google Sign-In thất bại: ${e.message ?? e.code}',
+      };
     } catch (e) {
       return {'success': false, 'message': 'Lỗi kết nối: $e'};
     }

@@ -48,6 +48,9 @@ dependencies:
   url_launcher: ^6.3.0
   signalr_netcore: ^1.4.4
   flutter_local_notifications: ^19.4.2
+  google_sign_in: ^6.3.0
+  firebase_core: ^3.6.0
+  firebase_auth: ^5.5.0
 
 dev_dependencies:
   flutter_test:

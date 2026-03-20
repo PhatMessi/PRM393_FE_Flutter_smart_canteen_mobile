@@ -40,12 +40,11 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              isKitchen
-                  ? const KitchenOrdersScreen()
-                  : isAdmin
-                      ? const AdminHomeScreen()
-                      : const HomeScreen(),
+          builder: (context) => isKitchen
+              ? const KitchenOrdersScreen()
+              : isAdmin
+              ? const AdminHomeScreen()
+              : const HomeScreen(),
         ),
       );
     } else if (context.mounted) {
@@ -53,8 +52,8 @@ class _LoginScreenState extends State<LoginScreen> {
       final lower = error.toLowerCase();
       final shouldChangePassword =
           (lower.contains('must') && lower.contains('password')) ||
-              lower.contains('đổi mật khẩu') ||
-              lower.contains('doi mat khau');
+          lower.contains('đổi mật khẩu') ||
+          lower.contains('doi mat khau');
 
       if (shouldChangePassword) {
         showDialog<void>(
@@ -90,8 +89,38 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _showSnackBar(BuildContext context, String message,
-      {bool isError = false}) {
+  void _handleGoogleLogin(BuildContext context) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final success = await authProvider.loginWithGoogle();
+
+    if (success && context.mounted) {
+      final role = authProvider.user?.role ?? 'Student';
+      final isKitchen = role.toLowerCase() == 'kitchen';
+      final isAdmin = role.toLowerCase() == 'systemadmin';
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => isKitchen
+              ? const KitchenOrdersScreen()
+              : isAdmin
+              ? const AdminHomeScreen()
+              : const HomeScreen(),
+        ),
+      );
+      return;
+    }
+
+    if (context.mounted) {
+      final error = authProvider.errorMessage ?? 'Đăng nhập Google thất bại';
+      _showSnackBar(context, error, isError: true);
+    }
+  }
+
+  void _showSnackBar(
+    BuildContext context,
+    String message, {
+    bool isError = false,
+  }) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -128,7 +157,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         shape: BoxShape.circle,
                         color: Color(0xFFE6DDBF),
                       ),
-                      padding: const EdgeInsets.all(20), // Padding để logo không sát viền tròn
+                      padding: const EdgeInsets.all(
+                        20,
+                      ), // Padding để logo không sát viền tròn
                       child: Image.asset(
                         'assets/images/Carteen.png', // Tên file từ cây thư mục
                         fit: BoxFit.contain,
@@ -145,19 +176,21 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    
+
                     Text(
                       "Đăng nhập Canteen Thông Minh",
                       style: TextStyle(
                         fontSize: 16,
-                        color: primaryColor.withOpacity(0.8), // Màu xanh rêu nhạt
+                        color: primaryColor.withOpacity(
+                          0.8,
+                        ), // Màu xanh rêu nhạt
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     const SizedBox(height: 40),
 
                     // --- 2. FORM SECTION ---
-                    
+
                     // Email Field
                     _buildLabel("Email học sinh"),
                     const SizedBox(height: 8),
@@ -191,10 +224,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {
-                        // --- ĐIỀU HƯỚNG SANG MÀN HÌNH QUÊN MẬT KHẨU ---
+                          // --- ĐIỀU HƯỚNG SANG MÀN HÌNH QUÊN MẬT KHẨU ---
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const ForgotPasswordScreen(),
+                            ),
                           );
                         },
                         child: const Text(
@@ -227,7 +263,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         child: authProvider.isLoading
-                            ? const CircularProgressIndicator(color: Colors.white)
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
                             : const Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -239,7 +277,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                   ),
                                   SizedBox(width: 8),
-                                  Icon(Icons.arrow_forward_rounded)
+                                  Icon(Icons.arrow_forward_rounded),
                                 ],
                               ),
                       ),
@@ -253,29 +291,24 @@ class _LoginScreenState extends State<LoginScreen> {
                         Expanded(child: Divider(color: Colors.grey[300])),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Text("Hoặc tiếp tục với",
-                              style: TextStyle(color: textGray)),
+                          child: Text(
+                            "Hoặc tiếp tục với",
+                            style: TextStyle(color: textGray),
+                          ),
                         ),
                         Expanded(child: Divider(color: Colors.grey[300])),
                       ],
                     ),
                     const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildSocialButton(
-                            label: "Google",
-                            imagePath: "assets/images/Google.png",
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: _buildSocialButton(
-                            label: "Apple",
-                            imagePath: "assets/images/Apple.png",
-                          ),
-                        ),
-                      ],
+                    SizedBox(
+                      width: double.infinity,
+                      child: _buildSocialButton(
+                        label: "Google",
+                        imagePath: "assets/images/Google.png",
+                        onTap: authProvider.isLoading
+                            ? null
+                            : () => _handleGoogleLogin(context),
+                      ),
                     ),
 
                     const SizedBox(height: 40),
@@ -397,8 +430,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildSocialButton({
-    required String label, 
+    required String label,
     required String imagePath,
+    VoidCallback? onTap,
   }) {
     return Container(
       height: 50,
@@ -418,7 +452,7 @@ class _LoginScreenState extends State<LoginScreen> {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(30),
-          onTap: () {},
+          onTap: onTap,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
