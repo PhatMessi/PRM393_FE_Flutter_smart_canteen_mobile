@@ -6,17 +6,17 @@ class ApiConfig {
   // - Android emulator: flutter run --dart-define=API_HOST=http://10.0.2.2:5090
   // If not provided, defaults to local (web=localhost, others=10.0.2.2).
   // You can still set production explicitly via dart-define.
-  // static const String _prodHost =
-      // 'https://prm393-be-smartcanteensystemwebapp.onrender.com';
+  static const String _prodHost =
+      'https://prm393-be-smartcanteensystemwebapp.onrender.com';
 
   static const String _hostFromEnv = String.fromEnvironment(
     'API_HOST',
-    defaultValue: '',
+    defaultValue: 'https://prm393-be-smartcanteensystemwebapp.onrender.com',
   );
 
   static String get _host {
     if (_hostFromEnv.isNotEmpty) return _hostFromEnv;
-    // if (kReleaseMode) return _prodHost;
+    if (kReleaseMode) return _prodHost;
     return kIsWeb ? 'http://localhost:5090' : 'http://10.0.2.2:5090';
   }
 
