@@ -283,7 +283,17 @@ class InventoryReconciler {
   }
 
   ReconcileReport reconcile(List<InventoryEvent> input) {
-    _issues.clear();
+    return reconcileWithInitialState(input);
+  }
+
+  ReconcileReport reconcileWithInitialState(
+    List<InventoryEvent> input, {
+    Map<String, InventoryState>? initialStates,
+    bool resetIssues = true,
+  }) {
+    if (resetIssues) {
+      _issues.clear();
+    }
 
     final normalized = input.map(_Normalize.normalizeEvent).toList();
 
@@ -315,7 +325,9 @@ class InventoryReconciler {
       }
     }
 
-    final states = <String, InventoryState>{};
+    final states = <String, InventoryState>{
+      if (initialStates != null) ...initialStates,
+    };
     var applied = 0;
     var rejected = 0;
 
@@ -470,6 +482,51 @@ class BatchReconcileRunner {
       reports.add(reconciler.reconcile(events.sublist(i, end)));
     }
     return reports;
+  }
+
+  ReconcileReport runSequentialChunks(
+    List<InventoryEvent> events, {
+    int chunkSize = 500,
+  }) {
+    if (chunkSize <= 0) {
+      throw ArgumentError('chunkSize must be > 0');
+    }
+
+    var totalInput = 0;
+    var applied = 0;
+    var rejected = 0;
+    var deduplicated = 0;
+    var reordered = 0;
+    final mergedIssues = <ReconcileIssue>[];
+    var carryStates = <String, InventoryState>{};
+
+    for (var i = 0; i < events.length; i += chunkSize) {
+      final end = (i + chunkSize < events.length) ? i + chunkSize : events.length;
+      final chunk = events.sublist(i, end);
+      final report = reconciler.reconcileWithInitialState(
+        chunk,
+        initialStates: carryStates,
+        resetIssues: true,
+      );
+
+      totalInput += report.totalInput;
+      applied += report.applied;
+      rejected += report.rejected;
+      deduplicated += report.deduplicated;
+      reordered += report.reordered;
+      mergedIssues.addAll(report.issues);
+      carryStates = Map<String, InventoryState>.from(report.finalStates);
+    }
+
+    return ReconcileReport(
+      totalInput: totalInput,
+      applied: applied,
+      rejected: rejected,
+      deduplicated: deduplicated,
+      reordered: reordered,
+      finalStates: carryStates,
+      issues: mergedIssues,
+    );
   }
 
   ReconcileReport mergeReports(List<ReconcileReport> reports) {
@@ -661,8 +718,8 @@ void main() {
   final reconciler = InventoryReconciler();
   final batch = BatchReconcileRunner(reconciler);
 
-  final partial = batch.runByChunks(events, chunkSize: 5);
-  final merged = batch.mergeReports(partial);
+  // Fixed approach: process chunks sequentially with carry-over state.
+  final merged = batch.runSequentialChunks(events, chunkSize: 5);
 
   print(merged.pretty());
   runAssertions(merged);
