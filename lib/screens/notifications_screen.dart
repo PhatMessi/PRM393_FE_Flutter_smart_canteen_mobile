@@ -36,7 +36,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: const Text(
-          'Thong bao',
+          'Thông báo',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
         centerTitle: false,
@@ -47,7 +47,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           IconButton(
             onPressed: _refresh,
             icon: const Icon(Icons.refresh, color: Colors.black),
-            tooltip: 'Lam moi',
+            tooltip: 'Làm mới',
           )
         ],
       ),
@@ -84,7 +84,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         elevation: 0,
                       ),
-                      child: const Text('Thu lai'),
+                      child: const Text('Thu lại thông báo', style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
@@ -95,7 +95,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           final items = snapshot.data ?? const [];
           if (items.isEmpty) {
             return const Center(
-              child: Text('Chua co thong bao nao', style: TextStyle(color: Colors.grey)),
+              child: Text('Chưa có thông báo nào', style: TextStyle(color: Colors.grey)),
             );
           }
 

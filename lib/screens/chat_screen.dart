@@ -13,7 +13,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final List<_ChatMessage> _messages = [
     _ChatMessage(
-      text: 'Xin chao! Chung toi co the ho tro ban gi hom nay?',
+      text: 'Xin chào! Chúng tôi có thể hỗ trợ bạn gì hôm nay?',
       isMe: false,
       time: DateTime.now(),
     ),
@@ -35,7 +35,7 @@ class _ChatScreenState extends State<ChatScreen> {
       setState(() {
         _messages.add(
           _ChatMessage(
-            text: 'Da nhan thong tin. Chung toi se kiem tra va phan hoi ban ngay.',
+            text: 'Đã nhận thông tin. Chúng tôi sẽ kiểm tra và phản hồi bạn ngay.',
             isMe: false,
             time: DateTime.now(),
           ),

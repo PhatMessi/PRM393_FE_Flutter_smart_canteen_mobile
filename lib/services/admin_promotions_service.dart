@@ -24,7 +24,7 @@ class AdminPromotionsService {
   Future<List<PromotionModel>> listPromotions() async {
     final token = await _authService.getToken();
     if (token == null) {
-      throw Exception('Vui long dang nhap truoc!');
+      throw Exception('Vui lòng đăng nhập trước!');
     }
 
     final url = Uri.parse('${ApiConfig.baseUrl}${ApiConfig.adminPromotions}');
@@ -45,7 +45,7 @@ class AdminPromotionsService {
 
   Future<(bool success, String message)> updatePromotion(PromotionModel promo) async {
     final token = await _authService.getToken();
-    if (token == null) return (false, 'Vui long dang nhap truoc!');
+    if (token == null) return (false, 'Vui lòng đăng nhập trước!');
 
     final url = Uri.parse(
       '${ApiConfig.baseUrl}${ApiConfig.adminPromotions}/${promo.promotionId}',
@@ -82,7 +82,7 @@ class AdminPromotionsService {
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
       final msg = decoded is Map<String, dynamic> ? (decoded['message'] ?? decoded['Message']) : null;
-      return (true, (msg ?? 'Da cap nhat voucher.').toString());
+      return (true, (msg ?? 'Đã cập nhật voucher.').toString());
     }
 
     return (false, _extractErrorMessage(response.body));
@@ -101,7 +101,7 @@ class AdminPromotionsService {
     bool isActive = true,
   }) async {
     final token = await _authService.getToken();
-    if (token == null) return (false, 'Vui long dang nhap truoc!');
+    if (token == null) return (false, 'Vui lòng đăng nhập trước!');
 
     final url = Uri.parse('${ApiConfig.baseUrl}${ApiConfig.adminPromotions}');
 
@@ -130,7 +130,7 @@ class AdminPromotionsService {
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
       final msg = decoded is Map<String, dynamic> ? (decoded['message'] ?? decoded['Message']) : null;
-      return (true, (msg ?? 'Da tao voucher.').toString());
+      return (true, (msg ?? 'Đã tạo voucher.').toString());
     }
 
     return (false, _extractErrorMessage(response.body));
@@ -138,7 +138,7 @@ class AdminPromotionsService {
 
   Future<(bool success, String? payload, String message)> getQrPayload(int promotionId) async {
     final token = await _authService.getToken();
-    if (token == null) return (false, null, 'Vui long dang nhap truoc!');
+    if (token == null) return (false, null, 'Vui lòng đăng nhập trước!');
 
     final url = Uri.parse(
       '${ApiConfig.baseUrl}${ApiConfig.adminPromotions}/$promotionId/qr',

@@ -74,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (mounted) {
       setState(() {
-        _categories = [Category(categoryId: -1, name: "Tat ca"), ...categories];
+        _categories = [Category(categoryId: -1, name: "Tất cả"), ...categories];
         _menuItems = menu;
         _isLoading = false;
       });
@@ -128,9 +128,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text("Chao buoi sang,", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                                const Text("Chào buổi sáng,", style: TextStyle(color: Colors.grey, fontSize: 12)),
                                 Text(
-                                  "Xin chao, ${user?.fullName ?? 'Hoc sinh'} 👋", 
+                                  "Xin chào, ${user?.fullName ?? 'Học sinh'} 👋", 
                                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)
                                 ),
                               ],
@@ -208,7 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       child: const TextField(
                         decoration: InputDecoration(
-                          hintText: "Tim mon an, do uong...",
+                          hintText: "Tìm món ăn, đồ uống...",
                           hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
                           border: InputBorder.none,
                           icon: Icon(Icons.search, color: Colors.grey),
@@ -258,11 +258,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                                   decoration: BoxDecoration(color: brandGreen, borderRadius: BorderRadius.circular(20)),
-                                  child: const Text("GIAM 50%", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                                  child: const Text("GIẢM 50%", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
                                 ),
                                 const SizedBox(height: 5),
-                                const Text("Uu dai hom nay", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-                                const Text("Combo gia tot moi ngay", style: TextStyle(color: Colors.white70, fontSize: 12)),
+                                const Text("Ưu đãi hôm nay", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+                                const Text("Combo giá tốt mỗi ngày", style: TextStyle(color: Colors.white70, fontSize: 12)),
                               ],
                             ),
                           ),
@@ -307,14 +307,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("Mon pho bien", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                        TextButton(onPressed: () {}, child: const Text("Xem tat ca", style: TextStyle(color: brandGreen)))
+                        const Text("Món phổ biến", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                        TextButton(onPressed: () {}, child: const Text("Xem tất cả", style: TextStyle(color: brandGreen)))
                       ],
                     ),
 
                     // 6. MENU LIST (ĐÃ FIX ĐIỀU HƯỚNG)
                     _menuItems.isEmpty 
-                        ? const Center(child: Padding(padding: EdgeInsets.all(20), child: Text("Khong tim thay mon nao")))
+                        ? const Center(child: Padding(padding: EdgeInsets.all(20), child: Text("Không tìm thấy món nào")))
                         : ListView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
@@ -365,7 +365,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               Container(
                                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                                 decoration: BoxDecoration(color: Colors.orange[50], borderRadius: BorderRadius.circular(10)),
-                                                child: const Text("\uD83D\uDD25 BAN CHAY", style: TextStyle(color: Colors.orange, fontSize: 10, fontWeight: FontWeight.bold)),
+                                                child: const Text("\uD83D\uDD25 BÁN CHẠY", style: TextStyle(color: Colors.orange, fontSize: 10, fontWeight: FontWeight.bold)),
                                               ),
                                             const SizedBox(height: 5),
                                             
@@ -379,7 +379,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             // ----------------------------
                                             
                                             const SizedBox(height: 5),
-                                            const Text("~ 10 phut • 450 kcal", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                                            const Text("~ 10 phút • 450 kcal", style: TextStyle(color: Colors.grey, fontSize: 12)),
                                             const SizedBox(height: 8),
                                             Text(Money.vnd(item.price), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                                           ],

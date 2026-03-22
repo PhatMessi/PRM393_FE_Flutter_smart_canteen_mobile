@@ -177,7 +177,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
 
     for (final extra in _selectedExtras) {
-      options.add('Them: $extra');
+      options.add('Thêm: $extra');
     }
 
     return options;
@@ -204,7 +204,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           padding: const EdgeInsets.symmetric(vertical: 2),
           child: _buildSectionHeader(
             group.title,
-            group.required ? '(Bat buoc)' : '(Tuy chon)',
+            group.required ? '(Bắt buộc)' : '(Tùy chọn)',
           ),
         ),
         if (!group.required && selected != null && selected.isNotEmpty)
@@ -216,7 +216,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   _selectedByGroup.remove(group.key);
                 });
               },
-              child: const Text('Bo chon'),
+              child: const Text('Bỏ chọn'),
             ),
           ),
         ...group.choices.map(
@@ -282,7 +282,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Khong the cap nhat yeu thich.'),
+                          content: Text('Không thể cập nhật yêu thích.'),
                         ),
                       );
                       return;
@@ -293,8 +293,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       SnackBar(
                         content: Text(
                           wasFavorite
-                              ? 'Da bo khoi yeu thich'
-                              : 'Da them vao yeu thich',
+                              ? 'Đã bỏ khỏi yêu thích'
+                              : 'Đã thêm vào yêu thích',
                         ),
                         backgroundColor: kPrimaryColor,
                       ),
@@ -370,7 +370,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
           const SizedBox(height: 8),
           const Text(
-            "Cang tin A • Khu phia Tay",
+            "Canteen A • Khu phía Tây",
             style: TextStyle(color: Colors.grey),
           ),
 
@@ -389,19 +389,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 _calories,
                 Colors.orange,
               ),
-              _buildMetricChip(Icons.eco, "Tot cho suc khoe", Colors.green),
+              _buildMetricChip(Icons.eco, "Tốt cho sức khỏe", Colors.green),
             ],
           ),
 
           const SizedBox(height: 24),
           // Description
           const Text(
-            "Mo ta",
+            "Mô tả",
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
-            widget.menuItem.description ?? "Chua co mo ta.",
+            widget.menuItem.description ?? "Chưa có mô tả.",
             style: const TextStyle(color: Colors.grey, height: 1.5),
           ),
 
@@ -412,7 +412,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
           if (_preset.extras.isNotEmpty) ...[
             const SizedBox(height: 8),
-            _buildSectionHeader('Phan them', '(Tuy chon)'),
+            _buildSectionHeader('Phần thêm', '(Tùy chọn)'),
             ..._preset.extras.entries.map(
               (entry) => CheckboxListTile(
                 title: Text(entry.key),
@@ -441,7 +441,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ],
 
           const SizedBox(height: 16),
-          _buildSectionHeader('Khac', '(Ghi chu tuy chon)'),
+          _buildSectionHeader('Khác', '(Ghi chú tùy chọn)'),
           const SizedBox(height: 8),
           TextField(
             controller: _otherController,
@@ -550,7 +550,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       96 + MediaQuery.of(context).padding.bottom,
                     ),
                     content: Text(
-                      "Da them ${widget.menuItem.name} vao khay!",
+                      "Đã thêm ${widget.menuItem.name} vào giỏ hàng!",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -581,7 +581,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 children: [
                   const Expanded(
                     child: Text(
-                      "Them vao don",
+                      "Thêm vào đơn",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,

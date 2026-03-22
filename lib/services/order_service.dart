@@ -14,7 +14,7 @@ class OrderService {
     // ------------------------------------------------
 
     if (token == null) {
-      throw Exception('Nguoi dung chua dang nhap');
+      throw Exception('Người dùng chưa đăng nhập');
     }
 
     final url = Uri.parse('${ApiConfig.baseUrl}${ApiConfig.getMyOrders}');
@@ -31,7 +31,7 @@ class OrderService {
       final List<dynamic> data = json.decode(response.body);
       return data.map((json) => OrderModel.fromJson(json)).toList();
     } else {
-      throw Exception('Khong the tai danh sach don hang: ${response.statusCode} ${response.body}');
+      throw Exception('Không thể tải danh sách đơn hàng: ${response.statusCode} ${response.body}');
     }
   }
 }

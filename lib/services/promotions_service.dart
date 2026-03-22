@@ -8,7 +8,7 @@ class PromotionsService {
   final AuthService _authService = AuthService();
 
   String _extractErrorMessage(String body) {
-    if (body.trim().isEmpty) return 'Loi khong xac dinh';
+    if (body.trim().isEmpty) return 'Lỗi không xác định';
     try {
       final data = jsonDecode(body);
       if (data is Map<String, dynamic>) {
@@ -45,7 +45,7 @@ class PromotionsService {
 
   Future<(bool success, String message)> savePromotion(String code) async {
     final token = await _authService.getToken();
-    if (token == null) return (false, 'Vui long dang nhap truoc!');
+    if (token == null) return (false, 'Vui lòng đăng nhập trước!');
 
     final url = Uri.parse(ApiConfig.baseUrl + ApiConfig.promotionsSave);
     final response = await http.post(
@@ -60,7 +60,7 @@ class PromotionsService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final msg = (data is Map<String, dynamic> ? (data['message'] ?? data['Message']) : null);
-      return (true, (msg ?? 'Da luu voucher.').toString());
+      return (true, (msg ?? 'Đã lưu voucher.').toString());
     }
 
     return (false, _extractErrorMessage(response.body));
@@ -71,7 +71,7 @@ class PromotionsService {
     required List<CartLineDto> items,
   }) async {
     final token = await _authService.getToken();
-    if (token == null) return (false, null, 'Vui long dang nhap truoc!');
+    if (token == null) return (false, null, 'Vui lòng đăng nhập trước!');
 
     final url = Uri.parse(ApiConfig.baseUrl + ApiConfig.promotionsApply);
     final response = await http.post(

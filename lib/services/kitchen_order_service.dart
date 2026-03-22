@@ -12,7 +12,7 @@ class KitchenOrderService {
   Future<String> _requireToken() async {
     final token = await _authService.getToken();
     if (token == null || token.isEmpty) {
-      throw Exception('Chua dang nhap');
+      throw Exception('Chưa đăng nhập');
     }
     return token;
   }
@@ -30,7 +30,7 @@ class KitchenOrderService {
     );
 
     if (res.statusCode != 200) {
-      throw Exception('Khong the tai don cho xac nhan: ${res.statusCode} ${res.body}');
+      throw Exception('Không thể tải đơn cho xác nhận: ${res.statusCode} ${res.body}');
     }
 
     final data = jsonDecode(res.body);
@@ -53,7 +53,7 @@ class KitchenOrderService {
     );
 
     if (res.statusCode != 200) {
-      throw Exception('Khong the tai don cooking: ${res.statusCode} ${res.body}');
+      throw Exception('Không thể tải đơn cooking: ${res.statusCode} ${res.body}');
     }
 
     final data = jsonDecode(res.body);
@@ -76,7 +76,7 @@ class KitchenOrderService {
     );
 
     if (res.statusCode != 200) {
-      throw Exception('Xac nhan don that bai: ${res.statusCode} ${res.body}');
+      throw Exception('Xác nhận đơn thất bại: ${res.statusCode} ${res.body}');
     }
   }
 
@@ -93,7 +93,7 @@ class KitchenOrderService {
     );
 
     if (res.statusCode != 200) {
-      throw Exception('Hoan thanh don that bai: ${res.statusCode} ${res.body}');
+      throw Exception('Hoàn thành đơn thất bại: ${res.statusCode} ${res.body}');
     }
   }
 }

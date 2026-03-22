@@ -28,7 +28,7 @@ class CartScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
-        title: const Text("Khay cua ban", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+        title: const Text("Khay của bạn", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -46,7 +46,7 @@ class CartScreen extends StatelessWidget {
           // 1. LIST ITEMS
           Expanded(
             child: cart.items.isEmpty
-              ? const Center(child: Text("Khay cua ban dang trong!"))
+              ? const Center(child: Text("Khay của bạn đang trống!"))
                 : ListView.builder(
                     padding: const EdgeInsets.all(20),
                     itemCount: cart.items.length + 1, // +1 cho nút "Add more items"
@@ -57,7 +57,7 @@ class CartScreen extends StatelessWidget {
                           child: TextButton.icon(
                             onPressed: () => _handleBack(context), // Quay về Home chọn tiếp
                             icon: const Icon(Icons.add_circle, color: brandGreen),
-                            label: const Text("Them mon khac", style: TextStyle(color: Colors.grey)),
+                            label: const Text("Thêm món khác", style: TextStyle(color: Colors.grey)),
                           ),
                         );
                       }
@@ -110,7 +110,7 @@ class CartScreen extends StatelessWidget {
                                     Padding(
                                       padding: const EdgeInsets.only(top: 4, bottom: 4),
                                       child: Text(
-                                        item.orderItemNote ?? "Mac dinh",
+                                        item.orderItemNote ?? "Mặc định",
                                         style: const TextStyle(color: Colors.grey, fontSize: 12),
                                         maxLines: 2, overflow: TextOverflow.ellipsis,
                                       ),
@@ -164,14 +164,14 @@ class CartScreen extends StatelessWidget {
             ),
             child: Column(
               children: [
-                _buildSummaryRow("Tam tinh", Money.vnd(cart.subtotal)),
+                _buildSummaryRow("Tạm tính", Money.vnd(cart.subtotal)),
                 const SizedBox(height: 10),
-                _buildSummaryRow("Thue (10%)", Money.vnd(cart.tax)),
+                _buildSummaryRow("Thuế (10%)", Money.vnd(cart.tax)),
                 const Padding(padding: EdgeInsets.symmetric(vertical: 15), child: Divider()),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("Tong cong", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    const Text("Tổng cộng", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                     Text(Money.vnd(cart.totalAmount), 
                       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: brandGreen)),
                   ],
@@ -181,7 +181,7 @@ class CartScreen extends StatelessWidget {
                   children: [
                     Icon(Icons.credit_card, size: 16, color: Colors.grey),
                     SizedBox(width: 8),
-                    Text("Thanh toan bang the hoc sinh", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    Text("Thanh toán bằng thẻ học sinh", style: TextStyle(color: Colors.grey, fontSize: 12)),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -203,7 +203,7 @@ class CartScreen extends StatelessWidget {
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Thanh toan", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                        Text("Thanh toán", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
                         SizedBox(width: 10),
                         Icon(Icons.arrow_forward_rounded, color: Colors.white)
                       ],

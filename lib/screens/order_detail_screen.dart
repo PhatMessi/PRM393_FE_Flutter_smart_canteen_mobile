@@ -23,7 +23,7 @@ class OrderDetailScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
-        title: Text('Don hang #${order.orderId}'),
+        title: Text('Đơn hàng #${order.orderId}'),
         centerTitle: true,
         backgroundColor: const Color(0xFFF9FAFB),
         elevation: 0,
@@ -35,13 +35,13 @@ class OrderDetailScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _infoRow('Trang thai', _mapStatus(order.status)),
+                _infoRow('Trạng thái', _mapStatus(order.status)),
                 const SizedBox(height: 8),
-                _infoRow('Thoi gian dat', dateText),
+                _infoRow('Thời gian đặt', dateText),
                 if (order.pickupTime != null) ...[
                   const SizedBox(height: 8),
                   _infoRow(
-                    'Thoi gian nhan',
+                    'Thời gian nhận',
                     DateFormat('dd/MM/yyyy HH:mm').format(VnTime.toVn(order.pickupTime!)),
                   ),
                 ],
@@ -55,7 +55,7 @@ class OrderDetailScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      'Ly do: ${order.rejectionReason}',
+                      'Lý do: ${order.rejectionReason}',
                       style: TextStyle(color: Colors.red.shade700),
                     ),
                   ),
@@ -69,7 +69,7 @@ class OrderDetailScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Chi tiet mon an',
+                  'Chi tiết món ăn',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 const SizedBox(height: 12),
@@ -99,9 +99,9 @@ class OrderDetailScreen extends StatelessWidget {
                                 style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                               ),
                               const SizedBox(height: 3),
-                              Text('So luong: ${item.quantity}', style: const TextStyle(color: Colors.grey)),
+                              Text('Số lượng: ${item.quantity}', style: const TextStyle(color: Colors.grey)),
                               if (item.note != null && item.note!.trim().isNotEmpty)
-                                Text('Ghi chu: ${item.note}', style: const TextStyle(color: Colors.grey)),
+                                Text('Ghi chú: ${item.note}', style: const TextStyle(color: Colors.grey)),
                             ],
                           ),
                         ),
@@ -121,12 +121,12 @@ class OrderDetailScreen extends StatelessWidget {
           _SectionCard(
             child: Column(
               children: [
-                _moneyRow('Tam tinh', Money.vnd(subtotal)),
+                _moneyRow('Tạm tính', Money.vnd(subtotal)),
                 const SizedBox(height: 8),
-                _moneyRow('Thue (10%)', Money.vnd(tax)),
+                _moneyRow('Thuế (10%)', Money.vnd(tax)),
                 const Divider(height: 20),
                 _moneyRow(
-                  'Tong thanh toan',
+                  'Tổng thanh toán',
                   Money.vnd(order.totalPrice),
                   isTotal: true,
                 ),
@@ -141,17 +141,17 @@ class OrderDetailScreen extends StatelessWidget {
   String _mapStatus(String status) {
     switch (status) {
       case 'Ready for Pickup':
-        return 'San sang nhan mon';
+        return 'Sẵn sàng nhận món';
       case 'Preparing':
-        return 'Dang chuan bi';
+        return 'Đang chuẩn bị';
       case 'Paid':
-        return 'Da thanh toan';
+        return 'Đã thanh toán';
       case 'Pending Payment':
-        return 'Cho thanh toan';
+        return 'Chờ thanh toán';
       case 'Cancelled':
-        return 'Da huy';
+        return 'Đã hủy';
       case 'Completed':
-        return 'Hoan tat';
+        return 'Hoàn tất';
       default:
         return status;
     }
