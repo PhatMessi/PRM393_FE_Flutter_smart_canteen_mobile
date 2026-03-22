@@ -5,6 +5,7 @@ import 'admin_home_screen.dart';
 import 'home_screen.dart';
 import 'kitchen_orders_screen.dart';
 import 'login_screen.dart';
+import 'manager_home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -33,8 +34,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (isLoggedIn) {
       final role = authProvider.user?.role ?? 'Student';
-      final isKitchen = role.toLowerCase() == 'kitchen';
-      final isAdmin = role.toLowerCase() == 'systemadmin';
+      final roleKey = role.toLowerCase().replaceAll(' ', '');
+      final isKitchen = roleKey == 'kitchen';
+      final isAdmin = roleKey == 'systemadmin';
+      final isManager = roleKey == 'canteenmanager';
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (_) =>
@@ -42,6 +45,8 @@ class _SplashScreenState extends State<SplashScreen> {
                   ? const KitchenOrdersScreen()
                   : isAdmin
                       ? const AdminHomeScreen()
+                      : isManager
+                          ? const ManagerHomeScreen()
                       : const HomeScreen(),
         ),
       );

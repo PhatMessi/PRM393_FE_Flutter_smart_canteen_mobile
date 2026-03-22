@@ -5,6 +5,8 @@ class MenuItem {
   final double price;
   final String? imageUrl;
   final int categoryId;
+  final int inventoryQuantity;
+  final bool isAvailable;
   final String?
   categoryName; // Backend có thể trả về hoặc không, xử lý null an toàn
 
@@ -15,6 +17,8 @@ class MenuItem {
     required this.price,
     this.imageUrl,
     required this.categoryId,
+    this.inventoryQuantity = 0,
+    this.isAvailable = true,
     this.categoryName,
   });
 
@@ -27,6 +31,9 @@ class MenuItem {
       price: (json['price'] ?? json['Price'] ?? 0).toDouble(),
       imageUrl: json['imageUrl'] ?? json['ImageUrl'],
       categoryId: json['categoryId'] ?? json['CategoryId'] ?? 0,
+      inventoryQuantity:
+          (json['inventoryQuantity'] ?? json['InventoryQuantity'] ?? 0) as int,
+      isAvailable: (json['isAvailable'] ?? json['IsAvailable'] ?? true) == true,
       categoryName: json['categoryName'] ?? json['CategoryName'],
     );
   }
@@ -39,6 +46,8 @@ class MenuItem {
       'price': price,
       'imageUrl': imageUrl,
       'categoryId': categoryId,
+      'inventoryQuantity': inventoryQuantity,
+      'isAvailable': isAvailable,
       'categoryName': categoryName,
     };
   }

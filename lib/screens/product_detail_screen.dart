@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../models/menu_item.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
@@ -10,6 +7,8 @@ import 'home_screen.dart';
 import '../providers/favorites_provider.dart';
 import '../utils/image_helper.dart'; // [FIX] Import image helper
 import '../utils/money.dart';
+import '../models/menu_item_customization.dart';
+import '../services/menu_item_customization_service.dart';
 
 // Định nghĩa màu xanh giống trong hình thiết kế
 const Color kPrimaryColor = Color(0xFF2ED162); // Màu xanh lá sáng
@@ -52,6 +51,9 @@ class ProductDetailScreen extends StatefulWidget {
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int quantity = 1;
 
+  final MenuItemCustomizationService _customizationService =
+      MenuItemCustomizationService();
+
   // --- FAKE DATA ĐỂ GIỐNG UI DESIGN (Vì Backend chưa có) ---
   // Sau này có API thì thay thế list này bằng dữ liệu từ API
   final String _calories = "520 kcal";
@@ -84,12 +86,57 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Future<void> _initPreset() async {
-    final preset = await _loadPresetFromAssets(widget.menuItem);
+    final customization = await _customizationService.getCustomizations(
+      widget.menuItem.itemId,
+    );
     if (!mounted) return;
 
     setState(() {
-      _applyPreset(preset);
+      _applyPreset(_presetFromCustomization(customization));
     });
+  }
+
+  _CustomizationPreset _presetFromCustomization(MenuItemCustomization? customization) {
+    if (customization == null) {
+      return const _CustomizationPreset(optionGroups: [], extras: {});
+    }
+
+    final groups = [...customization.optionGroups];
+    groups.sort((a, b) {
+      final byOrder = a.sortOrder.compareTo(b.sortOrder);
+      if (byOrder != 0) return byOrder;
+      return a.optionGroupId.compareTo(b.optionGroupId);
+    });
+
+    final optionGroups = <_OptionGroup>[];
+    final extras = <String, double>{};
+
+    for (final g in groups) {
+      final options = [...g.options.where((o) => o.isAvailable)];
+      options.sort((a, b) {
+        final byOrder = a.sortOrder.compareTo(b.sortOrder);
+        if (byOrder != 0) return byOrder;
+        return a.optionId.compareTo(b.optionId);
+      });
+
+      if (g.isMultiple) {
+        for (final o in options) {
+          extras[o.name] = o.priceDelta;
+        }
+        continue;
+      }
+
+      optionGroups.add(
+        _OptionGroup(
+          key: g.key,
+          title: g.title,
+          required: g.isRequired,
+          choices: options.map((o) => o.name).toList(),
+        ),
+      );
+    }
+
+    return _CustomizationPreset(optionGroups: optionGroups, extras: extras);
   }
 
   void _applyPreset(_CustomizationPreset preset) {
@@ -119,86 +166,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     return (widget.menuItem.price + extrasTotal) * quantity;
   }
 
-  Future<_CustomizationPreset> _loadPresetFromAssets(MenuItem item) async {
-    try {
-      final raw = await rootBundle.loadString(
-        'assets/config/customization_presets.json',
-      );
-      final decoded = jsonDecode(raw);
-      if (decoded is! Map<String, dynamic>) {
-        return const _CustomizationPreset(optionGroups: [], extras: {});
-      }
-
-      final categories = decoded['categories'];
-      final defaultPreset = decoded['default'];
-
-      Map<String, dynamic>? presetJson;
-      if (categories is Map) {
-        final byCategory = categories[item.categoryId.toString()];
-        if (byCategory is Map) {
-          presetJson = Map<String, dynamic>.from(byCategory);
-        }
-      }
-
-      if (presetJson == null && defaultPreset is Map) {
-        presetJson = Map<String, dynamic>.from(defaultPreset);
-      }
-
-      if (presetJson == null) {
-        return const _CustomizationPreset(optionGroups: [], extras: {});
-      }
-
-      return _presetFromJson(presetJson);
-    } catch (_) {
-      return const _CustomizationPreset(optionGroups: [], extras: {});
-    }
-  }
-
-  _CustomizationPreset _presetFromJson(Map<String, dynamic> json) {
-    final groupsRaw = json['optionGroups'];
-    final extrasRaw = json['extras'];
-
-    final groups = <_OptionGroup>[];
-    if (groupsRaw is List) {
-      for (final g in groupsRaw) {
-        if (g is! Map) continue;
-        final map = Map<String, dynamic>.from(g);
-        final choicesRaw = map['choices'];
-        final choices = <String>[];
-        if (choicesRaw is List) {
-          for (final c in choicesRaw) {
-            if (c == null) continue;
-            choices.add(c.toString());
-          }
-        }
-
-        groups.add(
-          _OptionGroup(
-            key: (map['key'] ?? '').toString(),
-            title: (map['title'] ?? '').toString(),
-            required: (map['required'] == true),
-            choices: choices,
-          ),
-        );
-      }
-    }
-
-    final extras = <String, double>{};
-    if (extrasRaw is Map) {
-      for (final entry in extrasRaw.entries) {
-        final key = entry.key.toString();
-        final value = entry.value;
-        final parsed = (value is num)
-            ? value.toDouble()
-            : double.tryParse(value.toString());
-        if (parsed != null) {
-          extras[key] = parsed;
-        }
-      }
-    }
-
-    return _CustomizationPreset(optionGroups: groups, extras: extras);
-  }
 
   List<String> _buildSelectedOptions() {
     final options = <String>[];

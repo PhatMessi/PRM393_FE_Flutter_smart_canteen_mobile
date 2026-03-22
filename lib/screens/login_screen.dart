@@ -6,6 +6,7 @@ import 'forgot_password_screen.dart';
 import 'admin_home_screen.dart';
 import 'home_screen.dart';
 import 'kitchen_orders_screen.dart';
+import 'manager_home_screen.dart';
 import 'register_otp_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -35,8 +36,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (success && context.mounted) {
       final role = authProvider.user?.role ?? 'Student';
-      final isKitchen = role.toLowerCase() == 'kitchen';
-      final isAdmin = role.toLowerCase() == 'systemadmin';
+      final roleKey = role.toLowerCase().replaceAll(' ', '');
+      final isKitchen = roleKey == 'kitchen';
+      final isAdmin = roleKey == 'systemadmin';
+      final isManager = roleKey == 'canteenmanager';
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -44,6 +47,8 @@ class _LoginScreenState extends State<LoginScreen> {
               ? const KitchenOrdersScreen()
               : isAdmin
               ? const AdminHomeScreen()
+              : isManager
+              ? const ManagerHomeScreen()
               : const HomeScreen(),
         ),
       );
@@ -95,8 +100,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (success && context.mounted) {
       final role = authProvider.user?.role ?? 'Student';
-      final isKitchen = role.toLowerCase() == 'kitchen';
-      final isAdmin = role.toLowerCase() == 'systemadmin';
+      final roleKey = role.toLowerCase().replaceAll(' ', '');
+      final isKitchen = roleKey == 'kitchen';
+      final isAdmin = roleKey == 'systemadmin';
+      final isManager = roleKey == 'canteenmanager';
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -104,6 +111,8 @@ class _LoginScreenState extends State<LoginScreen> {
               ? const KitchenOrdersScreen()
               : isAdmin
               ? const AdminHomeScreen()
+              : isManager
+              ? const ManagerHomeScreen()
               : const HomeScreen(),
         ),
       );
