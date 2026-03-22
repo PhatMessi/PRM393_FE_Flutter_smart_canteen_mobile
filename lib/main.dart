@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart'; // Import Google Fonts
 import 'providers/auth_provider.dart';
@@ -11,9 +12,44 @@ import 'providers/cart_provider.dart';
 import 'providers/order_provider.dart';
 import 'providers/favorites_provider.dart';
 
+Future<void> _initFirebase() async {
+  if (!kIsWeb) {
+    await Firebase.initializeApp();
+    return;
+  }
+
+  // Web requires explicit FirebaseOptions. We allow running without Firebase
+  // (useful for local API testing) by skipping init when options are absent.
+  const apiKey = String.fromEnvironment('FIREBASE_API_KEY', defaultValue: '');
+  const appId = String.fromEnvironment('FIREBASE_APP_ID', defaultValue: '');
+  const messagingSenderId = String.fromEnvironment(
+    'FIREBASE_MESSAGING_SENDER_ID',
+    defaultValue: '',
+  );
+  const projectId = String.fromEnvironment('FIREBASE_PROJECT_ID', defaultValue: '');
+
+  final hasRequired =
+      apiKey.isNotEmpty && appId.isNotEmpty && messagingSenderId.isNotEmpty && projectId.isNotEmpty;
+  if (!hasRequired) {
+    return;
+  }
+
+  await Firebase.initializeApp(
+    options: FirebaseOptions(
+      apiKey: apiKey,
+      appId: appId,
+      messagingSenderId: messagingSenderId,
+      projectId: projectId,
+      authDomain: const String.fromEnvironment('FIREBASE_AUTH_DOMAIN', defaultValue: ''),
+      storageBucket: const String.fromEnvironment('FIREBASE_STORAGE_BUCKET', defaultValue: ''),
+      measurementId: const String.fromEnvironment('FIREBASE_MEASUREMENT_ID', defaultValue: ''),
+    ),
+  );
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await _initFirebase();
   await LocalNotificationService.instance.initAndRequestPermissions();
   runApp(const MyApp());
 }

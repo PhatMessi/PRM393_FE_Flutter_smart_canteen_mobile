@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart'; // Import mới
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import '../config/api_config.dart';
 import '../models/user_model.dart'; // Import Model mới
@@ -109,12 +110,17 @@ class AuthService {
       final idToken = auth.idToken;
       final accessToken = auth.accessToken;
 
-      if (idToken != null && idToken.isNotEmpty && accessToken != null && accessToken.isNotEmpty) {
-        final credential = fb_auth.GoogleAuthProvider.credential(
-          idToken: idToken,
-          accessToken: accessToken,
-        );
-        await fb_auth.FirebaseAuth.instance.signInWithCredential(credential);
+      final firebaseReady = Firebase.apps.isNotEmpty;
+      if (firebaseReady && idToken != null && idToken.isNotEmpty && accessToken != null && accessToken.isNotEmpty) {
+        try {
+          final credential = fb_auth.GoogleAuthProvider.credential(
+            idToken: idToken,
+            accessToken: accessToken,
+          );
+          await fb_auth.FirebaseAuth.instance.signInWithCredential(credential);
+        } catch (_) {
+          // Ignore FirebaseAuth sign-in errors; server-side verification still uses idToken.
+        }
       }
 
       if (idToken == null || idToken.isEmpty) {
