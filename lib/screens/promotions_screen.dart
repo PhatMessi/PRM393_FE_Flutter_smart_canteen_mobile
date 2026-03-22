@@ -140,27 +140,27 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
     String discountText() {
       final type = p.type;
       if (type == 'PercentBill') {
-        return 'Giam: ${p.discountPercentage}%';
+        return 'Giảm: ${p.discountPercentage}%';
       }
       if (type == 'AmountBill' && p.discountAmount != null) {
-        return 'Giam: ${Money.vnd(p.discountAmount!)}';
+        return 'Giảm: ${Money.vnd(p.discountAmount!)}';
       }
       if (type == 'BuyXGetY') {
-        return 'Loai: Mua X tang Y';
+        return 'Loại: Mua X tang Y';
       }
       if (type == 'Combo') {
-        return 'Loai: Combo';
+        return 'Loại: Combo';
       }
-      return 'Loai: $type';
+      return 'Loại: $type';
     }
 
     String conditionText() {
       final parts = <String>[];
       if (p.minOrderAmount != null && (p.minOrderAmount as num) > 0) {
-        parts.add('Toi thieu ${Money.vnd(p.minOrderAmount!)}');
+        parts.add('Tối thiểu ${Money.vnd(p.minOrderAmount!)}');
       }
       if (p.maxDiscountAmount != null && (p.maxDiscountAmount as num) > 0) {
-        parts.add('Giam toi da ${Money.vnd(p.maxDiscountAmount!)}');
+        parts.add('Giảm tối đa ${Money.vnd(p.maxDiscountAmount!)}');
       }
       if (p.type == 'BuyXGetY' && p.buyItemId != null && p.buyQuantity != null && p.getItemId != null && p.getQuantity != null) {
         parts.add('Mua ${p.buyQuantity} (ID ${p.buyItemId}) tang ${p.getQuantity} (ID ${p.getItemId})');
@@ -169,8 +169,8 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
         final combo = p.comboRequirements.map((e) => '${e.qty}xID${e.itemId}').join(', ');
         parts.add('Combo: $combo');
       }
-      if (parts.isEmpty) return 'Dieu kien: Khong';
-      return 'Dieu kien: ${parts.join(' • ')}';
+      if (parts.isEmpty) return 'Điều kiện: Không';
+      return 'Điều kiện: ${parts.join(' • ')}';
     }
 
     return Container(
@@ -199,12 +199,12 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
               ),
               TextButton(
                 onPressed: () => _applyCode(p.code),
-                child: const Text('Dung'),
+                child: const Text('Dùng'),
               ),
               if (showSave)
                 TextButton(
                   onPressed: () => _saveCode(p.code),
-                  child: const Text('Luu'),
+                  child: const Text('Lưu'),
                 ),
             ],
           ),
@@ -216,7 +216,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
           Text(conditionText(), style: const TextStyle(fontSize: 12, color: Colors.black54)),
           const SizedBox(height: 10),
           Text(
-            'Hieu luc: ${fmt.format(p.startDate.toLocal())} - ${fmt.format(p.endDate.toLocal())}',
+            'Hiệu lực: ${fmt.format(p.startDate.toLocal())} - ${fmt.format(p.endDate.toLocal())}',
             style: const TextStyle(color: Colors.grey, fontSize: 12),
           ),
         ],
@@ -233,7 +233,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
         }
         final data = snap.data ?? [];
         if (data.isEmpty) {
-          return const Center(child: Text('Khong co voucher nao.'));
+          return const Center(child: Text('Không có voucher nào.'));
         }
         return ListView.builder(
           padding: const EdgeInsets.all(16),
@@ -252,7 +252,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
         backgroundColor: const Color(0xFFF9FAFB),
         appBar: AppBar(
           title: const Text(
-            'Khuyen mai',
+            'Khuyến mãi',
             style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
           ),
           centerTitle: true,
@@ -262,8 +262,8 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
           bottom: const TabBar(
             labelColor: Colors.black,
             tabs: [
-              Tab(text: 'Dang co'),
-              Tab(text: 'Da luu'),
+              Tab(text: 'Đang có'),
+              Tab(text: 'Đã lưu'),
             ],
           ),
         ),

@@ -33,9 +33,9 @@ class OrderProvider with ChangeNotifier {
 
   // Hàm lọc danh sách theo Tab
   List<OrderModel> getOrdersByStatus(String tab) {
-    if (tab == "Tat ca") return _allOrders;
+    if (tab == "Tất cả") return _allOrders;
     
-    if (tab == "Cho xu ly") {
+    if (tab == "Cho xử lý") {
       // Backend statuses: "Pending Payment", "Paid"
       return _allOrders
           .where((o) => o.status == "Pending Payment" || o.status == "Paid")

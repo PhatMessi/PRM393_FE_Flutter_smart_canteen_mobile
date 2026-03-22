@@ -111,7 +111,7 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
       builder: (ctx) {
         final fmt = DateFormat('dd/MM/yyyy');
         return AlertDialog(
-          title: const Text('Them voucher'),
+          title: const Text('Thêm voucher'),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -123,7 +123,7 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
                 const SizedBox(height: 8),
                 TextField(
                   controller: _descCtl,
-                  decoration: const InputDecoration(labelText: 'Mo ta'),
+                  decoration: const InputDecoration(labelText: 'Mô tả'),
                 ),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
@@ -131,18 +131,18 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
                   items: const [
                     DropdownMenuItem(
                       value: 'PercentBill',
-                      child: Text('Giam % bill'),
+                      child: Text(' % bill'),
                     ),
                     DropdownMenuItem(
                       value: 'AmountBill',
-                      child: Text('Giam so tien bill'),
+                      child: Text('Giảm số tiền bill'),
                     ),
                   ],
                   onChanged: (v) {
                     if (v == null) return;
                     setState(() => _createType = v);
                   },
-                  decoration: const InputDecoration(labelText: 'Loai'),
+                  decoration: const InputDecoration(labelText: 'Loại'),
                 ),
                 const SizedBox(height: 8),
                 if (_createType == 'PercentBill')
@@ -181,7 +181,7 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
                     Expanded(child: Text('Start: ${fmt.format(_startDate)}')),
                     TextButton(
                       onPressed: () => _pickDate(isStart: true),
-                      child: const Text('Chon'),
+                      child: const Text('Chọn'),
                     ),
                   ],
                 ),
@@ -190,7 +190,7 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
                     Expanded(child: Text('End: ${fmt.format(_endDate)}')),
                     TextButton(
                       onPressed: () => _pickDate(isStart: false),
-                      child: const Text('Chon'),
+                      child: const Text('Chọn'),
                     ),
                   ],
                 ),
@@ -198,7 +198,7 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
                   contentPadding: EdgeInsets.zero,
                   value: _createActive,
                   onChanged: (v) => setState(() => _createActive = v),
-                  title: const Text('Kich hoat'),
+                  title: const Text('Kích hoạt'),
                 ),
               ],
             ),
@@ -206,14 +206,14 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Huy'),
+              child: const Text('Hủy'),
             ),
             ElevatedButton(
               onPressed: () async {
                 final code = _codeCtl.text.trim();
                 if (code.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Vui long nhap code.')),
+                    const SnackBar(content: Text('Vui lòng nhập code.')),
                   );
                   return;
                 }
@@ -244,7 +244,7 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
                   _refresh();
                 }
               },
-              child: const Text('Tao'),
+              child: const Text('Tạo'),
             ),
           ],
         );
@@ -306,7 +306,7 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
     );
     if (validation.status != QrValidationStatus.valid) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Khong the tao QR: ${validation.error}')),
+        SnackBar(content: Text('Không thể tạo QR: ${validation.error}')),
       );
       return;
     }
@@ -350,14 +350,14 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
                 Clipboard.setData(ClipboardData(text: payload));
                 Navigator.of(ctx).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Da copy payload.')),
+                  const SnackBar(content: Text('Đã copy payload.')),
                 );
               },
               child: const Text('Copy'),
             ),
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Dong'),
+              child: const Text('Đóng'),
             ),
           ],
         );
@@ -383,7 +383,7 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
-        title: const Text('Quan ly voucher'),
+        title: const Text('Quản lý voucher'),
         centerTitle: true,
         actions: [
           IconButton(onPressed: _openCreateDialog, icon: const Icon(Icons.add)),
@@ -401,7 +401,7 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
           }
           final data = snap.data ?? [];
           if (data.isEmpty) {
-            return const Center(child: Text('Khong co voucher nao.'));
+            return const Center(child: Text('Không có voucher nào.'));
           }
 
           return ListView.builder(
@@ -446,7 +446,7 @@ class _AdminPromotionsScreenState extends State<AdminPromotionsScreen> {
                       children: [
                         Expanded(
                           child: Text(
-                            'Het han: ${fmt.format(p.endDate.toLocal())} • ${_discountText(p)}',
+                            'Hết hạn: ${fmt.format(p.endDate.toLocal())} • ${_discountText(p)}',
                             style: const TextStyle(
                               color: Colors.grey,
                               fontSize: 12,

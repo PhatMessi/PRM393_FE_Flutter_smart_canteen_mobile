@@ -207,7 +207,7 @@ class _ManagerMenuManagementScreenState extends State<ManagerMenuManagementScree
     final auth = context.read<AuthProvider>();
     final token = auth.user?.token;
     if (token == null || token.isEmpty) {
-      _toast('Chua dang nhap', error: true);
+      _toast('Chưa đăng nhập', error: true);
       return;
     }
 
@@ -217,7 +217,7 @@ class _ManagerMenuManagementScreenState extends State<ManagerMenuManagementScree
     final qty = int.tryParse(_qtyCtrl.text.trim());
 
     if (name.isEmpty || price == null || qty == null || _categoryId == null) {
-      _toast('Vui long nhap du thong tin bat buoc', error: true);
+      _toast('Vui lòng nhập đầy đủ thông tin bắt buộc', error: true);
       return;
     }
 
@@ -235,7 +235,7 @@ class _ManagerMenuManagementScreenState extends State<ManagerMenuManagementScree
         );
 
         if (created == null) {
-          _toast('Tao mon that bai', error: true);
+          _toast('Tạo món thất bại', error: true);
           setState(() => _loading = false);
           return;
         }
@@ -248,7 +248,7 @@ class _ManagerMenuManagementScreenState extends State<ManagerMenuManagementScree
 
         await _load();
         if (!mounted) return;
-        _toast(ok ? 'Da tao mon + cap nhat tuy chon' : 'Da tao mon (chua cap nhat tuy chon)');
+        _toast(ok ? 'Đã tạo món + cập nhật tùy chọn' : 'Đã tạo món (chưa cập nhật tùy chọn)');
         _selectItem(created);
         return;
       }
@@ -272,10 +272,10 @@ class _ManagerMenuManagementScreenState extends State<ManagerMenuManagementScree
 
       await _load();
       if (!mounted) return;
-      _toast(updated && ok ? 'Da cap nhat mon + tuy chon' : 'Cap nhat chua thanh cong');
+      _toast(updated && ok ? 'Đã cập nhật món + tùy chọn' : 'Cập nhật chưa thành công hoàn toàn');
     } catch (_) {
       if (!mounted) return;
-      _toast('Co loi xay ra khi luu', error: true);
+      _toast('Có lỗi xảy ra khi lưu', error: true);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -288,7 +288,7 @@ class _ManagerMenuManagementScreenState extends State<ManagerMenuManagementScree
     final auth = context.read<AuthProvider>();
     final token = auth.user?.token;
     if (token == null || token.isEmpty) {
-      _toast('Chua dang nhap', error: true);
+      _toast('Chưa đăng nhập', error: true);
       return;
     }
 
@@ -298,10 +298,10 @@ class _ManagerMenuManagementScreenState extends State<ManagerMenuManagementScree
       await _load();
       if (!mounted) return;
       if (ok) {
-        _toast('Da xoa mon');
+        _toast('Đã xóa món');
         _clearEditor();
       } else {
-        _toast('Xoa mon that bai', error: true);
+        _toast('Xóa món thất bại', error: true);
       }
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -327,7 +327,7 @@ class _ManagerMenuManagementScreenState extends State<ManagerMenuManagementScree
             selected: selected,
             title: Text(item.name),
             subtitle: Text(
-              'Gia: ${Money.vnd(item.price)}  •  SL: ${item.inventoryQuantity}  •  ${item.isAvailable ? 'Dang ban' : 'Tam dung'}',
+              'Giá: ${Money.vnd(item.price)}  •  SL: ${item.inventoryQuantity}  •  ${item.isAvailable ? 'Đang bán' : 'Tạm dừng'}',
             ),
             trailing: const Icon(Icons.edit_outlined),
             onTap: () => _selectItem(item),
@@ -347,26 +347,26 @@ class _ManagerMenuManagementScreenState extends State<ManagerMenuManagementScree
             children: [
               Expanded(
                 child: Text(
-                  _selected == null ? 'Them mon moi' : 'Chinh sua mon (ID: ${_selected!.itemId})',
+                  _selected == null ? 'Thêm món mới' : 'Chỉnh sửa món (ID: ${_selected!.itemId})',
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
               TextButton.icon(
                 onPressed: _clearEditor,
                 icon: const Icon(Icons.add),
-                label: const Text('Mon moi'),
+                label: const Text('Món mới'),
               ),
             ],
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _nameCtrl,
-            decoration: const InputDecoration(labelText: 'Ten mon *'),
+            decoration: const InputDecoration(labelText: 'Tên món *'),
           ),
           const SizedBox(height: 10),
           TextField(
             controller: _descCtrl,
-            decoration: const InputDecoration(labelText: 'Mo ta'),
+            decoration: const InputDecoration(labelText: 'Mô tả'),
             maxLines: 2,
           ),
           const SizedBox(height: 10),
@@ -376,7 +376,7 @@ class _ManagerMenuManagementScreenState extends State<ManagerMenuManagementScree
                 child: TextField(
                   controller: _priceCtrl,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Gia *'),
+                  decoration: const InputDecoration(labelText: 'Giá *'),
                 ),
               ),
               const SizedBox(width: 12),
@@ -384,7 +384,7 @@ class _ManagerMenuManagementScreenState extends State<ManagerMenuManagementScree
                 child: TextField(
                   controller: _qtyCtrl,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'So luong *'),
+                  decoration: const InputDecoration(labelText: 'Số lượng *'),
                 ),
               ),
             ],
@@ -406,12 +406,12 @@ class _ManagerMenuManagementScreenState extends State<ManagerMenuManagementScree
           const SizedBox(height: 10),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('Dang ban'),
+            title: const Text('Đang bán'),
             value: _isAvailable,
             onChanged: (v) => setState(() => _isAvailable = v),
           ),
           const SizedBox(height: 12),
-          const Text('Tuy chon cho mon', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          const Text('Tùy chọn cho món', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           ..._groups.asMap().entries.map((entry) {
             final idx = entry.key;
@@ -429,7 +429,7 @@ class _ManagerMenuManagementScreenState extends State<ManagerMenuManagementScree
                         Expanded(
                           child: TextFormField(
                             initialValue: g.title,
-                            decoration: const InputDecoration(labelText: 'Tieu de'),
+                            decoration: const InputDecoration(labelText: 'Tiêu đề'),
                             onChanged: (v) => g.title = v,
                           ),
                         ),
@@ -454,7 +454,7 @@ class _ManagerMenuManagementScreenState extends State<ManagerMenuManagementScree
                         Expanded(
                           child: SwitchListTile(
                             contentPadding: EdgeInsets.zero,
-                            title: const Text('Bat buoc'),
+                            title: const Text('Bắt buộc'),
                             value: g.isRequired,
                             onChanged: (v) => setState(() => g.isRequired = v),
                           ),
@@ -463,12 +463,12 @@ class _ManagerMenuManagementScreenState extends State<ManagerMenuManagementScree
                     ),
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
-                      title: const Text('Chon nhieu (extras)'),
+                      title: const Text('Chọn nhiều (extras)'),
                       value: g.isMultiple,
                       onChanged: (v) => setState(() => g.isMultiple = v),
                     ),
                     const SizedBox(height: 6),
-                    const Text('Lua chon'),
+                    const Text('Lựa chọn'),
                     const SizedBox(height: 6),
                     ...g.options.asMap().entries.map((optEntry) {
                       final j = optEntry.key;
@@ -481,7 +481,7 @@ class _ManagerMenuManagementScreenState extends State<ManagerMenuManagementScree
                             Expanded(
                               child: TextFormField(
                                 initialValue: o.name,
-                                decoration: const InputDecoration(labelText: 'Ten'),
+                                decoration: const InputDecoration(labelText: 'Tên'),
                                 onChanged: (v) => o.name = v,
                               ),
                             ),
@@ -492,7 +492,7 @@ class _ManagerMenuManagementScreenState extends State<ManagerMenuManagementScree
                                 child: TextFormField(
                                   initialValue: o.priceDelta.toStringAsFixed(0),
                                   keyboardType: TextInputType.number,
-                                  decoration: const InputDecoration(labelText: 'Gia +'),
+                                  decoration: const InputDecoration(labelText: 'Giá +'),
                                   onChanged: (v) => o.priceDelta = double.tryParse(v) ?? 0,
                                 ),
                               ),
@@ -515,7 +515,7 @@ class _ManagerMenuManagementScreenState extends State<ManagerMenuManagementScree
                           });
                         },
                         icon: const Icon(Icons.add),
-                        label: const Text('Them lua chon'),
+                        label: const Text('Thêm lựa chọn'),
                       ),
                     ),
                   ],
@@ -541,7 +541,7 @@ class _ManagerMenuManagementScreenState extends State<ManagerMenuManagementScree
                 });
               },
               icon: const Icon(Icons.add),
-              label: const Text('Them nhom tuy chon'),
+              label: const Text('Thêm nhóm tùy chọn'),
             ),
           ),
           const SizedBox(height: 12),
@@ -550,7 +550,7 @@ class _ManagerMenuManagementScreenState extends State<ManagerMenuManagementScree
               Expanded(
                 child: ElevatedButton(
                   onPressed: _loading ? null : _save,
-                  child: const Text('Luu'),
+                  child: const Text('Lưu'),
                 ),
               ),
               const SizedBox(width: 12),
@@ -558,7 +558,7 @@ class _ManagerMenuManagementScreenState extends State<ManagerMenuManagementScree
                 Expanded(
                   child: OutlinedButton(
                     onPressed: _loading ? null : _deleteSelected,
-                    child: const Text('Xoa'),
+                    child: const Text('Xóa'),
                   ),
                 ),
             ],
@@ -573,7 +573,7 @@ class _ManagerMenuManagementScreenState extends State<ManagerMenuManagementScree
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
-        title: const Text('Quan ly mon an'),
+        title: const Text('Quản lý món ăn'),
         centerTitle: true,
         actions: [
           IconButton(

@@ -42,7 +42,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
     required String checkoutUrl,
     required String qrCode,
   }) async {
-    final statusText = ValueNotifier<String>('Dang cho thanh toan...');
+    final statusText = ValueNotifier<String>('Đang chờ thanh toán...');
     bool dialogShown = false;
 
     Future<void> poll() async {
@@ -70,14 +70,14 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
         if (!mounted) return;
 
         if (status.toLowerCase() == 'paid' && processed) {
-          statusText.value = 'Trang thai: Paid';
+          statusText.value = 'Trạng thái: Paid';
           _statusTimer?.cancel();
           if (dialogShown &&
               Navigator.of(context, rootNavigator: true).canPop()) {
             Navigator.of(context, rootNavigator: true).pop(true);
           }
         } else {
-          statusText.value = 'Trang thai: $status';
+          statusText.value = 'Trạng thái: $status';
         }
       } catch (_) {}
     }
@@ -94,13 +94,13 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
       builder: (dialogContext) {
         dialogShown = true;
         return AlertDialog(
-          title: const Text('Thanh toan PayOS'),
+          title: const Text('Thanh toán PayOS'),
           content: SizedBox(
             width: 280,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('So tien: ${amount.toString()} d'),
+                Text('Số tiền: ${amount.toString()} d'),
                 const SizedBox(height: 12),
                 if (qrCode.isNotEmpty)
                   SizedBox.square(
@@ -108,7 +108,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
                     child: QrImageView(data: qrCode, version: QrVersions.auto),
                   )
                 else
-                  const Text('Khong co du lieu QR'),
+                  const Text('Không có dữ liệu QR'),
                 const SizedBox(height: 12),
                 ValueListenableBuilder<String>(
                   valueListenable: statusText,
@@ -128,7 +128,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
                         _statusTimer?.cancel();
                         Navigator.pop(dialogContext, false);
                       },
-                      child: const Text('Dong'),
+                      child: const Text('Đóng'),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -137,7 +137,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
                       onPressed: () => _openCheckoutUrl(checkoutUrl),
                       child: const FittedBox(
                         fit: BoxFit.scaleDown,
-                        child: Text('Mo trang thanh toan'),
+                        child: Text('Mở trang thanh toán'),
                       ),
                     ),
                   ),
@@ -156,7 +156,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Nap tien thanh cong')));
+      ).showSnackBar(const SnackBar(content: Text('Nạp tiền thành công')));
       Navigator.pop(context, true);
     }
   }
@@ -169,7 +169,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
         0;
     if (amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui long nhap so tien hop le')),
+        const SnackBar(content: Text('Vui lòng nhập số tiền hợp lệ')),
       );
       return;
     }
@@ -181,7 +181,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
       if (token == null) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Vui long dang nhap truoc')),
+          const SnackBar(content: Text('Vui lòng đăng nhập trước khi nạp tiền')),
         );
         return;
       }
@@ -227,7 +227,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Nap tien that bai: $message')));
+        ).showSnackBar(SnackBar(content: Text('Nạp tiền thất bại: $message')));
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
@@ -245,7 +245,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
         backgroundColor: scaffoldBg,
         elevation: 0,
         title: const Text(
-          'Nap tien',
+          'Nạp tiền vào ví',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         iconTheme: const IconThemeData(color: Colors.black),
@@ -257,7 +257,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'So tien',
+              'Số tiền cần nạp',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 10),
@@ -265,7 +265,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
               controller: _amountController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                hintText: 'Vi du: 50000',
+                hintText: 'Ví dụ: 50000',
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
@@ -323,7 +323,7 @@ class _WalletTopUpScreenState extends State<WalletTopUpScreen> {
                         ),
                       )
                     : const Text(
-                        'Nap tien ngay',
+                        'Nạp tiền ngay',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,

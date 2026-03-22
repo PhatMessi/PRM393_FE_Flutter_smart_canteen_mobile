@@ -57,7 +57,7 @@ class AdminProfileScreen extends StatelessWidget {
                   );
                 },
                 icon: const Icon(Icons.logout),
-                label: const Text('Dang xuat'),
+                label: const Text('Đăng xuất'),
               ),
             ),
           ],

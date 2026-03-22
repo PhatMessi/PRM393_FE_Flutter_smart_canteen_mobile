@@ -19,8 +19,8 @@ class OrderHistoryScreen extends StatefulWidget {
 }
 
 class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
-  String _selectedTab = "Tat ca"; // Tab mặc định
-  final List<String> _tabs = ["Tat ca", "Cho xu ly", "San sang", "Lich su"];
+  String _selectedTab = "Tất cả"; // Tab mặc định
+  final List<String> _tabs = ["Tất cả", "Chờ xử lý", "Sẵn sàng", "Lịch sử"];
 
   @override
   void initState() {
@@ -40,7 +40,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: const Text(
-          "Lich su don hang",
+          "Lịch sử đơn hàng",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
         backgroundColor: const Color(0xFFF9FAFB),
@@ -121,7 +121,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     ),
                   )
                 : displayedOrders.isEmpty
-                ? const Center(child: Text("Khong co don hang nao"))
+                ? const Center(child: Text("Không có đơn hàng nào"))
                 : ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     itemCount: displayedOrders.length,
@@ -165,29 +165,29 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     switch (order.status) {
       case "Ready for Pickup":
         statusColor = const Color(0xFF2ED162); // Xanh lá
-        statusText = "SAN SANG NHAN MON";
+        statusText = "SẴN SÀNG NHẬN MÓN";
         break;
       case "Preparing":
         statusColor = Colors.orange; // Vàng
-        statusText = "DANG CHUAN BI";
+        statusText = "ĐANG CHUẨN BỊ";
         break;
       case "Paid":
         statusColor = Colors.orange;
-        statusText = "DA THANH TOAN";
+        statusText = "ĐÃ THANH TOÁN";
         break;
       case "Pending Payment":
         statusColor = Colors.orange;
-        statusText = "CHO THANH TOAN";
+        statusText = "CHO THANH TOÁN";
         break;
       case "Cancelled":
         statusColor = Colors.red;
         statusIcon = Icons.error;
-        statusText = "DA HUY";
+        statusText = "ĐÃ HỦY";
         break;
       case "Completed":
         statusColor = Colors.grey;
         statusIcon = Icons.check_circle;
-        statusText = "HOAN TAT";
+        statusText = "HOÀN TẤT";
         break;
       default:
         statusColor = Colors.blue;
@@ -259,7 +259,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                "Ly do: ${order.rejectionReason}",
+                "Lý do: ${order.rejectionReason}",
                 style: TextStyle(color: Colors.red.shade700, fontSize: 13),
               ),
             ),
@@ -292,9 +292,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     Text(
                       firstItem != null
                           ? (otherItemsCount > 0
-                                ? "${firstItem.menuItemName} + $otherItemsCount mon khac"
+                                ? "${firstItem.menuItemName} + $otherItemsCount món khác"
                                 : firstItem.menuItemName)
-                          : "Khong ro mon",
+                          : "Không rõ món",
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -302,7 +302,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      firstItem?.note ?? "Mac dinh",
+                      firstItem?.note ?? "Mặc định",
                       style: const TextStyle(color: Colors.grey, fontSize: 13),
                     ),
                     const SizedBox(height: 8),
@@ -335,7 +335,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     icon: const Icon(Icons.location_on, size: 18),
                     label: const FittedBox(
                       fit: BoxFit.scaleDown,
-                      child: Text("Theo doi don", maxLines: 1),
+                      child: Text("Theo dõi đơn", maxLines: 1),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF2ED162),
@@ -364,7 +364,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     ),
                     child: const FittedBox(
                       fit: BoxFit.scaleDown,
-                      child: Text("Xem chi tiet", maxLines: 1),
+                      child: Text("Xem chi tiết", maxLines: 1),
                     ),
                   ),
                 ),
@@ -384,7 +384,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
-                child: const Text("Xem chi tiet"),
+                child: const Text("Xem chi tiết"),
               ),
             )
           else if (order.status == "Completed")
@@ -401,7 +401,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                         borderRadius: BorderRadius.circular(25),
                       ),
                     ),
-                    child: const Text("Danh gia"),
+                    child: const Text("Đánh giá"),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -409,7 +409,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   child: ElevatedButton.icon(
                     onPressed: () {},
                     icon: const Icon(Icons.refresh, size: 18),
-                    label: const Text("Dat lai"),
+                    label: const Text("Đặt lại"),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFD4F8E2), // Màu xanh nhạt
                       foregroundColor: const Color(0xFF2ED162),

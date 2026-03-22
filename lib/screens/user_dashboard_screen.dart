@@ -14,6 +14,7 @@ import '../services/wallet_service.dart';
 import '../utils/money.dart';
 import '../utils/vn_time.dart';
 import 'promotions_screen.dart';
+import 'parent_child_management_screen.dart';
 
 class UserDashboardScreen extends StatefulWidget {
   const UserDashboardScreen({super.key});
@@ -57,12 +58,12 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                 ),
                 const SizedBox(height: 14),
                 const Text(
-                  'Chuyen tien nhanh',
+                  'Chuyển tiền nhanh',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
                 const Text(
-                  'Chon tac vu phu hop de thao tac nhanh hon',
+                  'Chọn tác vụ phù hợp để thao tác nhanh hơn',
                   style: TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 12),
@@ -75,8 +76,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                       color: Color(0xFF2ED162),
                     ),
                   ),
-                  title: const Text('Nap tien vao vi'),
-                  subtitle: const Text('Bo sung so du de thanh toan don hang'),
+                  title: const Text('ạp tiền vào ví'),
+                  subtitle: const Text('Bổ sung số dư để thanh toán đơn hàng'),
                   onTap: () => Navigator.pop(ctx, 'topup'),
                 ),
                 ListTile(
@@ -85,8 +86,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     backgroundColor: Colors.blue.shade50,
                     child: const Icon(Icons.history, color: Colors.blue),
                   ),
-                  title: const Text('Xem lich su giao dich'),
-                  subtitle: const Text('Theo doi nap tien va thanh toan'),
+                  title: const Text('Xem lịch sử giao dịch'),
+                  subtitle: const Text('Theo dõi nạp tiền và thanh toán'),
                   onTap: () => Navigator.pop(ctx, 'history'),
                 ),
                 ListTile(
@@ -98,8 +99,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                       color: Colors.purple,
                     ),
                   ),
-                  title: const Text('Nhan tin ho tro'),
-                  subtitle: const Text('Can tro giup khi can giao dich'),
+                  title: const Text('Nhận tin hỗ trợ'),
+                  subtitle: const Text('Cần trợ giúp khi cần giao dịch'),
                   onTap: () => Navigator.pop(ctx, 'chat'),
                 ),
               ],
@@ -156,9 +157,9 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
     final weekAgo = DateTime.now().subtract(const Duration(days: 7));
     double delta = 0;
     for (final t in history.where((t) => t.date.isAfter(weekAgo))) {
-      if (t.type == 'TopUp' || t.type == 'Refund' || t.type == 'Nap tien') {
+      if (t.type == 'TopUp' || t.type == 'Refund' || t.type == 'Nạp tiền') {
         delta += t.amount;
-      } else if (t.type == 'Payment' || t.type == 'Thanh toan') {
+      } else if (t.type == 'Payment' || t.type == 'Thanh toán') {
         delta -= t.amount;
       }
     }
@@ -176,6 +177,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   Widget build(BuildContext context) {
     // Lấy thông tin user từ Provider (nếu có)
     final user = Provider.of<AuthProvider>(context).user;
+    final roleKey = (user?.role ?? '').toLowerCase().replaceAll(' ', '');
+    final isParent = roleKey == 'parent';
 
     // Màu sắc chủ đạo (Giống Home)
     const Color brandGreen = Color(0xFF2ED162);
@@ -207,11 +210,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            "Chao buoi sang,",
+                            "Chào buổi sáng,",
                             style: TextStyle(color: Colors.grey, fontSize: 13),
                           ),
                           Text(
-                            user?.fullName ?? "Ban!",
+                            user?.fullName ?? "Bạn!",
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 20,
@@ -291,7 +294,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                 child: Column(
                   children: [
                     const Text(
-                      "SO DU HIEN TAI",
+                      "SỐ DƯ HIỆN TẠI",
                       style: TextStyle(
                         color: Colors.white54,
                         fontSize: 12,
@@ -331,7 +334,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                           ),
                           const SizedBox(width: 5),
                           Text(
-                            "${_weekDelta >= 0 ? '+' : '-'}${Money.vnd(_weekDelta.abs())} trong tuan nay",
+                            "${_weekDelta >= 0 ? '+' : '-'}${Money.vnd(_weekDelta.abs())} trong tuần này",
                             style: TextStyle(
                               color: _weekDelta >= 0
                                   ? brandGreen
@@ -374,7 +377,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                       label: const FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(
-                          "Nap tien",
+                          "Nạp tiền",
                           maxLines: 1,
                           style: TextStyle(
                             color: Colors.black,
@@ -399,7 +402,9 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Ma QR cua toi: sap co'),
+                            content: Text(
+                              'Mã QR của tôi: sắp có trong bản cập nhật tiếp theo!',
+                            ),
                           ),
                         );
                       },
@@ -407,7 +412,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                       label: const FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(
-                          "Ma QR cua toi",
+                          "Mã QR của tôi",
                           maxLines: 1,
                           style: TextStyle(
                             color: Colors.black,
@@ -452,7 +457,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     child: const Icon(Icons.swap_horiz, color: Colors.blue),
                   ),
                   title: const Text(
-                    "Chuyen tien",
+                    "Chuyển tiền",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   // subtitle: const Text(
@@ -473,6 +478,59 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                   ),
                 ),
               ),
+              const SizedBox(height: 12),
+
+              if (isParent)
+                Container(
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(40),
+                    border: Border.all(color: Colors.grey.shade100),
+                  ),
+                  child: ListTile(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ParentChildManagementScreen(),
+                        ),
+                      );
+                    },
+                    leading: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.green.shade50,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.family_restroom,
+                        color: Color(0xFF2ED162),
+                      ),
+                    ),
+                    title: const Text(
+                      'Quản lí con',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: const Text(
+                      'Ví giám hộ, hạn mức ngày, khóa món',
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                    trailing: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.arrow_forward,
+                        size: 16,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+
               const SizedBox(height: 25),
 
               // 4.0 FAVORITES ITEM
@@ -496,7 +554,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     child: const Icon(Icons.favorite, color: Colors.red),
                   ),
                   title: const Text(
-                    'Yeu thich',
+                    'Yêu thích',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   trailing: Container(
@@ -591,11 +649,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     ),
                   ),
                   title: const Text(
-                    "Nhan tin",
+                    "Nhắn tin",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: const Text(
-                    "Tro chuyen voi ho tro",
+                    "Trò chuyện với hỗ trợ",
                     style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                   trailing: Container(
@@ -619,7 +677,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    "Giao dich gan day",
+                    "Giao dịch gần đây",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                   ),
                   TextButton(
@@ -632,7 +690,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                       );
                     },
                     child: const Text(
-                      "Xem tat ca",
+                      "Xem tất cả",
                       style: TextStyle(color: brandGreen),
                     ),
                   ),
@@ -652,7 +710,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                   padding: EdgeInsets.symmetric(vertical: 18),
                   child: Center(
                     child: Text(
-                      'Chua co giao dich nao',
+                      'Chưa có giao dịch nào',
                       style: TextStyle(color: Colors.grey),
                     ),
                   ),
@@ -688,11 +746,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
 
   Widget _buildTransactionRow(TransactionModel t, Color brandGreen) {
     final isNegative =
-        t.type == 'Payment' || t.type == 'Withdrawal' || t.type == 'Thanh toan';
-    final iconColor = t.type == 'TopUp' || t.type == 'Nap tien'
+        t.type == 'Payment' || t.type == 'Withdrawal' || t.type == 'Thanh toán';
+    final iconColor = t.type == 'TopUp' || t.type == 'Nạp tiền'
         ? brandGreen
         : (t.type == 'Refund' ? Colors.purple : Colors.orange);
-    final icon = t.type == 'TopUp' || t.type == 'Nap tien'
+    final icon = t.type == 'TopUp' || t.type == 'Nạp tiền'
         ? Icons.account_balance_wallet
         : (t.type == 'Refund' ? Icons.undo : Icons.fastfood);
 

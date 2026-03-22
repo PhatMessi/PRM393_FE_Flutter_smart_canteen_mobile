@@ -61,7 +61,7 @@ class AuthService {
             : false;
 
         if (token == null || token.isEmpty) {
-          return {'success': false, 'message': 'Phan hoi dang nhap thieu token'};
+          return {'success': false, 'message': 'Phản hồi đăng nhập thiếu token'};
         }
 
         final prefs = await SharedPreferences.getInstance();
@@ -77,7 +77,7 @@ class AuthService {
         final profile = await getProfile(token);
         final user =
             profile ??
-            User(fullName: 'Nguoi dung', email: email, role: 'Student', token: token);
+            User(fullName: 'Người dùng', email: email, role: 'Student', token: token);
 
         return {'success': true, 'user': user};
       } else {
@@ -150,7 +150,7 @@ class AuthService {
         if (token == null || token.isEmpty) {
           return {
             'success': false,
-            'message': 'Phan hoi dang nhap Google thieu token',
+            'message': 'Phản hồi đăng nhập Google thiếu token',
           };
         }
 
@@ -167,7 +167,7 @@ class AuthService {
         final profile = await getProfile(token);
         final user = profile ??
             User(
-              fullName: account.displayName ?? 'Nguoi dung',
+              fullName: account.displayName ?? 'Người dùng',
               email: account.email,
               role: 'Student',
               token: token,
@@ -214,7 +214,7 @@ class AuthService {
       if (response.statusCode == 200) {
         return {
           'success': true,
-          'message': _readMessage(decoded) ?? 'Da gui OTP',
+          'message': _readMessage(decoded) ?? 'Đã gửi OTP',
         };
       }
 
@@ -223,7 +223,7 @@ class AuthService {
         'message': _readMessage(decoded) ?? response.body,
       };
     } catch (e) {
-      return {'success': false, 'message': 'Loi ket noi: $e'};
+      return {'success': false, 'message': 'Lỗi kết nối: $e'};
     }
   }
 
@@ -251,7 +251,7 @@ class AuthService {
       if (response.statusCode == 200) {
         return {
           'success': true,
-          'message': _readMessage(decoded) ?? 'Dang ky thanh cong',
+          'message': _readMessage(decoded) ?? 'Đăng ký thành công',
         };
       }
 
@@ -260,7 +260,7 @@ class AuthService {
         'message': _readMessage(decoded) ?? response.body,
       };
     } catch (e) {
-      return {'success': false, 'message': 'Loi ket noi: $e'};
+      return {'success': false, 'message': 'Lỗi kết nối: $e'};
     }
   }
 
@@ -280,24 +280,24 @@ class AuthService {
         try {
           final body = jsonDecode(response.body);
           if (body is Map<String, dynamic>) {
-            final msg = (body['message'] ?? body['Message'] ?? 'Da gui email').toString();
+            final msg = (body['message'] ?? body['Message'] ?? 'Đã gửi email').toString();
             return {'success': true, 'message': msg};
           }
         } catch (_) {}
-        return {'success': true, 'message': 'Da gui email'};
+        return {'success': true, 'message': 'Đã gửi email'};
       } else {
         try {
           final body = jsonDecode(response.body);
           return {
             'success': false,
-            'message': (body['message'] ?? body['Message'] ?? 'That bai').toString(),
+            'message': (body['message'] ?? body['Message'] ?? 'Thất bại').toString(),
           };
         } catch (_) {
           return {'success': false, 'message': response.body};
         }
       }
     } catch (e) {
-      return {'success': false, 'message': 'Loi ket noi: $e'};
+      return {'success': false, 'message': 'Lỗi kết nối: $e'};
     }
   }
 
@@ -332,14 +332,14 @@ class AuthService {
         'message': _readMessage(decoded) ?? response.body,
       };
     } catch (e) {
-      return {'success': false, 'message': 'Loi ket noi: $e'};
+      return {'success': false, 'message': 'Lỗi kết nối: $e'};
     }
   }
 
   Future<Map<String, dynamic>> requestChangePasswordOtp() async {
     final token = await getToken();
     if (token == null || token.isEmpty) {
-      return {'success': false, 'message': 'Chua dang nhap'};
+      return {'success': false, 'message': 'Chưa đăng nhập'};
     }
 
     final url = Uri.parse(ApiConfig.baseUrl + ApiConfig.changePasswordRequestOtp);
@@ -357,7 +357,7 @@ class AuthService {
       if (response.statusCode == 200) {
         return {
           'success': true,
-          'message': _readMessage(decoded) ?? 'Da gui OTP',
+          'message': _readMessage(decoded) ?? 'Đã gửi OTP',
         };
       }
 
@@ -366,7 +366,7 @@ class AuthService {
         'message': _readMessage(decoded) ?? response.body,
       };
     } catch (e) {
-      return {'success': false, 'message': 'Loi ket noi: $e'};
+      return {'success': false, 'message': 'Lỗi kết nối: $e'};
     }
   }
 
@@ -377,7 +377,7 @@ class AuthService {
   }) async {
     final token = await getToken();
     if (token == null || token.isEmpty) {
-      return {'success': false, 'message': 'Chua dang nhap'};
+      return {'success': false, 'message': 'Chưa đăng nhập'};
     }
 
     final url = Uri.parse(ApiConfig.baseUrl + ApiConfig.changePassword);
@@ -400,7 +400,7 @@ class AuthService {
       if (response.statusCode == 200) {
         return {
           'success': true,
-          'message': _readMessage(decoded) ?? 'Doi mat khau thanh cong',
+          'message': _readMessage(decoded) ?? 'Đổi mật khẩu thành công',
         };
       }
 
@@ -409,7 +409,7 @@ class AuthService {
         'message': _readMessage(decoded) ?? response.body,
       };
     } catch (e) {
-      return {'success': false, 'message': 'Loi ket noi: $e'};
+      return {'success': false, 'message': 'Lỗi kết nối: $e'};
     }
   }
 

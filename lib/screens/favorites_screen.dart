@@ -20,7 +20,7 @@ class FavoritesScreen extends StatelessWidget {
         backgroundColor: const Color(0xFFF8F9FA),
         elevation: 0,
         title: const Text(
-          'Yeu thich',
+          'Yêu thích',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
@@ -34,7 +34,7 @@ class FavoritesScreen extends StatelessWidget {
 
           final items = favorites.items;
           if (items.isEmpty) {
-            return const Center(child: Text('Chua co mon nao duoc yeu thich.'));
+            return const Center(child: Text('Chưa có món nào được yêu thích.'));
           }
 
           return ListView.builder(

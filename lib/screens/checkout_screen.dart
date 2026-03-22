@@ -134,7 +134,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   String _extractErrorMessage(String body) {
-    if (body.trim().isEmpty) return 'Loi khong xac dinh';
+    if (body.trim().isEmpty) return 'Lỗi không xác định';
     try {
       final data = jsonDecode(body);
       if (data is Map<String, dynamic>) {
@@ -198,7 +198,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     if (result.canApply) {
       cart.setPromotion(code: code, discount: result.discountAmount.toDouble());
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result.message.isNotEmpty ? result.message : 'Da ap dung voucher.')),
+        SnackBar(content: Text(result.message.isNotEmpty ? result.message : 'Đã áp dụng voucher.')),
       );
       return;
     }
@@ -240,7 +240,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         if (result2.canApply) {
           cart.setPromotion(code: code, discount: result2.discountAmount.toDouble());
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(result2.message.isNotEmpty ? result2.message : 'Da ap dung voucher.')),
+            SnackBar(content: Text(result2.message.isNotEmpty ? result2.message : 'Đã áp dụng voucher.')),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result2.message)));
@@ -295,9 +295,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     if (_walletBalance < cart.finalTotal) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text("So du khong du! Vui long nap them vao vi."),
+          content: const Text("Số dư không đủ! Vui lòng nạp thêm vào ví."),
           action: SnackBarAction(
-            label: 'Nap tien',
+            label: 'Nạp tiền',
             onPressed: () async {
               final didTopUp = await Navigator.push<bool>(
                 context,
@@ -320,7 +320,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       if (token == null) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text("Vui long dang nhap truoc!")));
+        ).showSnackBar(const SnackBar(content: Text("Vui lòng đăng nhập trước!")));
         return;
       }
 
@@ -359,13 +359,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         await _confirmPayment(orderId);
       } else {
         throw Exception(
-          "Dat don that bai: ${_extractErrorMessage(response.body)}",
+          "Đặt đơn thất bại: ${_extractErrorMessage(response.body)}",
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Loi: $e")));
+      ).showSnackBar(SnackBar(content: Text("Lỗi: $e")));
     }
   }
 
@@ -391,7 +391,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         builder: (ctx) => AlertDialog(
           title: const Text("Success!"),
           content: const Text(
-            "Don hang da duoc dat va thanh toan thanh cong.",
+            "Đơn hàng đã được đặt và thanh toán thành công.",
           ),
           actions: [
             TextButton(
@@ -399,7 +399,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 Navigator.of(ctx).pop();
                 Navigator.of(context).popUntil((route) => route.isFirst);
               },
-              child: const Text("Dong"),
+              child: const Text("Đóng"),
             ),
           ],
         ),
@@ -408,7 +408,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       final msg = _extractErrorMessage(response.body);
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Thanh toan that bai: $msg")));
+      ).showSnackBar(SnackBar(content: Text("Thanh toán thất bại: $msg")));
     }
   }
 
@@ -422,7 +422,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: const Text(
-          "Thanh toan",
+          "Thanh toán",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
         centerTitle: true,
@@ -468,7 +468,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ),
                             const SizedBox(width: 10),
                             const Text(
-                              "So du vi",
+                              "Số dư ví",
                               style: TextStyle(color: Colors.grey),
                             ),
                           ],
@@ -493,7 +493,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             Text(
                               isSufficient
                                   ? "DU SO DU"
-                                    : "KHONG DU SO DU",
+                                    : "KHÔNG ĐỦ SỐ DƯ",
                               style: TextStyle(
                                 color: isSufficient ? brandGreen : Colors.red,
                                 fontWeight: FontWeight.bold,
@@ -508,7 +508,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
                   const SizedBox(height: 25),
                   const Text(
-                    "Don hang cua ban",
+                    "Đơn hàng của bạn",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 15),
@@ -545,7 +545,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text(
-                            item.orderItemNote ?? "Mac dinh",
+                            item.orderItemNote ?? "Mặc định",
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -563,7 +563,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   Row(
                     children: [
                       const Text(
-                        "Gio nhan mon",
+                        "Giờ nhận món",
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -571,7 +571,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ),
                       const SizedBox(width: 5),
                       const Text(
-                        "*Bat buoc",
+                        "Bắt buộc",
                         style: TextStyle(color: Colors.red, fontSize: 12),
                       ),
                     ],
@@ -651,13 +651,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         if (cart.promotionCode != null)
                           Row(
                             children: [
-                              Expanded(child: Text('Dang ap dung: ${cart.promotionCode}')),
+                              Expanded(child: Text('Đang áp dụng: ${cart.promotionCode}')),
                               TextButton(
                                 onPressed: () {
                                   cart.clearPromotion();
                                   _voucherController.clear();
                                 },
-                                child: const Text('Bo'),
+                                child: const Text('Bỏ voucher'),
                               ),
                             ],
                           )
@@ -668,7 +668,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 child: TextField(
                                   controller: _voucherController,
                                   decoration: const InputDecoration(
-                                    hintText: 'Nhap ma voucher',
+                                    hintText: 'Nhập mã voucher',
                                     border: OutlineInputBorder(),
                                     isDense: true,
                                   ),
@@ -690,7 +690,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                         height: 18,
                                         child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                                       )
-                                    : const Text('Ap dung', style: TextStyle(color: Colors.white)),
+                                    : const Text('Áp dụng', style: TextStyle(color: Colors.white)),
                               ),
                             ],
                           ),
@@ -700,19 +700,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
                   const SizedBox(height: 20),
                   // 4. SUMMARY
-                  _buildSummaryRow("Tam tinh", Money.vnd(cart.subtotal)),
+                  _buildSummaryRow("Tạm tính", Money.vnd(cart.subtotal)),
                   const SizedBox(height: 10),
-                  _buildSummaryRow("Thue (10%)", Money.vnd(cart.tax)),
+                  _buildSummaryRow("Thuế (10%)", Money.vnd(cart.tax)),
                   if (cart.promotionDiscount > 0) ...[
                     const SizedBox(height: 10),
-                    _buildSummaryRow("Giam gia", '-${Money.vnd(cart.promotionDiscount)}'),
+                    _buildSummaryRow("Giảm giá", '-${Money.vnd(cart.promotionDiscount)}'),
                   ],
                   const Divider(height: 30),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        "Tong cong",
+                        "Tổng cộng",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -750,7 +750,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           const Icon(Icons.arrow_forward, color: Colors.white),
                           const SizedBox(width: 10),
                           Text(
-                            "Thanh toan ${Money.vnd(cart.finalTotal)}",
+                            "Thanh toán ${Money.vnd(cart.finalTotal)}",
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
